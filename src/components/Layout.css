@@ -1,0 +1,169 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.main-wrapper {
+  flex: 1;
+  margin-left: 280px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+}
+
+.main-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo {
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 8px;
+}
+
+.app-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+/* Hamburger Button */
+.hamburger-btn {
+  display: none;
+  /* Hidden on desktop */
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #374151;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+}
+
+.hamburger-btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  /* Below sidebar (100) but above everything else */
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@media (max-width: 1024px) {
+  .main-wrapper {
+    margin-left: 0;
+  }
+
+  /* Sidebar is handled in Sidebar.css, but layout needs to know */
+
+  .hamburger-btn {
+    display: block;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .app-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+  }
+
+  .logo-container {
+    gap: 0.5rem;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    font-size: 1.5rem;
+  }
+
+  .app-title {
+    font-size: 0.875rem;
+    line-height: 1.2;
+    /* Hide long title on very small screens if needed, or truncate */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .main-content {
+    padding: 1rem;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 0.8rem;
+  }
+
+  .header-right {
+    gap: 0.5rem;
+  }
+
+  .main-header {
+    padding: 0.5rem 1rem;
+  }
+}

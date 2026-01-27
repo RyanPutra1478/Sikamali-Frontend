@@ -1,0 +1,283 @@
+/* =========================================
+   GLOBAL STYLES
+   ========================================= */
+.complaints-page {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* HEADER */
+.complaints-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.complaints-header h2 {
+  font-size: 2rem;
+  color: #111827;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.section-label {
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* =========================================
+   LAYOUT (2 KOLOM: Form Kiri, List Kanan)
+   ========================================= */
+.complaint-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr; /* List sedikit lebih lebar */
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* =========================================
+   FORM SECTION (PANEL KIRI)
+   ========================================= */
+.complaint-form-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Garis Aksen Oranye/Merah */
+.form-header-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+.complaint-form-section h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* INPUT STYLES */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.complaint-form input,
+.complaint-form textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #f9fafb;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #1f2937;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.complaint-form input:focus,
+.complaint-form textarea:focus {
+  background: #fff;
+  border-color: #f59e0b; /* Fokus warna Oranye */
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+}
+
+.complaint-form textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* BUTTON STYLE (Gradient Merah/Oranye) */
+.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4);
+}
+
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================
+   LIST SECTION (PANEL KANAN)
+   ========================================= */
+.complaints-list-section h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.complaints-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* CARD DESIGN */
+.complaint-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  position: relative;
+  border-left: 5px solid transparent; /* Untuk indikator status */
+}
+
+.complaint-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Border warna sesuai status */
+.complaint-card.status-border-open { border-left-color: #ef4444; } /* Merah */
+.complaint-card.status-border-in_progress { border-left-color: #3b82f6; } /* Biru */
+.complaint-card.status-border-closed { border-left-color: #10b981; } /* Hijau */
+
+.complaint-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.complaint-card h4 {
+  margin: 0 0 0.75rem 0;
+  color: #111827;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.complaint-message {
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+}
+
+.complaint-date {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* STATUS BADGES */
+.status-badge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-open {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-in_progress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-closed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* MESSAGES & EMPTY STATES */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #d1d5db;
+  color: #9ca3af;
+}
+
+.message {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+.message.success { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; }
+.message.error { background: #fef2f2; color: #991b1b; border: 1px solid #ef4444; }
+
+.loading-text { color: #6b7280; text-align: center; margin-top: 2rem; }
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .complaint-layout {
+    grid-template-columns: 1fr; /* Tumpuk ke bawah di layar kecil */
+    gap: 2rem;
+  }
+}

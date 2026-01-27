@@ -1,0 +1,624 @@
+/* =========================================
+   GLOBAL PAGE STYLES
+   ========================================= */
+.documents-page {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Header Halaman */
+.documents-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.documents-header h2 {
+  font-size: 2rem;
+  color: #111827;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.documents-header .section-label {
+  color: #6b7280;
+  background: transparent;
+  padding: 0;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* =========================================
+   FORM INPUT SECTION (PANEL INPUT)
+   ========================================= */
+.upload-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aksen Garis Warna di Atas Form */
+.upload-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+}
+
+.upload-section h3 {
+  font-size: 1.25rem;
+  color: #1f2937;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- STYLING INPUT & SELECT --- */
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Tanda Wajib Diisi (Required Mark) */
+.required-mark {
+  color: #ef4444; /* Merah */
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.select-type {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #f9fafb; /* Abu-abu sangat muda */
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1f2937;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Efek Fokus Input */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.select-type:focus {
+  background: #fff;
+  border-color: #3b82f6; /* Biru saat aktif */
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Dropdown Pemilihan Tipe Dokumen */
+.select-type {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  background: #eff6ff;
+  color: #1e40af;
+  cursor: pointer;
+  border: 1px solid #dbeafe;
+}
+
+/* --- TOMBOL UTAMA (Primary Button) --- */
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- KHUSUS FORM KK (Anggota Keluarga) --- */
+.kk-form {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.anggota-section {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px dashed #cbd5e1;
+  margin-top: 2rem;
+}
+
+.anggota-header h4 {
+  color: #334155;
+}
+
+.btn-add {
+  background: #10b981;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-add:hover {
+  background: #059669;
+}
+
+.anggota-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.anggota-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 0.5rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+/* --- ANIMASI --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Grid Helper untuk Form */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   DESAIN KARTU PREMIUM (CARD STYLES)
+   ========================================= */
+.document-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  display: flex;
+  flex-direction: column;
+}
+
+.document-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================
+   HEADER WARNA-WARNI (GRADIENT)
+   ========================================= */
+.doc-card-header {
+  padding: 1.5rem;
+  color: white;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* KK: Hijau Segar */
+.card-type-kk .doc-card-header {
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+.card-type-kk .section-label {
+  color: #d1fae5;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Styling Teks Header */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.document-card h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.doc-meta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.5rem;
+}
+
+/* Action Buttons di Header */
+.doc-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.doc-actions button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.doc-actions button:hover {
+  background: white;
+  color: #333;
+  transform: scale(1.05);
+}
+
+.doc-actions .btn-danger {
+  background: rgba(239, 68, 68, 0.3);
+}
+.doc-actions .btn-danger:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* =========================================
+   BODY KARTU (ISI DATA)
+   ========================================= */
+.doc-card-body {
+  padding: 1.5rem;
+  background: #fff;
+  flex-grow: 1;
+}
+
+/* Grid untuk Data Detail KK */
+.doc-detail-grid {
+  /* Default Mobile (1 Kolom) */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* =========================================
+   TABEL ANGGOTA KK (DIPERBAIKI)
+   ========================================= */
+.kk-members-table {
+  margin-top: 1rem;
+  border-radius: 12px;
+  /* PERBAIKAN PENTING: Ganti hidden jadi auto agar bisa scroll samping */
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.kk-members-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.kk-members-table thead {
+  background: #f3f4f6;
+}
+
+/* Header tabel dikendalikan oleh JSX inline style, tapi ini default fallback */
+.kk-members-table th {
+  padding: 12px;
+  text-align: left;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  white-space: nowrap; /* Mencegah header turun baris */
+}
+
+.kk-members-table td {
+  padding: 12px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap; /* Agar data tabel rapi sebaris */
+}
+
+.kk-members-table tr:last-child td {
+  border-bottom: none;
+}
+
+.kk-members-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.kk-members-table tbody tr:hover {
+  background: #eff6ff;
+}
+
+/* =========================================
+   RESPONSIVE (HP & TABLET)
+   ========================================= */
+@media (max-width: 640px) {
+  .doc-card-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .doc-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* PAKSA 1 KOLOM DI HP meskipun di JSX diset 2 kolom */
+  .doc-detail-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* Reset span kolom alamat di HP */
+  .doc-detail-grid > div {
+    grid-column: span 1 !important;
+  }
+}
+
+/* =========================================
+   MODAL / POP UP STYLES (EDIT & DELETE)
+   ========================================= */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9000; /* Di bawah overlay loading */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-lg {
+  max-width: 900px; /* Diperlebar agar form edit muat 2 kolom */
+}
+
+.modal h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 0;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Animasi Slide Up */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================
+   OVERLAY LOADING & SUKSES (BARU)
+   ========================================= */
+.submit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Lebih gelap */
+  z-index: 9999; /* Paling Depan */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s;
+}
+
+.submit-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  min-width: 320px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.submit-content h3 {
+  margin: 15px 0 5px 0;
+  color: #111827;
+}
+
+.submit-content p {
+  color: #6b7280;
+  margin: 0;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Spinner */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Centang Sukses */
+.checkmark-circle {
+  width: 70px;
+  height: 70px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3);
+}
+
+.checkmark {
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+}

@@ -1,0 +1,454 @@
+/* =========================================
+   GLOBAL PAGE STYLES (Konsisten)
+   ========================================= */
+.land-page {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  animation: fadeIn 0.6s ease-out;
+  color: var(--text-main);
+}
+
+/* HEADER */
+.land-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--secondary-bg);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.land-header h2 {
+  font-size: 2rem;
+  color: var(--text-main);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.section-label {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Tombol Toggle Form */
+.btn-toggle {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-add-new {
+  background: var(--primary);
+  color: var(--text-white);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+.btn-add-new:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: var(--danger);
+  color: var(--text-white);
+}
+
+.btn-cancel:hover {
+  background: var(--danger-hover);
+}
+
+
+/* =========================================
+   FORM CONTAINER (Panel Modern)
+   ========================================= */
+.land-form-container {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  animation: slideDown 0.4s ease-out;
+}
+
+/* Garis aksen hijau di atas form */
+.form-header-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary), var(--info));
+}
+
+.land-form-container h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+}
+
+/* INPUT STYLES */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--bg-body);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--text-main);
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+/* TOMBOL SUBMIT */
+.btn-submit {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 100%);
+  color: var(--text-white);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+}
+
+/* PREVIEW PETA */
+.map-preview-container {
+  margin-bottom: 1.5rem;
+}
+
+.preview-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.iframe-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--secondary-bg);
+  height: 300px;
+}
+
+.iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+/* =========================================
+   LIST & CARDS (Grid System)
+   ========================================= */
+.land-list h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+  border-left: 5px solid var(--primary);
+  padding-left: 1rem;
+}
+
+.land-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+/* CARD DESIGN */
+.land-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+}
+
+.land-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+/* Header Kartu (Hijau Alam) */
+.card-header {
+  background: linear-gradient(135deg, var(--primary-active), var(--primary));
+  padding: 1.25rem;
+  color: var(--text-white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-white);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.icon-map {
+  font-size: 1.5rem;
+}
+
+/* Body Kartu */
+.card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.coord-box {
+  background: var(--primary-bg);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px dashed var(--primary-light);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.coord-box small {
+  color: var(--primary-active);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.coord-box p {
+  margin: 0;
+  color: var(--primary-active);
+  font-family: monospace;
+  font-size: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--secondary-bg);
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.detail-row strong {
+  color: var(--text-main);
+}
+
+/* Actions (Edit/Hapus) */
+.card-actions {
+  padding: 1rem 1.5rem;
+  background: var(--bg-body);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action.edit {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.btn-action.edit:hover {
+  background: var(--info);
+  color: white;
+}
+
+.btn-action.delete {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.btn-action.delete:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Empty State & Alerts */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: var(--bg-body);
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+  color: var(--text-muted);
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.message.error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+/* Animasi */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 800px;
+  }
+}
+
+/* Responsif */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .land-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-toggle {
+    width: 100%;
+  }
+}
+
+/* =========================================
+   STYLE UNTUK AUTOCOMPLETE DROPDOWN
+   ========================================= */
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  /* Muncul tepat di bawah input */
+  left: 0;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestions-list li {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--secondary-bg);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  transition: background 0.2s;
+}
+
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+.suggestions-list li:hover {
+  background-color: var(--primary-bg);
+  color: var(--primary);
+}
+
+.suggestions-list li strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.suggestions-list li span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
