@@ -74,7 +74,7 @@
 .modern-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   min-width: 900px;
 }
 
@@ -84,7 +84,7 @@
 
 .modern-table th {
   text-align: left;
-  padding: 0.9rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   font-weight: 600;
   color: #4b5563;
   border-bottom: 1px solid #e5e7eb;
@@ -92,11 +92,11 @@
 }
 
 .modern-table td {
-  padding: 0.9rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   border-bottom: 1px solid #f3f4f6;
   vertical-align: middle;
   color: #1f2937;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 /* zebra striping */
@@ -304,25 +304,6 @@
   font-size: 1.4rem;
   color: #111827;
   font-weight: 700;
-}
-
-.btn-close {
-  background: #f3f4f6;
-  border-radius: 999px;
-  border: none;
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-close:hover {
-  background: #e5e7eb;
-  color: #111827;
 }
 
 .form-scroller {

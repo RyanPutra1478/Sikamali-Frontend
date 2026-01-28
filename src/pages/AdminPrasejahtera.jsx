@@ -97,6 +97,14 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     }
   };
 
+  const handleRefresh = () => {
+    setSearchTerm('');
+    setFilterCategory('');
+    setFilterValue('');
+    setPage(1);
+    loadData();
+  };
+
   const handleExportExcel = (exportFiltered) => {
     const sourceData = exportFiltered ? filteredData : data;
     if (sourceData.length === 0) {
@@ -254,8 +262,11 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     if (filterCategory === 'Kecamatan') return item.kecamatan === filterValue;
     if (filterCategory === 'Status') {
       const isPra = isWargaPrasejahtera(item);
+      const status = (item.status_kesejahteraan || '').toLowerCase();
+      
       if (filterValue === 'Prasejahtera') return isPra;
-      if (filterValue === 'Sejahtera') return !isPra;
+      if (filterValue === 'Sejahtera') return status === 'sejahtera';
+      if (filterValue === 'Sejahtera Mandiri') return status === 'sejahtera mandiri';
     }
 
     return true;
@@ -283,7 +294,6 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     <div className="admin-page">
       <div className="admin-header">
         <div className="header-title-section">
-          <div className="section-badge">Data Kesejahteraan</div>
           <h2><FileText size={28} /> Data Warga Prasejahtera</h2>
           <p className="header-subtitle">
             Pemantauan kondisi ekonomi, status sosial, dan klasifikasi kesejahteraan penduduk.
@@ -291,7 +301,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
         </div>
         <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <Tooltip title="Refresh Data">
-            <IconButton onClick={loadData} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+            <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
               <RefreshIcon size={20} color="#10b981" />
             </IconButton>
           </Tooltip>
@@ -414,7 +424,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                     sx={{ borderRadius: 3, bgcolor: 'white' }}
                   >
                     <MenuItem value=""><em>All</em></MenuItem>
-                    {filterCategory === 'Status' && ['Prasejahtera', 'Sejahtera'].map(opt => (
+                    {filterCategory === 'Status' && ['Prasejahtera', 'Sejahtera', 'Sejahtera Mandiri'].map(opt => (
                       <MenuItem key={opt} value={opt}>{opt}</MenuItem>
                     ))}
                     {filterCategory === 'Desa' && uniqueDesa.map(opt => (
@@ -434,19 +444,21 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               </IconButton>
             </Tooltip>
           </Box>
+
+          <div className="table-container">
           <table className="modern-table">
             <thead>
               <tr>
-                <th width="5%">No</th>
-                <th width="15%">No Kartu Keluarga</th>
-                <th width="15%">Kepala Keluarga</th>
-                <th width="15%">Nama Penerima</th>
-                <th width="15%">NIK</th>
-                <th width="10%">Ekonomi</th>
-                <th width="10%">Hunian</th>
-                <th width="10%">Kategori Sosial</th>
-                <th width="10%">Tingkat Sosial</th>
-                <th width="10%">Aksi</th>
+                <th width="4%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
+                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
+                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
+                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NAMA TERDAFTAR</th>
+                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
+                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>PENDAPATAN PERBULAN</th>
+                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>FASILITAS HUNIAN</th>
+                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>KATEGORI SOSIAL</th>
+                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>TINGKAT SOSIAL</th>
+                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
               </tr>
             </thead>
             <tbody>
@@ -468,73 +480,48 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                             : 'row-sejahtera'
                         }
                       >
-                      <td>{(page - 1) * itemsPerPage + index + 1}</td>
-                    <td>{row.nomor_kk}</td>
+                      <td style={{ fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.nomor_kk}</td>
                     <td>
-                      <div className="user-cell">
+                      <div>
+                        <span style={{ fontSize: '0.75rem' }}>
+                          {row.kepala_keluarga || '-'}
+                        </span>
                         <div
-                          className="avatar-small"
                           style={{
-                            background: '#10b981',
+                            fontSize: '0.75rem',
+                            color: '#6b7280',
+                            marginTop: '2px',
                           }}
                         >
-                          {row.kepala_keluarga
-                            ? row.kepala_keluarga.charAt(0).toUpperCase()
-                            : '?'}
-                        </div>
-                        <div>
-                          <span className="username-text">
-                            {row.kepala_keluarga || '-'}
-                          </span>
-                          <div
-                            style={{
-                              fontSize: '0.75rem',
-                              color: '#6b7280',
-                              marginTop: '2px',
-                            }}
-                          >
-                            {row.user_alamat || row.alamat_kk}
-                          </div>
+                          {row.user_alamat || row.alamat_kk}
                         </div>
                       </div>
                     </td>
                     <td>
                       {row.nama_penerima ? (
-                        <div className="user-cell">
-                          <div
-                            className="avatar-small"
-                            style={{
-                              background: '#2563eb',
-                            }}
-                          >
-                            {row.nama_penerima.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <span className="username-text">
-                              {row.nama_penerima}
-                            </span>
-                          </div>
+                        <div>
+                          <span style={{ fontSize: '0.75rem' }}>
+                            {row.nama_penerima}
+                          </span>
                         </div>
                       ) : (
                         '-'
                       )}
                     </td>
-                    <td className="nowrap-cell">
+                    <td className="nowrap-cell" style={{ fontSize: '0.75rem' }}>
                       {row.nik_penerima || row.user_nik || '-'}
                     </td>
                     <td
                       style={{
-                        fontWeight: '600',
                         color: '#4b5563',
+                        fontSize: '0.75rem',
                       }}
                     >
                       {formatRupiah(row.income_per_month)}
-                      <div style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>
-                        per bulan
-                      </div>
                     </td>
                     <td className="nowrap-cell">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
                         {row.house_condition && (
                           <span
                             className={`condition-tag ${row.house_condition === 'Tidak Layak Huni'
@@ -547,10 +534,9 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                           </span>
                         )}
                         <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: '500' }}>Fasilitas:</span>
                           {row.access_listrik_air ? (
                             <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                              ✅ Memadai
+                  ✅ Memadai
                             </span>
                           ) : (
                             <span style={{ color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
@@ -561,27 +547,52 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                       </div>
                     </td>
                     <td>
-                      <span
-                        style={{
-                          fontSize: '0.8rem',
-                          fontWeight: '600',
-                          textTransform: 'uppercase',
-                          whiteSpace: 'nowrap',
-                          color: isWargaPrasejahtera(row) ? '#2563eb' : '#10b981'
-                        }}
-                      >
-                        {row.status_kesejahteraan || (row.is_prasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA')}
-                      </span>
+                      {(() => {
+                        const status = row.status_kesejahteraan || (row.is_prasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA');
+                        const s = status.toLowerCase();
+                        let textColor = '#475569';
+                        if (s.includes('prasejahtera')) textColor = '#dc2626';
+                        else if (s === 'sejahtera mandiri') textColor = '#2563eb';
+                        else if (s.includes('sejahtera')) textColor = '#16a34a';
+                        
+                        return (
+                          <span
+                            style={{
+                              textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                              fontSize: '0.75rem',
+                              color: textColor,
+                              display: 'inline-block'
+                            }}
+                          >
+                            {status}
+                          </span>
+                        );
+                      })()}
                     </td>
-                    <td>
-                      {row.tingkat_sosial ? (
-                        <span className={`status-badge-lg ${
-                          row.tingkat_sosial === 'Rentan Ekstrem' ? 'status-danger' : 
-                          row.tingkat_sosial === 'Rentan Miskin' ? 'status-moved' : 'status-newcomer'
-                        }`} style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>
-                          {row.tingkat_sosial}
-                        </span>
-                      ) : '-'}
+                    <td style={{ fontSize: '0.75rem' }}>
+                      {(() => {
+                        const tingkat = row.tingkat_sosial || '';
+                        if (!tingkat) return '-';
+                        const t = tingkat.toLowerCase();
+                        let textColor = '#475569';
+                        if (t.includes('ekstrem')) textColor = '#dc2626';
+                        else if (t.includes('prioritas')) textColor = '#16a34a';
+                        else if (t.includes('transisi')) textColor = '#2563eb';
+                        
+                        return (
+                          <span
+                            style={{
+                              textTransform: 'uppercase',
+                              fontSize: '0.75rem',
+                              color: textColor,
+                              display: 'inline-block'
+                            }}
+                          >
+                            {tingkat}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td>
                       <div className="action-buttons">
@@ -642,30 +653,31 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               )}
             </tbody>
           </table>
-          
-          {Math.ceil(filteredData.length / itemsPerPage) > 1 && (
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
-              <Pagination
-                count={Math.ceil(filteredData.length / itemsPerPage)}
-                page={page}
-                onChange={(e, v) => setPage(v)}
-                color="primary"
-                size="large"
-                showFirstButton
-                showLastButton
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                  },
-                  '& .Mui-selected': {
-                    bgcolor: '#10b981 !important',
-                    color: 'white',
-                  }
-                }}
-              />
-            </Box>
-          )}
+        </div>
+
+        {Math.ceil(filteredData.length / itemsPerPage) > 1 && (
+          <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
+            <Pagination
+              count={Math.ceil(filteredData.length / itemsPerPage)}
+              page={page}
+              onChange={(e, v) => setPage(v)}
+              color="primary"
+              size="large"
+              showFirstButton
+              showLastButton
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                },
+                '& .Mui-selected': {
+                  bgcolor: '#10b981 !important',
+                  color: 'white',
+                }
+              }}
+            />
+          </Box>
+        )}
         </div>
       )}
 
@@ -875,7 +887,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                 >
                   <option value="">Pilih Tingkat...</option>
                   <option value="Rentan Ekstrem">Rentan Ekstrem</option>
-                  <option value="Rentan Miskin">Rentan Miskin</option>
+                  <option value="Rentan Prioritas">Rentan Prioritas</option>
                   <option value="Rentan Transisi">Rentan Transisi</option>
                 </select>
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const formatDateInput = (dateString) => dateString ? new Date(dateString).toISOString().split('T')[0] : '';
 
@@ -89,9 +90,11 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className={`modal-content ${viewMode ? 'modal-md' : 'modal-xl'}`} onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
+                <div className={`modal-header ${viewMode ? 'modal-header-green' : ''}`}>
                     <h3>{viewMode ? 'Detail Anggota Keluarga' : (isEdit ? 'Edit Anggota Keluarga' : 'Tambah Anggota Keluarga')}</h3>
-                    <button className="close-btn" onClick={onClose}>&times;</button>
+                    <button className="btn-close" onClick={onClose} title="Tutup">
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <div className="modal-body">

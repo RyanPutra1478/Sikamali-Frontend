@@ -23,7 +23,7 @@
   align-items: center;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 2000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
@@ -36,6 +36,21 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.logo-image {
+  border-radius: 50%;
+  background: #ffffff;
+  padding: 4px;
+  border: 2px solid #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
 }
 
 .logo {
@@ -51,8 +66,8 @@
 
 .app-title {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: bold;
+  color: #064e3b;
   margin: 0;
 }
 
@@ -94,7 +109,7 @@
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 90;
+  z-index: 2100;
   /* Below sidebar (100) but above everything else */
   backdrop-filter: blur(2px);
   animation: fadeIn 0.2s ease-out;

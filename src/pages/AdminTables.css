@@ -95,8 +95,8 @@
 }
 
 .modern-table th {
-  padding: 1rem 1.5rem;
-  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   color: #64748b;
@@ -104,7 +104,10 @@
 }
 
 .modern-table td {
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: #000000;
+  font-weight: 400;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
   white-space: nowrap;
@@ -165,7 +168,6 @@
 
 .username-text {
   display: block;
-  font-weight: 600;
   color: #1e293b;
   font-size: 0.95rem;
 }
@@ -181,7 +183,6 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.65rem;
-  font-weight: 700;
   margin-left: 8px;
   text-transform: uppercase;
 }

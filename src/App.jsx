@@ -27,6 +27,7 @@ import DataPreviewPenduduk from './pages/DataPreviewPenduduk';
 import LandingPage from './pages/LandingPage';
 
 import { getRolePermissions } from './utils/permissions';
+import { initTokenRefresh, cleanupTokenRefresh } from './services/api';
 
 import './App.css';
 import DataZona from './pages/DataZona';
@@ -55,6 +56,8 @@ function App() {
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
+        // Initialize token refresh mechanism
+        initTokenRefresh();
       } catch (err) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -70,6 +73,7 @@ function App() {
 
     return () => {
       window.removeEventListener('token-expired', handleTokenExpiration);
+      cleanupTokenRefresh();
     };
   }, []);
 
@@ -80,9 +84,13 @@ function App() {
       localStorage.setItem('refreshToken', authData.refreshToken);
     }
     localStorage.setItem('user', JSON.stringify(authData.user));
+    // Initialize token refresh after login
+    initTokenRefresh();
   };
 
   const handleLogout = () => {
+    // Cleanup token refresh before logout
+    cleanupTokenRefresh();
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');

@@ -31,7 +31,7 @@ import './AdminPage.css';
 const StatCard = ({ title, value, icon, color, unit = "Orang" }) => (
   <Card
     sx={{
-      height: '110px',
+      minHeight: '110px',
       display: 'flex',
       alignItems: 'center',
       px: 3,
@@ -126,7 +126,7 @@ const DataPreviewPenduduk = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDesa, setSelectedDesa] = useState('');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -145,6 +145,13 @@ const DataPreviewPenduduk = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = () => {
+    setSearchTerm('');
+    setSelectedDesa('');
+    setPage(1);
+    fetchData();
   };
 
   const handleExportExcel = (exportAll = false) => {
@@ -220,7 +227,6 @@ const DataPreviewPenduduk = () => {
     <Container maxWidth="xl" sx={{ mt: 5, mb: 10 }}>
       <div className="admin-header" style={{ marginBottom: '3rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
         <div className="header-title-section">
-          <div className="section-badge">Statistik Kependudukan</div>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Users size={32} /> Data Preview Penduduk
           </h2>
@@ -230,7 +236,7 @@ const DataPreviewPenduduk = () => {
         </div>
         <div className="header-actions">
           <Tooltip title="Refresh Data">
-            <IconButton onClick={fetchData} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
+            <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
               <RefreshIcon size={24} color="#10b981" />
             </IconButton>
           </Tooltip>
@@ -266,17 +272,29 @@ const DataPreviewPenduduk = () => {
         </div>
       </div>
 
-      <Grid container spacing={3} sx={{ mb: 5 }}>
-        <Grid item xs={12} md={4}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexWrap: 'nowrap', 
+          gap: 3, 
+          mb: 5, 
+          overflowX: 'auto',
+          pb: 1,
+          '&::-webkit-scrollbar': { height: '6px' },
+          '&::-webkit-scrollbar-track': { bgcolor: '#f1f5f9' },
+          '&::-webkit-scrollbar-thumb': { bgcolor: '#cbd5e1', borderRadius: '10px' }
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
           <StatCard title="Total Penduduk" value={stats.total} icon={<PeopleIcon />} color="#6366f1" />
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
           <StatCard title="Laki-laki" value={stats.laki} icon={<ManIcon />} color="#0ea5e9" />
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
           <StatCard title="Perempuan" value={stats.perempuan} icon={<WomanIcon />} color="#f43f5e" />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* TABLE PAPER */}
       <Paper elevation={0} sx={{ borderRadius: 5, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
@@ -321,11 +339,19 @@ const DataPreviewPenduduk = () => {
                   'ZONA LINGKAR TAMBANG', 'NAMA LENGKAP', 'NIK', 'JENIS KELAMIN', 'UMUR',
                   'PENDIDIKAN', 'PEKERJAAN', 'HUBUNGAN KELUARGA', 'PENDIDIKAN TERAKHIR', 'SKILL',
                   'STATUS KERJA', 'TEMPAT BEKERJA', 'NO HP/WA', 'E-MAIL'
-                ].map((head) => (
-                  <th key={head}>
-                    {head}
-                  </th>
-                ))}
+                ].map((head) => {
+                  const isCentered = head === 'NO';
+                  return (
+                    <th key={head} style={{ 
+                      fontSize: '0.8rem', 
+                      fontWeight: '800',
+                      textAlign: isCentered ? 'center' : 'left',
+                      paddingLeft: isCentered ? '0.5rem' : head === 'ZONA LINGKAR TAMBANG' ? '40px' : '1rem'
+                    }}>
+                      {head}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -334,34 +360,46 @@ const DataPreviewPenduduk = () => {
               ) : (
                 filteredData.slice((page-1)*itemsPerPage, page*itemsPerPage).map((row, index) => (
                   <tr key={index}>
-                    <td style={{ textAlign: 'center' }}>{(page - 1) * itemsPerPage + index + 1}</td>
-                    <td style={{ fontWeight: 800, color: '#1e293b' }}>{row.no_kartu_keluarga}</td>
-                    <td style={{ fontWeight: 600, color: '#1e293b' }}>{row.kepala_keluarga || '-'}</td>
-                    <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.alamat}</td>
-                    <td>{row.desa_kelurahan || '-'}</td>
-                    <td>{row.kecamatan}</td>
-                    <td>
-                      <span className={`status-badge-lg ${row.zona_lingkar_tambang?.toLowerCase() === 'ring 1' ? 'status-danger' : 'status-success'}`}>
+                    <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.no_kartu_keluarga}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.kepala_keluarga || '-'}</td>
+                    <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem' }}>{row.alamat}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.desa_kelurahan || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.kecamatan}</td>
+                    <td style={{ fontSize: '0.75rem', paddingLeft: '40px' }}>
+                      <span style={{ 
+                        color: (() => {
+                          const z = (row.zona_lingkar_tambang || "").toUpperCase();
+                          if (z.includes("RING 1")) return "#3b82f6";
+                          if (z.includes("RING 2")) return "#10b981";
+                          if (z.includes("RING 3")) return "#000000";
+                          if (z.includes("RING 4")) return "#ef4444";
+                          return "inherit";
+                        })()
+                      }}>
                         {row.zona_lingkar_tambang || '-'}
                       </span>
                     </td>
-                    <td style={{ fontWeight: 600, color: '#1e293b' }}>{row.nama_lengkap}</td>
-                    <td style={{ color: '#64748b', fontWeight: 600 }}>{row.nik}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.nama_lengkap}</td>
+                    <td style={{ color: '#64748b', fontSize: '0.75rem' }}>{row.nik}</td>
                     <td>
-                      <span className={`status-badge-lg ${(row.jenis_kelamin || '').toString().toUpperCase().startsWith('L') ? 'status-newcomer' : 'status-deceased'}`} style={{ fontSize: '0.7rem' }}>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        color: (row.jenis_kelamin || '').toString().toUpperCase().startsWith('L') ? '#075985' : '#991b1b'
+                      }}>
                         {(row.jenis_kelamin || '').toString().toUpperCase().startsWith('L') ? 'LAKI-LAKI' : 'PEREMPUAN'}
                       </span>
                     </td>
-                    <td>{row.umur || '-'}</td>
-                    <td>{row.pendidikan || '-'}</td>
-                    <td>{row.pekerjaan || '-'}</td>
-                    <td>{row.hubungan_keluarga || '-'}</td>
-                    <td>{row.pendidikan_terakhir || '-'}</td>
-                    <td>{row.skill || '-'}</td>
-                    <td>{row.status_kerja || '-'}</td>
-                    <td>{row.tempat_bekerja || '-'}</td>
-                    <td>{row.no_hp_wa || '-'}</td>
-                    <td>{row.email || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.umur || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.pendidikan || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.pekerjaan || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.hubungan_keluarga || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.pendidikan_terakhir || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.skill || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.status_kerja || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.tempat_bekerja || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.no_hp_wa || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.email || '-'}</td>
                   </tr>
                 ))
               )}

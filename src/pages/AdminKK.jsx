@@ -120,6 +120,20 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     }
   };
 
+  const handleRefresh = async () => {
+    // 1. Reset all state values related to filters and search
+    setSearchTerm("");
+    setFilterCategory("");
+    setFilterValue("");
+    setPage(1);
+    
+    // 2. Clear any selected items (detail dialogs, etc)
+    setSelectedKK(null);
+    
+    // 3. Re-fetch data from API
+    await loadKKList();
+  };
+
   const loadProvinces = async () => {
     try {
       const data = await wilayahAPI.getProvinces();
@@ -538,15 +552,18 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     <div className="admin-page">
       <div className="admin-header">
         <div className="header-title-section">
-          <div className="section-badge">Manajemen Kartu Keluarga</div>
-          <h2><Home size={28} /> Manajemen KK</h2>
+          <h2><Home size={28} /> Manajemen Kartu Keluarga</h2>
           <p className="header-subtitle">
             Daftar lengkap Kartu Keluarga, pemetaan zona lingkar tambang, dan integrasi statistik kependudukan.
           </p>
         </div>
         <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <Tooltip title="Refresh Data">
-            <IconButton onClick={loadKKList} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+            <IconButton 
+              type="button"
+              onClick={() => handleRefresh()} 
+              sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}
+            >
               <RefreshIcon size={20} color="#10b981" />
             </IconButton>
           </Tooltip>
@@ -717,7 +734,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
             <table
               className="modern-table"
               style={{
-                minWidth: "2200px",
+                minWidth: "2000px",
                 tableLayout: "fixed",
                 borderCollapse: "separate",
                 borderSpacing: 0,
@@ -725,104 +742,82 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
             >
               <thead>
                 <tr>
-                  <th style={{ width: "60px", textAlign: "center" }}>NO</th>
-                  <th style={{ width: "200px" }}>No Kartu Keluarga</th>
-                  <th style={{ width: "250px" }}>KEPALA KELUARGA</th>
-                  <th style={{ width: "300px" }}>ALAMAT</th>
-                  <th style={{ width: "200px" }}>DESA/ KELURAHAN</th>
-                  <th style={{ width: "200px" }}>KECAMATAN</th>
-                  <th style={{ width: "200px" }}>KABUPATEN/ KOTA</th>
-                  <th style={{ width: "150px" }}>PROVINSI</th>
-                  <th style={{ width: "250px", textAlign: "center" }}>
+                  <th style={{ width: "50px", textAlign: "center", fontSize: "0.8rem", fontWeight: "800" }}>NO</th>
+                  <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>No Kartu Keluarga</th>
+                  <th style={{ width: "220px", fontSize: "0.8rem", fontWeight: "800" }}>KEPALA KELUARGA</th>
+                  <th style={{ width: "250px", fontSize: "0.8rem", fontWeight: "800" }}>ALAMAT</th>
+                  <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>DESA/ KELURAHAN</th>
+                  <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>KECAMATAN</th>
+                  <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>KABUPATEN/ KOTA</th>
+                  <th style={{ width: "150px", fontSize: "0.8rem", fontWeight: "800" }}>PROVINSI</th>
+                  <th style={{ width: "220px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
                     ZONA LINGKAR TAMBANG
                   </th>
-                  <th style={{ width: "200px", textAlign: "center" }}>
+                  <th style={{ width: "180px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
                     KOORDINAT
                   </th>
-                  <th style={{ width: "250px", textAlign: "center" }}>
+                  <th style={{ width: "220px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
                     TANGGAL KK DITERBITKAN
                   </th>
-                  <th style={{ width: "250px", textAlign: "center" }}>
+                  <th style={{ width: "200px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
                     STATUS HARD COPY KK
                   </th>
-                  <th style={{ width: "250px" }}>KETERANGAN</th>
-                  <th style={{ width: "120px", textAlign: "center" }}>AKSI</th>
+                  <th style={{ width: "200px", fontSize: "0.8rem", fontWeight: "800" }}>KETERANGAN</th>
+                  <th style={{ width: "100px", textAlign: "center", fontSize: "0.8rem", fontWeight: "800" }}>AKSI</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedKK.length > 0 ? (
                   paginatedKK.map((kk, index) => (
                     <tr key={kk.id}>
-                      <td style={{ textAlign: "center" }}>
+                      <td style={{ textAlign: "center", fontSize: "0.75rem" }}>
                         {(page - 1) * itemsPerPage + index + 1}
                       </td>
-                      <td style={{ fontSize: "0.8rem", fontWeight: "500" }}>
+                      <td style={{ fontSize: "0.75rem" }}>
                         {kk.nomor_kk}
                       </td>
-                      <td>
-                        <div className="user-cell">
-                          <div
-                            className="avatar-small"
-                            style={{ background: "#3b82f6" }}
-                          >
-                            {kk.kepala_keluarga
-                              ? kk.kepala_keluarga.charAt(0).toUpperCase()
-                              : "?"}
-                          </div>
-                          <div>
-                            <span
-                              className="username-text"
-                              style={{ fontSize: "0.85rem", fontWeight: "600" }}
-                            >
-                              {kk.kepala_keluarga}
-                            </span>
-                          </div>
-                        </div>
+                      <td style={{ fontSize: "0.75rem" }}>
+                        {kk.kepala_keluarga}
                       </td>
-                      <td style={{ fontSize: "0.8rem" }}>{kk.alamat}</td>
-                      <td style={{ fontSize: "0.8rem" }} className="nowrap-cell">{kk.desa}</td>
-                      <td style={{ fontSize: "0.8rem" }} className="nowrap-cell">{kk.kecamatan}</td>
-                      <td style={{ fontSize: "0.8rem" }} className="nowrap-cell">{kk.kabupaten}</td>
-                      <td style={{ fontSize: "0.8rem" }} className="nowrap-cell">{kk.provinsi}</td>
-                      <td style={{ textAlign: "center" }}>
+                      <td style={{ fontSize: "0.75rem" }}>{kk.alamat}</td>
+                      <td style={{ fontSize: "0.75rem" }} className="nowrap-cell">{kk.desa}</td>
+                      <td style={{ fontSize: "0.75rem" }} className="nowrap-cell">{kk.kecamatan}</td>
+                      <td style={{ fontSize: "0.75rem" }} className="nowrap-cell">{kk.kabupaten}</td>
+                      <td style={{ fontSize: "0.75rem" }} className="nowrap-cell">{kk.provinsi}</td>
+                      <td style={{ textAlign: "left" }}>
                         <span
-                          className={`status-badge-lg ${
-                            kk.zona_lingkar_tambang === "RING 1"
-                              ? "status-danger"
-                              : "status-success"
-                          }`}
-                          style={{ fontSize: "0.75rem", padding: "6px 12px" }}
+                          style={{
+                            color: (() => {
+                              const z = (kk.zona_lingkar_tambang || "").toUpperCase();
+                              if (z.includes("RING 1")) return "#3b82f6";
+                              if (z.includes("RING 2")) return "#10b981";
+                              if (z.includes("RING 3")) return "#000000";
+                              if (z.includes("RING 4")) return "#ef4444";
+                              return "inherit";
+                            })()
+                          }}
                         >
                           {kk.zona_lingkar_tambang || "-"}
                         </span>
                       </td>
-                      <td style={{ textAlign: "center" }}>
+                      <td style={{ textAlign: "left", fontSize: "0.75rem", color: "#64748b" }}>
                         {(kk.latitude || kk.lat || kk.lp_lat) && (kk.longitude || kk.lng || kk.lp_lng) ? (
-                          <span className="coords-badge" style={{ fontSize: "0.75rem", background: "#ecfdf5", color: "#065f46" }}>
-                            {parseFloat(kk.latitude || kk.lat || kk.lp_lat).toFixed(4)}, {parseFloat(kk.longitude || kk.lng || kk.lp_lng).toFixed(4)}
-                          </span>
+                          `${parseFloat(kk.latitude || kk.lat || kk.lp_lat)}, ${parseFloat(kk.longitude || kk.lng || kk.lp_lng)}`
                         ) : (
-                          <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>(Belum Terdata)</span>
+                          "-"
                         )}
                       </td>
-                      <td style={{ fontSize: "0.8rem", textAlign: "center" }}>
+                      <td style={{ fontSize: "0.75rem", textAlign: "left" }}>
                         {formatDate(kk.tanggal_diterbitkan)}
                       </td>
-                      <td style={{ textAlign: "center" }}>
-                        <span
-                          className={`status-badge ${
-                            kk.status_hard_copy === "LENGKAP"
-                              ? "status-success"
-                              : "status-pending"
-                          }`}
-                          style={{ fontSize: "0.75rem", padding: "4px 10px" }}
-                        >
+                      <td style={{ textAlign: "left" }}>
+                        <span>
                           {kk.status_hard_copy || "BELUM ADA"}
                         </span>
                       </td>
                       <td
                         style={{
-                          fontSize: "0.8rem",
+                          fontSize: "0.75rem",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -1322,7 +1317,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1335,7 +1330,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1348,7 +1343,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1361,7 +1356,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1374,7 +1369,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1387,7 +1382,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1415,7 +1410,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1432,7 +1427,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1447,7 +1442,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1468,7 +1463,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "0.85rem",
+                    fontSize: "0.75rem",
                     color: "#64748b",
                     marginBottom: "0.25rem",
                   }}
@@ -1502,50 +1497,45 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
               <table className="modern-table">
                 <thead>
                   <tr>
-                    <th>No</th>
-                    <th>NIK</th>
-                    <th>Nama Lengkap</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Hubungan</th>
-                    <th>Status</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>No</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>NIK</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Nama Lengkap</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Jenis Kelamin</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Hubungan</th>
+                    <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedKK.members && selectedKK.members.length > 0 ? (
                     selectedKK.members.map((member, index) => (
                       <tr key={member.id}>
-                        <td>{index + 1}</td>
-                        <td>{member.nik}</td>
+                        <td style={{ fontSize: "0.75rem" }}>{index + 1}</td>
+                        <td style={{ fontSize: "0.75rem" }}>{member.nik}</td>
                         <td>
                           <div className="user-cell">
-                            <div
-                              className="avatar-small"
-                              style={{ background: "#10b981" }}
-                            >
-                              {member.nama
-                                ? member.nama.charAt(0).toUpperCase()
-                                : "?"}
-                            </div>
-                            <span className="username-text">{member.nama}</span>
+                            <span className="username-text" style={{ fontSize: '0.75rem', fontWeight: '600' }}>{member.nama}</span>
                           </div>
                         </td>
-                        <td>
-                          {member.jenis_kelamin?.toString().toUpperCase().startsWith('L') ? "LAKI-LAKI" : (member.jenis_kelamin?.toString().toUpperCase().startsWith('P') ? "PEREMPUAN" : "-")}
+                        <td style={{ fontSize: "0.75rem" }}>
+                          <span style={{ 
+                            fontWeight: '700',
+                            color: member.jenis_kelamin?.toString().toUpperCase().startsWith('L') ? '#075985' : '#991b1b'
+                          }}>
+                            {member.jenis_kelamin?.toString().toUpperCase().startsWith('L') ? "LAKI-LAKI" : (member.jenis_kelamin?.toString().toUpperCase().startsWith('P') ? "PEREMPUAN" : "-")}
+                          </span>
                         </td>
-                        <td>
-                          <span className="kk-badge">
+                        <td style={{ fontSize: "0.75rem" }}>
+                          <span className="kk-badge" style={{ fontSize: "0.75rem" }}>
                             {member.hubungan_keluarga}
                           </span>
                         </td>
                         <td>
-                          <span className={`status-badge-lg ${(() => {
-                              const s = (member.status_domisili || '').toLowerCase();
-                              if (s.includes('meninggal')) return 'status-deceased';
-                              if (s.includes('pindah')) return 'status-moved';
-                              if (s.includes('pendatang')) return 'status-newcomer';
-                              return 'status-permanent';
-                          })()}`} style={{ fontSize: '0.7rem' }}>
-                              {member.status_domisili}
+                          <span style={{ 
+                              fontSize: "0.75rem", 
+                              fontWeight: "700",
+                              color: "#000000"
+                          }}>
+                              {member.status_domisili || '-'}
                           </span>
                         </td>
                       </tr>

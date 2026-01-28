@@ -199,7 +199,6 @@ export default function AdminUsers({ currentUser }) {
       <div className="admin-page">
         <div className="admin-header">
           <div className="header-title-section">
-            <div className="section-badge">Sistem & Keamanan</div>
             <h2><ShieldCheck size={32} /> Manajemen Pengguna</h2>
             <p className="header-subtitle">
               Kelola hak akses, monitoring autentikasi, dan pengaturan keamanan akun penduduk maupun perangkat desa.
@@ -254,9 +253,6 @@ export default function AdminUsers({ currentUser }) {
                       <TableCell sx={{ color: '#64748b', fontWeight: 500 }}>{index + 1}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Avatar sx={{ bgcolor: isCurrentUser(user.id) ? '#3b82f6' : '#94a3b8', width: 40, height: 40, fontSize: '1rem', fontWeight: 600 }}>
-                            {user.username?.charAt(0).toUpperCase()}
-                          </Avatar>
                           <Box>
                             <Typography sx={{ fontWeight: 600, color: '#1e293b' }}>
                               {user.username}
@@ -272,7 +268,7 @@ export default function AdminUsers({ currentUser }) {
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <FormControl size="small" fullWidth sx={{ maxWidth: 200 }}>
-                            <Select value={user.role} onChange={(e) => handleRoleChange(user.id, e.target.value)} disabled={isCurrentUser(user.id) || updatingRole[user.id]} sx={{ borderRadius: 2, fontSize: '0.85rem' }}>
+                            <Select value={user.role} onChange={(e) => handleRoleChange(user.id, e.target.value)} disabled={isCurrentUser(user.id) || updatingRole[user.id]} sx={{ borderRadius: 2, fontSize: '0.75rem' }}>
                               {ROLE_OPTIONS.map((opt) => (
                                 <MenuItem key={opt.value} value={opt.value} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{opt.icon} {opt.label}</MenuItem>
                               ))}

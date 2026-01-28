@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicNavbar from '../components/PublicNavbar';
 import { publicAPI } from '../services/api';
 import { 
   Users, Home, Sparkles, AlertCircle, ChevronDown, 
@@ -8,8 +7,39 @@ import {
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
-  ResponsiveContainer, BarChart, Bar, Cell
+  ResponsiveContainer, BarChart, Bar, Cell, LabelList
 } from 'recharts';
+
+// Custom hook for animated counting
+function useCountUp(end, duration = 1500) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime;
+    let animationFrame;
+    const startValue = count;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      // Easing function: easeOutExpo
+      const easing = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const currentValue = Math.floor(easing * end);
+      
+      setCount(currentValue);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration]);
+
+  return count;
+}
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -215,15 +245,12 @@ export default function LandingPage() {
           stroke: rgba(255, 255, 255, 0.1);
         }
         .recharts-text {
-          fill: rgba(255, 255, 255, 0.5) !important;
-          font-size: 12px;
-          font-weight: 500;
+          fill: rgba(255, 255, 255, 0.7);
+          font-size: 14px;
+          font-weight: 600;
         }
       `}</style>
       
-      <div className={isExiting ? "animate-fade-out" : ""}>
-        <PublicNavbar />
-      </div>
       
       {/* Background Image with Overlay */}
       <div style={{
@@ -246,7 +273,7 @@ export default function LandingPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '100px 5% 60px',
+        padding: '60px 5% 60px',
         color: 'white',
         textAlign: 'center'
       }}>
@@ -410,14 +437,12 @@ export default function LandingPage() {
                   axisLine={false} 
                   tickLine={false} 
                   interval={0}
-                  angle={-25}
-                  textAnchor="end"
-                  tick={{ fontSize: 10 }}
+                  tick={{ fontSize: 15, fill: 'rgba(255,255,255,0.8)', fontWeight: 'bold' }}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }}
+                  tick={{ fontSize: 28, fill: 'white', fontWeight: '900' }}
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
@@ -437,7 +462,18 @@ export default function LandingPage() {
                   radius={[8, 8, 0, 0]}
                   fill={activeMetric.color}
                   barSize={40}
+                  isAnimationActive={true}
+                  animationDuration={1500}
+                  animationEasing="ease-out"
+                  animationBegin={400}
                 >
+                  <LabelList 
+                    dataKey={(row) => row.value !== undefined ? row.value : row[selectedMetric]} 
+                    position="top" 
+                    fill="white" 
+                    fontSize={28} 
+                    fontWeight="900" 
+                  />
                   {comparisonData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={activeMetric.color} />
                   ))}
@@ -466,6 +502,8 @@ export default function LandingPage() {
 }
 
 function StatCard({ Icon, label, value, color }) {
+  const animatedValue = useCountUp(value);
+  
   return (
     <div className="stat-card-glass" style={{
       padding: '16px 12px',
@@ -487,7 +525,7 @@ function StatCard({ Icon, label, value, color }) {
         <Icon size={18} />
       </div>
       <h3 style={{ fontSize: '1.25rem', margin: '0 0 2px', color: 'white', fontWeight: '800' }}>
-        {value.toLocaleString('id-ID')}
+        {animatedValue.toLocaleString('id-ID')}
       </h3>
       <p style={{ color: 'rgba(255,255,255,0.6)', margin: 0, fontWeight: '600', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
         {label}

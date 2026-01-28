@@ -59,6 +59,7 @@ const AdminLand = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDesa, setSelectedDesa] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   
   const detailsRef = useRef(null);
 
@@ -136,7 +137,6 @@ const AdminLand = () => {
     <div className="admin-page">
       <div className="admin-header">
         <div className="header-title-section">
-          <div className="section-badge">Aset & Tata Ruang</div>
           <h2><MapPin size={32} /> Lokasi & Domisili</h2>
           <p className="header-subtitle">
             Peta sebaran rumah warga dan pemetaan zona kependudukan berdasarkan koordinat presisi.
@@ -241,9 +241,6 @@ const AdminLand = () => {
                 <div className="card-body">
                   <div className="card-main-info">
                     <div className="person-identity">
-                      <div className="avatar-large">
-                        {selectedItem.kepala_keluarga ? selectedItem.kepala_keluarga.charAt(0).toUpperCase() : "?"}
-                      </div>
                       <div className="identity-text">
                         <h3>{selectedItem.kepala_keluarga}</h3>
                         <p>Kepala Keluarga</p>
@@ -258,13 +255,13 @@ const AdminLand = () => {
                     <div className="info-column">
                       <div className="info-block" style={{ marginBottom: "1.5rem" }}>
                         <label>Nomor Kartu Keluarga</label>
-                        <div className="content" style={{ fontSize: "1.2rem", color: "#10b981", letterSpacing: "1px" }}>
+                        <div className="content" style={{ fontSize: "1.1rem", color: "#10b981", letterSpacing: "1px" }}>
                           {selectedItem.nomor_kk}
                         </div>
                       </div>
                       <div className="info-block">
                         <label>Alamat Domisili</label>
-                        <div className="content" style={{ fontSize: "1.1rem", fontWeight: "600", color: "#1e293b" }}>{selectedItem.alamat || selectedItem.alamat_kk || "-"}</div>
+                        <div className="content" style={{ fontSize: "1.0rem", fontWeight: "600", color: "#1e293b" }}>{selectedItem.alamat || selectedItem.alamat_kk || "-"}</div>
                       </div>
                     </div>
                     <div className="info-column">
@@ -279,12 +276,12 @@ const AdminLand = () => {
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                         <div className="info-block">
-                          <label>Kecamatan</label>
-                          <div className="content">{selectedItem.kecamatan || "-"}</div>
-                        </div>
-                        <div className="info-block">
                           <label>Desa</label>
                           <div className="content">{selectedItem.desa || "-"}</div>
+                        </div>
+                        <div className="info-block">
+                          <label>Kecamatan</label>
+                          <div className="content">{selectedItem.kecamatan || "-"}</div>
                         </div>
                       </div>
                     </div>
@@ -295,8 +292,10 @@ const AdminLand = () => {
                       <div className="photo-frame">
                         {selectedItem.foto_rumah ? (
                           <img 
-                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.250:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
+                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.244:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
                             alt="Foto Rumah" 
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setPreviewImage(`${import.meta.env.VITE_API_URL || "http://192.168.0.244:5000/api"}/land/foto/${selectedItem.foto_rumah}`)}
                           />
                         ) : (
                           <div className="no-photo-placeholder">
@@ -317,6 +316,63 @@ const AdminLand = () => {
             )}
           </div>
         </>
+      )}
+
+      {/* Full Screen Image Preview Modal */}
+      {previewImage && (
+        <div 
+          className="modal-backdrop" 
+          onClick={() => setPreviewImage(null)}
+          style={{ 
+            zIndex: 4000, 
+            background: 'rgba(0,0,0,0.9)', 
+            cursor: 'zoom-out' 
+          }}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              maxWidth: '90vw', 
+              maxHeight: '90vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={previewImage} 
+              alt="Preview Full" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '90vh', 
+                borderRadius: '12px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                objectFit: 'contain'
+              }} 
+            />
+            <button 
+              onClick={() => setPreviewImage(null)}
+              style={{
+                position: 'absolute',
+                top: '-40px',
+                right: '0',
+                background: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              &times;
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

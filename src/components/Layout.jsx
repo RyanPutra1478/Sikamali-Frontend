@@ -49,7 +49,7 @@ export default function Layout({ children, user, onLogout }) {
             </button>
 
             <div className="logo-container">
-              <img src="/logo-icon.png" alt="Sikamali Logo" className="logo-image" style={{ height: '40px', width: 'auto' }} />
+              <img src="/logo-icon.png" alt="Sikamali Logo" className="logo-image" style={{ height: '42px', width: '42px' }} />
               <h1 className="app-title">Sistem Informasi Kependudukan Masyarakat Lingkar Tambang</h1>
             </div>
           </div>

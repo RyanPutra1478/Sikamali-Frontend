@@ -141,6 +141,14 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     }
   };
 
+  const handleRefresh = () => {
+    setSearchTerm('');
+    setFilterCategory('');
+    setFilterValue('');
+    setPage(1);
+    loadData();
+  };
+
   const handleExportExcel = (exportFiltered) => {
     const sourceData = exportFiltered ? filteredList : dataList;
     if (sourceData.length === 0) {
@@ -204,7 +212,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       experience_years: item?.experience_years || '',
       availability: item?.availability !== undefined ? item.availability : (item ? 1 : (parsed.availability ?? 1)),
       preferred_roles: item?.preferred_roles || (item ? '' : (parsed.preferred_roles || '')),
-      cv_path: item?.cv_path || '',
 
       // 6. Kontak
       telepon: item?.telepon || '',
@@ -257,7 +264,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
         availability: editItem.availability !== undefined ? editItem.availability : 1,
         preferred_roles: editItem.preferred_roles || null,
         keterangan: editItem.keterangan || null,
-        cv_path: editItem.cv_path || null,
       };
 
       await adminAPI.updateEmploymentFull(payload);
@@ -383,7 +389,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       <div className="admin-page">
         <div className="admin-header">
           <div className="header-title-section">
-            <div className="section-badge">{activeTab === 'create' ? 'Formulir Data' : 'Profil Ketenagakerjaan'}</div>
             <h2><Briefcase size={28} /> {activeTab === 'create' ? (editItem?.id ? 'Edit Angkatan Kerja' : 'Input Anggota Baru') : 'Data Angkatan Kerja'}</h2>
             <p className="header-subtitle">
               {activeTab === 'create' ? 'Silakan isi formulir di bawah ini dengan data yang valid.' : 'Daftar lengkap angkatan kerja dan status pekerjaan penduduk lingkar tambang.'}
@@ -392,7 +397,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
           <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <Tooltip title="Refresh Data">
-              <IconButton onClick={loadData} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+              <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
                 <RefreshIcon size={20} color="#10b981" />
               </IconButton>
             </Tooltip>
@@ -465,6 +470,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
         {activeTab === 'list' && (
           <>
+        <div className="table-wrapper">
         {/* TOOLBAR */}
         <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: '#fcfcfc', flexWrap: 'wrap', gap: 2 }}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
@@ -546,30 +552,29 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
           </Tooltip>
         </Box>
 
-          <div className="table-wrapper">
             {loading ? (
               <p className="loading-text">Memuat data...</p>
             ) : error ? (
               <p className="error-text">Error: {error}</p>
             ) : (
-              <>
+              <div className="table-container">
                 <table className="modern-table">
                   <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>No Kartu Keluarga</th>
-                      <th>Kepala Keluarga</th>
-                      <th>Alamat</th>
-                      <th>Nama Anggota</th>
-                      <th>NIK</th>
-                      <th>Pendidikan</th>
-                      <th>Skill</th>
-                      <th>Status Kerja</th>
-                      <th>Tempat Bekerja</th>
-                      <th>No HP/WA</th>
-                      <th>E-mail</th>
-                      <th>Keterangan</th>
-                      <th width="10%">Aksi</th>
+                      <tr>
+                      <th style={{ minWidth: '40px', fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
+                      <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
+                      <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
+                      <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>ALAMAT</th>
+                      <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA ANGGOTA</th>
+                      <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>PENDIDIKAN</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>SKILL</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS KERJA</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>TEMPAT BEKERJA</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NO HP/WA</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>E-MAIL</th>
+                      <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>KETERANGAN</th>
+                      <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -589,27 +594,19 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
                           return (
                             <tr key={item.id || index}>
-                              <td>{(page - 1) * itemsPerPage + index + 1}</td>
-                              <td style={{ fontSize: '0.85rem', fontWeight: '500' }}>{item.nomor_kk || '-'}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.kepala_keluarga || '-'}</td>
-                              <td style={{ fontSize: '0.85rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.alamat || item.alamat_kk}>
+                              <td style={{ fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.nomor_kk || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.kepala_keluarga || '-'}</td>
+                              <td style={{ fontSize: '0.75rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.alamat || item.alamat_kk}>
                                 {item.alamat || item.alamat_kk || '-'}
                               </td>
-                              <td>
-                                <div className="user-cell">
-                                  <div className="avatar-small" style={{ background: '#10b981' }}>
-                                    {item.nama ? item.nama.charAt(0).toUpperCase() : '?'}
-                                  </div>
-                                  <span className="username-text" style={{ fontSize: '0.9rem', whiteSpace: 'nowrap' }}>{item.nama}</span>
-                                </div>
-                              </td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.nik}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.pendidikan_terakhir || item.pendidikan || '-'}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.skill_tags || item.skill || '-'}</td>
+                              <td>{item.nama}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.nik}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.pendidikan_terakhir || item.pendidikan || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.skill_tags || item.skill || '-'}</td>
                               <td>
                                 <span style={{ 
-                                  fontSize: '0.8rem', 
-                                  fontWeight: '600', 
+                                  fontSize: '0.75rem', 
                                   textTransform: 'uppercase', 
                                   whiteSpace: 'nowrap',
                                   color: isWorking ? '#10b981' : '#000000'
@@ -617,10 +614,10 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                                   {displayStatus}
                                 </span>
                               </td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.tempat_bekerja || '-'}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.telepon || '-'}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.email || '-'}</td>
-                              <td style={{ fontSize: '0.85rem' }}>{item.keterangan || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.tempat_bekerja || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.no_hp_wa || item.telepon || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.email || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.keterangan || '-'}</td>
                               <td>
                                 <div className="action-buttons">
                                   {employmentPerm.view && (
@@ -650,6 +647,8 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     )}
                   </tbody>
                 </table>
+              </div>
+            )}
 
                 {Math.ceil(filteredList.length / itemsPerPage) > 1 && (
                   <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
@@ -674,8 +673,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     />
                   </Box>
                 )}
-              </>
-            )}
           </div>
 
         </>
@@ -692,7 +689,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
             <div className="modal-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
               <div className="detail-item"><label>NIK</label><div className="detail-value highlight">{selectedItem.nik}</div></div>
               <div className="detail-item"><label>Nama</label><div className="detail-value highlight">{selectedItem.nama}</div></div>
-              <div className="detail-item"><label>CV Path</label><div className="detail-value">{selectedItem.cv_path || '-'}</div></div>
               <div className="detail-item"><label>Jenis Kelamin</label><div className="detail-value">{selectedItem.jenis_kelamin}</div></div>
               <div className="detail-item"><label>Umur</label><div className="detail-value">{selectedItem.tanggal_lahir ? calculateAge(selectedItem.tanggal_lahir) + ' Tahun' : '-'}</div></div>
               <div className="detail-item"><label>No Kartu Keluarga</label><div className="detail-value">{selectedItem.nomor_kk}</div></div>
@@ -718,7 +714,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
               <div className="detail-item"><label>Status Perkawinan</label><div className="detail-value">{selectedItem.status_perkawinan || '-'}</div></div>
               <div className="detail-item"><label>Nama Ayah</label><div className="detail-value">{selectedItem.nama_ayah || '-'}</div></div>
               <div className="detail-item"><label>Nama Ibu</label><div className="detail-value">{selectedItem.nama_ibu || '-'}</div></div>
-              <div className="detail-item"><label>No HP / WA</label><div className="detail-value">{selectedItem.telepon}</div></div>
+              <div className="detail-item"><label>No HP / WA</label><div className="detail-value">{selectedItem.no_hp_wa || selectedItem.telepon || '-'}</div></div>
               <div className="detail-item"><label>E-mail</label><div className="detail-value">{selectedItem.email}</div></div>
               {selectedItem.keterangan && (
                 <div className="detail-item" style={{ gridColumn: 'span 2' }}><label>Keterangan</label><div className="detail-value">{selectedItem.keterangan}</div></div>
@@ -735,9 +731,8 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       {activeTab === 'create' && editItem && (
         <div className="form-page-wrapper" style={{ animation: 'fadeIn 0.3s ease' }}>
              <form onSubmit={handleUpdate}>
-              <div className="form-container" style={{ padding: '0 10px', boxShadow: 'none' }}>
-                
-                {/* SEARCH SECTION (Visual only for now matching design) */}
+                <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: 'var(--shadow-md)' }}>
+                <h3>Input Anggota Keluarga Baru</h3>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
                   <label>Cari Penduduk (NIK / Nama) <span style={{ color: '#ef4444' }}>*</span></label>
                   <div style={{ position: 'relative' }}>
@@ -751,7 +746,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     />
                     {!editItem.id && <SearchIcon style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />}
                   </div>
-                  {!editItem.id && <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '4px' }}>Masukkan NIK penduduk yang ingin ditambahkan data kerjanya.</p>}
+                  {!editItem.id && <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>Masukkan NIK penduduk yang ingin ditambahkan data kerjanya.</p>}
                 </div>
 
                 {/* CARD CONTAINER */}
@@ -867,24 +862,18 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                   </div>
                 </div>
 
-                 <div className="form-row">
-                   <div className="form-group">
+                  <div className="form-group">
                     <label>Ketersediaan</label>
                     <select className="input-modern" value={editItem.availability} onChange={(e) => setEditItem({ ...editItem, availability: parseInt(e.target.value) })}>
                       <option value={1}>Tersedia</option>
                       <option value={0}>Tidak Tersedia</option>
                     </select>
                   </div>
-                  <div className="form-group">
-                    <label>Link CV / Path</label>
-                    <input className="input-modern" value={editItem.cv_path} onChange={(e) => setEditItem({ ...editItem, cv_path: e.target.value })} placeholder="Link atau Path CV" />
-                  </div>
-                </div>
 
                 <div className="form-row">
                   <div className="form-group">
                     <label>No HP / WA</label>
-                    <input className="input-modern" value={editItem.telepon} onChange={(e) => setEditItem({ ...editItem, telepon: e.target.value })} />
+                    <input className="input-modern" value={editItem.no_hp_wa || editItem.telepon || ''} onChange={(e) => setEditItem({ ...editItem, no_hp_wa: e.target.value })} />
                   </div>
                   <div className="form-group">
                     <label>Email</label>

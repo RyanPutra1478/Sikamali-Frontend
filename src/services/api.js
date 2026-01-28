@@ -4,6 +4,143 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "/api";
 
+// Token Refresh Management
+let refreshTimer = null;
+let lastActivity = Date.now();
+const ACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+const REFRESH_BEFORE_EXPIRY = 2 * 60 * 1000; // Refresh 2 minutes before expiry
+
+/**
+ * Decode JWT token to get expiration time
+ */
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return null;
+  }
+}
+
+/**
+ * Schedule automatic token refresh
+ */
+function scheduleTokenRefresh() {
+  // Clear existing timer
+  if (refreshTimer) {
+    clearTimeout(refreshTimer);
+    refreshTimer = null;
+  }
+
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  if (!token || !refreshToken) {
+    return;
+  }
+
+  const decoded = decodeToken(token);
+  if (!decoded || !decoded.exp) {
+    return;
+  }
+
+  // Calculate time until token expires (in milliseconds)
+  const expiryTime = decoded.exp * 1000;
+  const now = Date.now();
+  const timeUntilExpiry = expiryTime - now;
+  const timeUntilRefresh = timeUntilExpiry - REFRESH_BEFORE_EXPIRY;
+
+  // If token is already close to expiry or expired, don't schedule
+  if (timeUntilRefresh <= 0) {
+    console.log('[Token Refresh] Token too close to expiry, will refresh on next API call');
+    return;
+  }
+
+  console.log(`[Token Refresh] Scheduled in ${Math.round(timeUntilRefresh / 1000)} seconds`);
+
+  refreshTimer = setTimeout(async () => {
+    // Check if user has been active recently
+    const timeSinceActivity = Date.now() - lastActivity;
+    
+    if (timeSinceActivity > ACTIVITY_TIMEOUT) {
+      console.log('[Token Refresh] Skipping refresh - user inactive');
+      return;
+    }
+
+    console.log('[Token Refresh] Refreshing token...');
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        console.log('[Token Refresh] Token refreshed successfully');
+        
+        // Schedule next refresh
+        scheduleTokenRefresh();
+      } else {
+        console.error('[Token Refresh] Failed to refresh token');
+        // Token might be expired, let the next API call handle it
+      }
+    } catch (error) {
+      console.error('[Token Refresh] Error refreshing token:', error);
+    }
+  }, timeUntilRefresh);
+}
+
+/**
+ * Track user activity
+ */
+function trackActivity() {
+  lastActivity = Date.now();
+}
+
+/**
+ * Initialize token refresh mechanism
+ */
+export function initTokenRefresh() {
+  // Schedule initial refresh
+  scheduleTokenRefresh();
+
+  // Track user activity
+  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  events.forEach(event => {
+    window.addEventListener(event, trackActivity, { passive: true });
+  });
+
+  console.log('[Token Refresh] Initialized');
+}
+
+/**
+ * Cleanup token refresh mechanism
+ */
+export function cleanupTokenRefresh() {
+  if (refreshTimer) {
+    clearTimeout(refreshTimer);
+    refreshTimer = null;
+  }
+
+  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  events.forEach(event => {
+    window.removeEventListener(event, trackActivity);
+  });
+
+  console.log('[Token Refresh] Cleaned up');
+}
+
 /**
  * Helper utama untuk melakukan fetch API dengan otorisasi JWT.
  * Menangani JSON otomatis dan FormData jika diperlukan.
@@ -48,6 +185,9 @@ async function fetchWithAuth(url, options = {}) {
         if (refreshRes.ok) {
           const refreshData = await refreshRes.json();
           localStorage.setItem("token", refreshData.token);
+          
+          // Reschedule token refresh
+          scheduleTokenRefresh();
           
           // Retry original request with new token
           headers["Authorization"] = `Bearer ${refreshData.token}`;

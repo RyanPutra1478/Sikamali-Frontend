@@ -77,7 +77,6 @@ export default function AdminHistory() {
         <div className="admin-page">
             <div className="admin-header">
                 <div className="header-title-section">
-                    <div className="section-badge">Sistem Keamanan</div>
                     <h2><History size={32} /> Log Aktivitas</h2>
                     <p className="header-subtitle">
                         Pantau seluruh rekaman perubahan data, aktivitas autentikasi, dan audit sistem untuk menjaga integritas data.
@@ -120,7 +119,7 @@ export default function AdminHistory() {
                         <tbody>
                             {logs.map((log) => (
                                 <tr key={log.id}>
-                                    <td style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+                                    <td style={{ color: '#6b7280', fontSize: '0.8rem' }}>
                                         {formatDate(log.created_at)}
                                     </td>
                                     <td>
@@ -159,16 +158,16 @@ export default function AdminHistory() {
                     className="btn-secondary"
                     disabled={page === 0}
                     onClick={() => setPage(p => p - 1)}
-                    style={{ padding: '6px 12px', fontSize: '0.9rem' }}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem' }}
                 >
                     Previous
                 </button>
-                <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>Halaman {page + 1} dari {totalPages || 1}</span>
+                <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Halaman {page + 1} dari {totalPages || 1}</span>
                 <button
                     className="btn-secondary"
                     disabled={page >= totalPages - 1}
                     onClick={() => setPage(p => p + 1)}
-                    style={{ padding: '6px 12px', fontSize: '0.9rem' }}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem' }}
                 >
                     Next
                 </button>
@@ -215,7 +214,7 @@ export default function AdminHistory() {
                                 overflowX: 'auto',
                                 border: '1px solid #e5e7eb',
                                 fontFamily: 'JetBrains Mono, monospace',
-                                fontSize: '0.85rem',
+                                fontSize: '0.75rem',
                                 color: '#374151'
                             }}>
                                 <pre style={{ margin: 0 }}>

@@ -93,7 +93,6 @@ export default function AdminAnnouncements({ readOnly }) {
       <div className="admin-page">
         <div className="admin-header">
           <div className="header-title-section">
-            <div className="section-badge">Komunikasi Publik</div>
             <h2><Megaphone size={32} /> Pengumuman Desa</h2>
             <p className="header-subtitle">
               Sampaikan informasi penting, jadwal kegiatan, dan berita terkini kepada seluruh elemen warga lingkar tambang.
@@ -146,14 +145,14 @@ export default function AdminAnnouncements({ readOnly }) {
               <TableBody>
                 {list.map((item) => (
                   <TableRow key={item.id} sx={{ '&:hover': { bgcolor: '#f1f5f9' }, transition: 'background-color 0.2s' }}>
-                    <TableCell sx={{ color: '#64748b', fontSize: '0.85rem' }}>
+                    <TableCell sx={{ color: '#64748b', fontSize: '0.75rem' }}>
                       {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontWeight: 700, color: '#1e293b' }}>{item.title}</Typography>
                       <Typography sx={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>Oleh: {item.author_name || 'Admin'}</Typography>
                     </TableCell>
-                    <TableCell sx={{ color: '#475569', fontSize: '0.9rem', lineHeight: 1.6, maxWidth: 300 }}>
+                    <TableCell sx={{ color: '#475569', fontSize: '0.8rem', lineHeight: 1.6, maxWidth: 300 }}>
                       {item.content.length > 80 ? item.content.substring(0, 80) + '...' : item.content}
                     </TableCell>
                     <TableCell>

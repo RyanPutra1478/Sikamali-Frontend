@@ -34,9 +34,11 @@ export default function PublicNavbar() {
             width: '42px', 
             height: '42px', 
             background: '#ffffff', 
-            borderRadius: '12px', 
-            padding: '6px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.15)'
+            borderRadius: '50%', 
+            padding: '4px',
+            border: '2px solid #ffffff',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.25)',
+            objectFit: 'contain'
           }} 
         />
         <span style={{ 

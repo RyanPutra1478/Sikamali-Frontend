@@ -31,7 +31,7 @@ import './AdminPage.css';
 const StatCard = ({ title, value, icon, color }) => (
   <Card
     sx={{
-      height: '110px',
+      minHeight: '110px',
       display: 'flex',
       alignItems: 'center',
       px: 3,
@@ -127,7 +127,7 @@ const DataPreviewKeluarga = () => {
   const [filterValue, setFilterValue] = useState('');
   const [selectedDesa, setSelectedDesa] = useState('');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -146,6 +146,14 @@ const DataPreviewKeluarga = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = () => {
+    setSearchTerm('');
+    setFilterValue('');
+    setSelectedDesa('');
+    setPage(1);
+    fetchData();
   };
 
   const handleExportExcel = (exportAll = false) => {
@@ -189,6 +197,10 @@ const DataPreviewKeluarga = () => {
     return item.kategori_sosial?.toLowerCase() === 'prasejahtera';
   };
 
+  const isMandiri = (item) => {
+    return item.kategori_sosial?.toLowerCase() === 'sejahtera mandiri';
+  };
+
   const uniqueDesa = [...new Set(data.map(item => item.desa_kelurahan).filter(Boolean))].sort();
 
   const filteredData = data.filter(item => {
@@ -199,8 +211,9 @@ const DataPreviewKeluarga = () => {
     
     if (!matchesSearch) return false;
     
-    if (filterValue === 'sejahtera' && isPra(item)) return false;
+    if (filterValue === 'sejahtera' && (isPra(item) || isMandiri(item))) return false;
     if (filterValue === 'prasejahtera' && !isPra(item)) return false;
+    if (filterValue === 'sejahtera_mandiri' && !isMandiri(item)) return false;
 
     if (selectedDesa && item.desa_kelurahan !== selectedDesa) return false;
     
@@ -209,15 +222,15 @@ const DataPreviewKeluarga = () => {
 
   const stats = {
     total: data.length,
-    sejahtera: data.filter(d => !isPra(d)).length,
-    praSejahtera: data.filter(d => isPra(d)).length
+    praSejahtera: data.filter(d => isPra(d)).length,
+    sejahtera: data.filter(d => !isPra(d) && !isMandiri(d)).length,
+    sejahteraMandiri: data.filter(d => isMandiri(d)).length
   };
 
   return (
     <Container maxWidth="xl" sx={{ mt: 5, mb: 10 }}>
       <div className="admin-header" style={{ marginBottom: '3rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
         <div className="header-title-section">
-          <div className="section-badge">Statistik Kependudukan</div>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Home size={32} /> Data Preview Keluarga
           </h2>
@@ -227,7 +240,7 @@ const DataPreviewKeluarga = () => {
         </div>
         <div className="header-actions">
            <Tooltip title="Refresh Data">
-            <IconButton onClick={fetchData} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
+            <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
               <RefreshIcon size={24} color="#10b981" />
             </IconButton>
           </Tooltip>
@@ -263,17 +276,32 @@ const DataPreviewKeluarga = () => {
         </div>
       </div>
 
-      <Grid container spacing={3} sx={{ mb: 5 }}>
-        <Grid item xs={12} md={4}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexWrap: 'nowrap', 
+          gap: 3, 
+          mb: 5, 
+          overflowX: 'auto',
+          pb: 1, // small padding for scrollbar
+          '&::-webkit-scrollbar': { height: '6px' },
+          '&::-webkit-scrollbar-track': { bgcolor: '#f1f5f9' },
+          '&::-webkit-scrollbar-thumb': { bgcolor: '#cbd5e1', borderRadius: '10px' }
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
           <StatCard title="Total Kepala Keluarga" value={stats.total} icon={<HomeIcon />} color="#10b981" />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <StatCard title="Keluarga Sejahtera" value={stats.sejahtera} icon={<VerifiedUserIcon />} color="#3b82f6" />
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
           <StatCard title="Keluarga Prasejahtera" value={stats.praSejahtera} icon={<PeopleIcon />} color="#f43f5e" />
-        </Grid>
-      </Grid>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
+          <StatCard title="Keluarga Sejahtera" value={stats.sejahtera} icon={<VerifiedUserIcon />} color="#6366f1" />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '240px' }}>
+          <StatCard title="Keluarga Sejahtera Mandiri" value={stats.sejahteraMandiri} icon={<VerifiedUserIcon />} color="#3b82f6" />
+        </Box>
+      </Box>
 
       {/* MAIN TABLE PAPER */}
       <Paper elevation={0} sx={{ borderRadius: 5, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
@@ -313,8 +341,9 @@ const DataPreviewKeluarga = () => {
               }}
             >
               <MenuItem value=""><em>Semua Status</em></MenuItem>
-              <MenuItem value="sejahtera">Sejahtera</MenuItem>
               <MenuItem value="prasejahtera">Prasejahtera</MenuItem>
+              <MenuItem value="sejahtera">Sejahtera</MenuItem>
+              <MenuItem value="sejahtera_mandiri">Sejahtera Mandiri</MenuItem>
             </Select>
           </FormControl>
 
@@ -351,11 +380,20 @@ const DataPreviewKeluarga = () => {
                 {[
                   'NO', 'NO KARTU KELUARGA', 'KEPALA KELUARGA', 'ALAMAT', 'DESA', 'KECAMATAN',
                   'ZONA LINGKAR TAMBANG', 'KOORDINAT', 'JUMLAH ANGGOTA', 'ANGKATAN KERJA', 'BEKERJA', 'BELUM BEKERJA', 'KATEGORI SOSIAL', 'TINGKAT SOSIAL'
-                ].map((head) => (
-                  <th key={head}>
-                    {head}
-                  </th>
-                ))}
+                ].map((head) => {
+                  const centeredHeads = ['NO', 'JUMLAH ANGGOTA', 'ANGKATAN KERJA', 'BEKERJA', 'BELUM BEKERJA'];
+                  const isCentered = centeredHeads.includes(head);
+                  return (
+                    <th key={head} style={{ 
+                      fontSize: '0.8rem', 
+                      fontWeight: '800',
+                      textAlign: isCentered ? 'center' : 'left',
+                      paddingLeft: isCentered ? '0.5rem' : (head === 'ZONA LINGKAR TAMBANG' || head === 'KOORDINAT') ? '40px' : '1rem'
+                    }}>
+                      {head}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -370,28 +408,36 @@ const DataPreviewKeluarga = () => {
                   const isPrasejahtera = row.kategori_sosial?.toLowerCase() === 'prasejahtera';
                   return (
                     <tr key={index}>
-                      <td style={{ textAlign: 'center' }}>{(page - 1) * itemsPerPage + index + 1}</td>
-                      <td style={{ fontWeight: 800, color: '#1e293b' }}>{row.nomor_kk}</td>
-                      <td style={{ fontWeight: 600, color: '#1e293b' }}>{row.kepala_keluarga}</td>
-                      <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.alamat}>{row.alamat}</td>
-                      <td>{row.desa_kelurahan}</td>
-                      <td>{row.kecamatan}</td>
-                      <td>
-                        <span className={`status-badge-lg ${row.zona_lingkar?.toLowerCase() === 'ring 1' ? 'status-danger' : 'status-success'}`} style={{ fontSize: '0.7rem' }}>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                      <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.nomor_kk}</td>
+                      <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.kepala_keluarga}</td>
+                      <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem' }} title={row.alamat}>{row.alamat}</td>
+                      <td style={{ fontSize: '0.75rem' }}>{row.desa_kelurahan}</td>
+                      <td style={{ fontSize: '0.75rem' }}>{row.kecamatan}</td>
+                      <td style={{ fontSize: '0.75rem', paddingLeft: '40px' }}>
+                        <span style={{ 
+                          color: (() => {
+                            const z = (row.zona_lingkar || "").toUpperCase();
+                            if (z.includes("RING 1")) return "#3b82f6";
+                            if (z.includes("RING 2")) return "#10b981";
+                            if (z.includes("RING 3")) return "#000000";
+                            if (z.includes("RING 4")) return "#ef4444";
+                            return "inherit";
+                          })()
+                        }}>
                           {row.zona_lingkar || '-'}
                         </span>
                       </td>
-                      <td style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      <td style={{ fontSize: '0.75rem', color: '#64748b', paddingLeft: '40px' }}>
                         {row.koordinat_latitude && row.koordinat_longitude ? `${row.koordinat_latitude}, ${row.koordinat_longitude}` : '-'}
                       </td>
-                      <td style={{ textAlign: 'center' }}>{row.anggota_keluarga}</td>
-                      <td style={{ textAlign: 'center' }}>{row.angkatan_kerja}</td>
-                      <td style={{ textAlign: 'center', color: (row.sudah_bekerja > 0 ? '#10b981' : 'inherit') }}>{row.sudah_bekerja}</td>
-                      <td style={{ textAlign: 'center', color: (row.belum_bekerja > 0 ? '#f43f5e' : 'inherit') }}>{row.belum_bekerja}</td>
-                      <td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{row.anggota_keluarga}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{row.angkatan_kerja}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', color: (row.sudah_bekerja > 0 ? '#10b981' : 'inherit') }}>{row.sudah_bekerja}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', color: (row.belum_bekerja > 0 ? '#f43f5e' : 'inherit') }}>{row.belum_bekerja}</td>
+                      <td style={{ fontSize: '0.75rem' }}>
                         <span style={{ 
                           fontSize: '0.75rem', 
-                          fontWeight: 700, 
                           textTransform: 'uppercase',
                           color: (row.kategori_sosial?.toLowerCase() === 'sejahtera mandiri' ? '#3b82f6' : 
                                  (row.kategori_sosial?.toLowerCase() === 'prasejahtera' || isPrasejahtera) ? '#ef4444' : '#10b981')
@@ -399,12 +445,12 @@ const DataPreviewKeluarga = () => {
                           {row.kategori_sosial || (isPrasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA')}
                         </span>
                       </td>
-                      <td>
+                      <td style={{ fontSize: '0.75rem' }}>
                         {row.tingkat_sosial ? (
                           <span className={`status-badge-lg ${
                             row.tingkat_sosial.toLowerCase().includes('ekstrem') ? 'status-danger' : 
                             row.tingkat_sosial.toLowerCase().includes('miskin') ? 'status-moved' : 'status-newcomer'
-                          }`} style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                          }`} style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
                             {row.tingkat_sosial}
                           </span>
                         ) : (

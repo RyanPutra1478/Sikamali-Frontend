@@ -215,6 +215,14 @@ export default function AdminMembers({ user }) {
         }
     };
 
+    const handleRefresh = () => {
+        setSearchTerm('');
+        setFilterCategory('');
+        setFilterValue('');
+        setPage(1);
+        loadMembers();
+    };
+
     const loadAllKK = async () => {
         try {
             const data = await adminAPI.getKK();
@@ -239,7 +247,6 @@ export default function AdminMembers({ user }) {
         return age;
     };
 
-    const uniqueAgama = [...new Set(members.map(item => item.agama).filter(Boolean))].sort();
     const uniqueDesa = [...new Set(members.map(item => item.desa).filter(Boolean))].sort();
     const uniqueKecamatan = [...new Set(members.map(item => item.kecamatan).filter(Boolean))].sort();
 
@@ -263,7 +270,6 @@ export default function AdminMembers({ user }) {
 
         if (!filterCategory || !filterValue) return true;
 
-        if (filterCategory === 'Agama') return m.agama === filterValue;
         if (filterCategory === 'Desa') return m.desa === filterValue;
         if (filterCategory === 'Kecamatan') return m.kecamatan === filterValue;
         if (filterCategory === 'Jenis Kelamin') return m.jenis_kelamin === filterValue;
@@ -363,7 +369,6 @@ export default function AdminMembers({ user }) {
         <div className="admin-page">
             <div className="admin-header">
                 <div className="header-title-section">
-                    <div className="section-badge">Manajemen Data Penduduk</div>
                     <h2><Users size={28} /> Anggota Keluarga</h2>
                     <p className="header-subtitle">
                         Daftar seluruh penduduk yang terdaftar dalam sistem dan riwayat administrasi kependudukan.
@@ -371,7 +376,7 @@ export default function AdminMembers({ user }) {
                 </div>
                 <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     <Tooltip title="Refresh Data">
-                        <IconButton onClick={loadMembers} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+                        <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
                             <RefreshIcon size={20} color="#10b981" />
                         </IconButton>
                     </Tooltip>
@@ -668,7 +673,6 @@ export default function AdminMembers({ user }) {
                                 >
                                     <MenuItem value=""><em>None</em></MenuItem>
                                     <MenuItem value="Rentang Umur">Rentang Umur</MenuItem>
-                                    <MenuItem value="Agama">Agama</MenuItem>
                                     <MenuItem value="Desa">Desa</MenuItem>
                                     <MenuItem value="Kecamatan">Kecamatan</MenuItem>
                                     <MenuItem value="Jenis Kelamin">Jenis Kelamin</MenuItem>
@@ -687,9 +691,6 @@ export default function AdminMembers({ user }) {
                                     >
                                         <MenuItem value=""><em>All</em></MenuItem>
                                         {filterCategory === 'Rentang Umur' && Object.keys(ageRanges).map(opt => (
-                                            <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                                        ))}
-                                        {filterCategory === 'Agama' && uniqueAgama.map(opt => (
                                             <MenuItem key={opt} value={opt}>{opt}</MenuItem>
                                         ))}
                                         {filterCategory === 'Desa' && uniqueDesa.map(opt => (
@@ -717,31 +718,31 @@ export default function AdminMembers({ user }) {
                         <table className="modern-table">
                             <thead>
                                 <tr>
-                                    <th style={{ minWidth: '50px' }}>NO</th>
-                                    <th style={{ minWidth: '180px' }}>NO KARTU KELUARGA</th>
-                                    <th style={{ minWidth: '200px' }}>KEPALA KELUARGA</th>
-                                    <th style={{ minWidth: '200px' }}>ANGGOTA KELUARGA</th>
-                                    <th style={{ minWidth: '180px' }}>NIK</th>
-                                    <th style={{ minWidth: '100px' }}>JENIS KELAMIN</th>
-                                    <th style={{ minWidth: '150px' }}>TEMPAT LAHIR</th>
-                                    <th style={{ minWidth: '120px' }}>TANGGAL LAHIR</th>
-                                    <th style={{ minWidth: '80px' }}>UMUR</th>
-                                    <th style={{ minWidth: '100px' }}>AGAMA</th>
-                                    <th style={{ minWidth: '150px' }}>PENDIDIKAN</th>
-                                    <th style={{ minWidth: '150px' }}>PEKERJAAN</th>
-                                    <th style={{ minWidth: '100px' }}>GOLONGAN DARAH</th>
-                                    <th style={{ minWidth: '150px' }}>STATUS PERKAWINAN</th>
-                                    <th style={{ minWidth: '150px' }}>TANGGAL PERKAWINAN</th>
-                                    <th style={{ minWidth: '180px' }}>HUBUNGAN DALAM KELUARGA</th>
-                                    <th style={{ minWidth: '150px' }}>STATUS DOMISILI</th>
-                                    <th style={{ minWidth: '150px' }}>KEWARGANEGARAAN</th>
-                                    <th style={{ minWidth: '150px' }}>NO PASPORT</th>
-                                    <th style={{ minWidth: '150px' }}>NO KITAP</th>
-                                    <th style={{ minWidth: '150px' }}>NAMA AYAH</th>
-                                    <th style={{ minWidth: '150px' }}>NAMA IBU</th>
-                                    <th style={{ minWidth: '120px' }}>STATUS DATA</th>
-                                    <th style={{ minWidth: '200px' }}>KETERANGAN</th>
-                                    <th style={{ minWidth: '120px' }}>AKSI</th>
+                                    <th style={{ minWidth: '40px', fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
+                                    <th style={{ minWidth: '150px', fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
+                                    <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
+                                    <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>ANGGOTA KELUARGA</th>
+                                    <th style={{ minWidth: '150px', fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>JENIS KELAMIN</th>
+                                    <th style={{ minWidth: '120px', fontSize: '0.8rem', fontWeight: '800' }}>TEMPAT LAHIR</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>TANGGAL LAHIR</th>
+                                    <th style={{ minWidth: '70px', fontSize: '0.8rem', fontWeight: '800' }}>UMUR</th>
+                                    <th style={{ minWidth: '90px', fontSize: '0.8rem', fontWeight: '800' }}>AGAMA</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>PENDIDIKAN</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>PEKERJAAN</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>GOLONGAN DARAH</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS PERKAWINAN</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>TANGGAL PERKAWINAN</th>
+                                    <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>HUBUNGAN DALAM KELUARGA</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS DOMISILI</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>KEWARGANEGARAAN</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NO PASPORT</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NO KITAP</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA AYAH</th>
+                                    <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA IBU</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS DATA</th>
+                                    <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>KETERANGAN</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -752,40 +753,45 @@ export default function AdminMembers({ user }) {
                                         .slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage)
                                         .map((m, index) => (
                                         <tr key={m.id}>
-                                            <td>{(page - 1) * itemsPerPage + index + 1}</td>
-                                            <td className="nowrap-cell">{m.nomor_kk || '-'}</td>
-                                            <td style={{ fontWeight: '600' }}>{m.kepala_keluarga || '-'}</td>
-                                            <td style={{ fontWeight: '600', color: '#2c3e50' }}>{m.nama}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                                            <td>{m.nomor_kk || '-'}</td>
+                                            <td>{m.kepala_keluarga || '-'}</td>
+                                            <td>{m.nama}</td>
                                             <td>{m.nik}</td>
-                                             <td>{m.jenis_kelamin?.toString().toUpperCase().startsWith('L') ? 'LAKI-LAKI' : (m.jenis_kelamin?.toString().toUpperCase().startsWith('P') ? 'PEREMPUAN' : '-')}</td>
-                                            <td>{m.tempat_lahir || '-'}</td>
-                                            <td>{m.tanggal_lahir ? new Date(m.tanggal_lahir).toLocaleDateString('id-ID') : '-'}</td>
-                                            <td>{m.tanggal_lahir ? new Date().getFullYear() - new Date(m.tanggal_lahir).getFullYear() : (m.umur || '-')}</td>
-                                            <td>{m.agama || '-'}</td>
-                                            <td className="nowrap-cell">{m.pendidikan || '-'}</td>
-                                            <td className="nowrap-cell">{m.pekerjaan || '-'}</td>
-                                            <td style={{ textAlign: 'center' }}>{m.golongan_darah || '-'}</td>
-                                            <td>{m.status_perkawinan || '-'}</td>
-                                            <td>{m.tanggal_perkawinan ? new Date(m.tanggal_perkawinan).toLocaleDateString('id-ID') : '-'}</td>
-                                            <td>{m.hubungan_keluarga || '-'}</td>
+                                             <td>
+                                                 <span>
+                                                     {m.jenis_kelamin?.toString().toUpperCase().startsWith('L') ? 'LAKI-LAKI' : (m.jenis_kelamin?.toString().toUpperCase().startsWith('P') ? 'PEREMPUAN' : '-')}
+                                                 </span>
+                                             </td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.tempat_lahir || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.tanggal_lahir ? new Date(m.tanggal_lahir).toLocaleDateString('id-ID') : '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.tanggal_lahir ? new Date().getFullYear() - new Date(m.tanggal_lahir).getFullYear() : (m.umur || '-')}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.agama || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }} className="nowrap-cell">{m.pendidikan || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }} className="nowrap-cell">{m.pekerjaan || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem', textAlign: 'center' }}>{m.golongan_darah || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.status_perkawinan || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.tanggal_perkawinan ? new Date(m.tanggal_perkawinan).toLocaleDateString('id-ID') : '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.hubungan_keluarga || '-'}</td>
                                             <td>
-                                                <span className={`status-badge-lg ${(() => {
-                                                    const s = (m.status_domisili || '').toLowerCase();
-                                                    if (s.includes('meninggal')) return 'status-deceased';
-                                                    if (s.includes('pindah')) return 'status-moved';
-                                                    if (s.includes('pendatang')) return 'status-newcomer';
-                                                    return 'status-permanent';
-                                                })()}`} style={{ fontSize: '0.7rem' }}>
-                                                    {m.status_domisili}
+                                                <span style={{
+                                                   color: (() => {
+                                                       const s = (m.status_domisili || '').toUpperCase().trim();
+                                                       if (s.includes('PENDUDUK TETAP')) return '#10b981';
+                                                       if (s.includes('WARGA PENDATANG')) return '#3b82f6';
+                                                       return 'inherit';
+                                                   })()
+                                                }}>
+                                                    {m.status_domisili || '-'}
                                                 </span>
                                             </td>
-                                            <td>{m.kewarganegaraan || 'WNI'}</td>
-                                            <td>{m.no_paspor || '-'}</td>
-                                            <td>{m.no_kitap || '-'}</td>
-                                            <td>{m.nama_ayah || '-'}</td>
-                                            <td>{m.nama_ibu || '-'}</td>
-                                            <td>{m.status_data || 'AKTIF'}</td>
-                                            <td>{m.keterangan || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.kewarganegaraan || 'WNI'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.no_paspor || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.no_kitap || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.nama_ayah || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.nama_ibu || '-'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.status_data || 'AKTIF'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.keterangan || '-'}</td>
                                             <td>
                                                 <div className="action-buttons">
                                                     <button className="btn-icon view" onClick={() => handleViewMember(m)} title="Lihat Detail">
