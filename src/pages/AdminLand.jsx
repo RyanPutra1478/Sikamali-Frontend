@@ -253,9 +253,9 @@ const AdminLand = () => {
 
                   <div className="details-grid">
                     <div className="info-column">
-                      <div className="info-block" style={{ marginBottom: "1.5rem" }}>
+                      <div className="info-block" style={{ marginBottom: "1rem" }}>
                         <label>Nomor Kartu Keluarga</label>
-                        <div className="content" style={{ fontSize: "1.1rem", color: "#10b981", letterSpacing: "1px" }}>
+                        <div className="content" style={{ fontSize: "1.1rem", color: "#1e293b", letterSpacing: "1px", fontWeight: "600" }}>
                           {selectedItem.nomor_kk}
                         </div>
                       </div>
@@ -265,7 +265,7 @@ const AdminLand = () => {
                       </div>
                     </div>
                     <div className="info-column">
-                      <div className="info-block" style={{ marginBottom: "1.5rem" }}>
+                      <div className="info-block" style={{ marginBottom: "1rem" }}>
                         <label>Koordinat Lokasi</label>
                         <div className="content">
                           <span className="coords-badge" style={{ padding: "4px 12px", borderRadius: "8px", background: "#f1f5f9", border: "1px solid #e2e8f0" }}>
@@ -274,7 +274,7 @@ const AdminLand = () => {
                           </span>
                         </div>
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div className="info-block">
                           <label>Desa</label>
                           <div className="content">{selectedItem.desa || "-"}</div>
