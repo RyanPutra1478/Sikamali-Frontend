@@ -22,7 +22,8 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon, Home as HomeIcon, VerifiedUser as VerifiedUserIcon, People as PeopleIcon, FilterList as FilterListIcon } from '@mui/icons-material';
 import { Home, Download as FileDownloadIcon, RefreshCw as RefreshIcon } from 'lucide-react';
-import { adminAPI, previewAPI } from '../services/api';
+import { previewAPI } from '../services/api';
+import { getRolePermissions } from '../utils/permissions';
 import * as XLSX from 'xlsx';
 import './AdminTables.css';
 import './AdminPage.css';
@@ -31,11 +32,11 @@ import './AdminPage.css';
 const StatCard = ({ title, value, icon, color }) => (
   <Card
     sx={{
-      minHeight: '110px',
+      minHeight: '80px',
       display: 'flex',
       alignItems: 'center',
-      px: 3,
-      borderRadius: '24px',
+      px: 2,
+      borderRadius: '16px',
       border: '1px solid #f1f5f9',
       bgcolor: 'white',
       position: 'relative',
@@ -43,8 +44,8 @@ const StatCard = ({ title, value, icon, color }) => (
       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)',
       transition: 'all 0.3s ease',
       '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: `0 12px 20px -5px ${alpha(color, 0.1)}`,
+        transform: 'translateY(-2px)',
+        boxShadow: `0 8px 15px -5px ${alpha(color, 0.1)}`,
       }
     }}
   >
@@ -64,20 +65,20 @@ const StatCard = ({ title, value, icon, color }) => (
 
     <Box
       sx={{
-        width: 68,
-        height: 68,
-        borderRadius: '18px',
+        width: 48,
+        height: 48,
+        borderRadius: '12px',
         bgcolor: alpha(color, 0.08),
         color: color,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        mr: 2.5,
+        mr: 2,
         zIndex: 1,
         border: `1px solid ${alpha(color, 0.1)}`
       }}
     >
-      {React.cloneElement(icon, { sx: { fontSize: 32 } })}
+      {React.cloneElement(icon, { sx: { fontSize: 24 } })}
     </Box>
 
     <Box sx={{ zIndex: 1 }}>
@@ -99,7 +100,7 @@ const StatCard = ({ title, value, icon, color }) => (
           sx={{ 
             fontWeight: 850, 
             color: '#0f172a', 
-            fontSize: '1.75rem',
+            fontSize: '1.4rem',
             lineHeight: 1 
           }}
         >
@@ -120,7 +121,7 @@ const StatCard = ({ title, value, icon, color }) => (
   </Card>
 );
 
-const DataPreviewKeluarga = () => {
+const DataPreviewKeluarga = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -131,6 +132,10 @@ const DataPreviewKeluarga = () => {
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
+
+  const role = user?.role || 'user';
+  const perms = getRolePermissions(role);
+  const canExport = perms?.dataPreview?.penduduk?.export; // Reusing penduduk export perms for keluarga preview
 
   useEffect(() => {
     fetchData();
@@ -228,13 +233,13 @@ const DataPreviewKeluarga = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 5, mb: 10 }}>
-      <div className="admin-header" style={{ marginBottom: '3rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+      <div className="admin-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
         <div className="header-title-section">
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Home size={32} /> Data Preview Keluarga
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Home size={28} /> Data Preview Keluarga
           </h2>
-          <p className="header-subtitle" style={{ fontSize: '1.1rem', color: '#64748b', marginTop: '8px' }}>
+          <p className="header-subtitle" style={{ fontSize: '0.95rem', color: '#64748b', marginTop: '4px' }}>
             Ringkasan data Kartu Keluarga dan statistik kesejahteraan desa lingkar tambang.
           </p>
         </div>
@@ -244,35 +249,39 @@ const DataPreviewKeluarga = () => {
               <RefreshIcon size={24} color="#10b981" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export Excel">
-            <IconButton 
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-              sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1.5 }}
-            >
-              <FileDownloadIcon size={24} />
-            </IconButton>
-          </Tooltip>
+          {canExport && (
+            <>
+              <Tooltip title="Export Excel">
+                <IconButton 
+                  onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                  sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1.5 }}
+                >
+                  <FileDownloadIcon size={24} />
+                </IconButton>
+              </Tooltip>
 
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={openExportMenu}
-            onClose={() => setExportMenuAnchor(null)}
-            PaperProps={{
-              sx: {
-                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                borderRadius: 3,
-                mt: 1,
-                border: '1px solid #e2e8f0'
-              }
-            }}
-          >
-            <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-              <FileDownloadIcon size={18} /> Export Data Terfilter ({filteredData.length})
-            </MenuItem>
-            <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-              <PeopleIcon size={18} /> Export Semua Data ({data.length})
-            </MenuItem>
-          </Menu>
+              <Menu
+                anchorEl={exportMenuAnchor}
+                open={openExportMenu}
+                onClose={() => setExportMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                    borderRadius: 3,
+                    mt: 1,
+                    border: '1px solid #e2e8f0'
+                  }
+                }}
+              >
+                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                  <FileDownloadIcon size={18} /> Export Data Terfilter ({filteredData.length})
+                </MenuItem>
+                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                  <PeopleIcon size={18} /> Export Semua Data ({data.length})
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </div>
       </div>
 
@@ -280,32 +289,32 @@ const DataPreviewKeluarga = () => {
         sx={{ 
           display: 'flex', 
           flexWrap: 'nowrap', 
-          gap: 3, 
-          mb: 5, 
+          gap: 2, 
+          mb: 3, 
           overflowX: 'auto',
           pb: 1, // small padding for scrollbar
-          '&::-webkit-scrollbar': { height: '6px' },
+          '&::-webkit-scrollbar': { height: '4px' },
           '&::-webkit-scrollbar-track': { bgcolor: '#f1f5f9' },
           '&::-webkit-scrollbar-thumb': { bgcolor: '#cbd5e1', borderRadius: '10px' }
         }}
       >
-        <Box sx={{ flex: 1, minWidth: '240px' }}>
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <StatCard title="Total Kepala Keluarga" value={stats.total} icon={<HomeIcon />} color="#10b981" />
         </Box>
-        <Box sx={{ flex: 1, minWidth: '240px' }}>
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <StatCard title="Keluarga Prasejahtera" value={stats.praSejahtera} icon={<PeopleIcon />} color="#f43f5e" />
         </Box>
-        <Box sx={{ flex: 1, minWidth: '240px' }}>
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <StatCard title="Keluarga Sejahtera" value={stats.sejahtera} icon={<VerifiedUserIcon />} color="#6366f1" />
         </Box>
-        <Box sx={{ flex: 1, minWidth: '240px' }}>
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <StatCard title="Keluarga Sejahtera Mandiri" value={stats.sejahteraMandiri} icon={<VerifiedUserIcon />} color="#3b82f6" />
         </Box>
       </Box>
 
       {/* MAIN TABLE PAPER */}
-      <Paper elevation={0} sx={{ borderRadius: 5, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
-        <Box sx={{ p: 4, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#fcfcfc', borderBottom: '1px solid #f1f5f9' }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)' }}>
+        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#fcfcfc', borderBottom: '1px solid #f1f5f9' }}>
           <TextField
             size="small"
             placeholder="Cari No KK, Kepala Keluarga, dsb..."
@@ -385,10 +394,11 @@ const DataPreviewKeluarga = () => {
                   const isCentered = centeredHeads.includes(head);
                   return (
                     <th key={head} style={{ 
-                      fontSize: '0.8rem', 
+                      fontSize: '0.75rem', 
                       fontWeight: '800',
                       textAlign: isCentered ? 'center' : 'left',
-                      paddingLeft: isCentered ? '0.5rem' : (head === 'ZONA LINGKAR TAMBANG' || head === 'KOORDINAT') ? '40px' : '1rem'
+                      padding: '8px 12px',
+                      paddingLeft: isCentered ? '12px' : (head === 'ZONA LINGKAR TAMBANG' || head === 'KOORDINAT') ? '40px' : '12px'
                     }}>
                       {head}
                     </th>
@@ -408,13 +418,13 @@ const DataPreviewKeluarga = () => {
                   const isPrasejahtera = row.kategori_sosial?.toLowerCase() === 'prasejahtera';
                   return (
                     <tr key={index}>
-                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
-                      <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.nomor_kk}</td>
-                      <td style={{ color: '#1e293b', fontSize: '0.75rem' }}>{row.kepala_keluarga}</td>
-                      <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem' }} title={row.alamat}>{row.alamat}</td>
-                      <td style={{ fontSize: '0.75rem' }}>{row.desa_kelurahan}</td>
-                      <td style={{ fontSize: '0.75rem' }}>{row.kecamatan}</td>
-                      <td style={{ fontSize: '0.75rem', paddingLeft: '40px' }}>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{(page - 1) * itemsPerPage + index + 1}</td>
+                      <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.nomor_kk}</td>
+                      <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.kepala_keluarga}</td>
+                      <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem', padding: '5px 12px' }} title={row.alamat}>{row.alamat}</td>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.desa_kelurahan}</td>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.kecamatan}</td>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 40px' }}>
                         <span style={{ 
                           color: (() => {
                             const z = (row.zona_lingkar || "").toUpperCase();
@@ -428,14 +438,14 @@ const DataPreviewKeluarga = () => {
                           {row.zona_lingkar || '-'}
                         </span>
                       </td>
-                      <td style={{ fontSize: '0.75rem', color: '#64748b', paddingLeft: '40px' }}>
+                      <td style={{ fontSize: '0.75rem', color: '#64748b', padding: '5px 40px' }}>
                         {row.koordinat_latitude && row.koordinat_longitude ? `${row.koordinat_latitude}, ${row.koordinat_longitude}` : '-'}
                       </td>
-                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{row.anggota_keluarga}</td>
-                      <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{row.angkatan_kerja}</td>
-                      <td style={{ textAlign: 'center', fontSize: '0.75rem', color: (row.sudah_bekerja > 0 ? '#10b981' : 'inherit') }}>{row.sudah_bekerja}</td>
-                      <td style={{ textAlign: 'center', fontSize: '0.75rem', color: (row.belum_bekerja > 0 ? '#f43f5e' : 'inherit') }}>{row.belum_bekerja}</td>
-                      <td style={{ fontSize: '0.75rem' }}>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{row.anggota_keluarga}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{row.angkatan_kerja}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px', color: (row.sudah_bekerja > 0 ? '#10b981' : 'inherit') }}>{row.sudah_bekerja}</td>
+                      <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px', color: (row.belum_bekerja > 0 ? '#f43f5e' : 'inherit') }}>{row.belum_bekerja}</td>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
                         <span style={{ 
                           fontSize: '0.75rem', 
                           textTransform: 'uppercase',
@@ -445,7 +455,7 @@ const DataPreviewKeluarga = () => {
                           {row.kategori_sosial || (isPrasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA')}
                         </span>
                       </td>
-                      <td style={{ fontSize: '0.75rem' }}>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
                         {row.tingkat_sosial ? (
                           <span className={`status-badge-lg ${
                             row.tingkat_sosial.toLowerCase().includes('ekstrem') ? 'status-danger' : 
@@ -469,7 +479,10 @@ const DataPreviewKeluarga = () => {
             count={Math.ceil(filteredData.length / itemsPerPage)} 
             page={page} 
             onChange={(e,v) => setPage(v)} 
-            sx={{ '& .Mui-selected': { bgcolor: '#10b981 !important', color: 'white' } }}
+            sx={{ 
+              '& .MuiPaginationItem-root': { fontWeight: 700 },
+              '& .Mui-selected': { bgcolor: '#10b981 !important', color: 'white' } 
+            }}
           />
         </Box>
       </Paper>

@@ -11,9 +11,9 @@ export const ROLE_PERMISSIONS = {
       announcements: { view: true, create: true, edit: true, delete: true },
     },
     database: {
-      kk: { view: true, insert: true, edit: true, delete: true, copy: true },
-      employment: { view: true, insert: true, edit: true, delete: true, copy: true },
-      kesejahteraan: { view: true, insert: true, edit: true, delete: true, copy: true },
+      kk: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
+      employment: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
+      kesejahteraan: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
     },
     dataPreview: {
       penduduk: { view: true, edit: true, delete: true, copy: true, export: true },
@@ -36,14 +36,14 @@ export const ROLE_PERMISSIONS = {
       announcements: { view: false, create: false, edit: false, delete: false },
     },
     database: {
-      kk: { view: true, insert: true, edit: true, delete: false, copy: true },
-      employment: { view: true, insert: true, edit: true, delete: false, copy: true },
-      kesejahteraan: { view: true, insert: true, edit: true, delete: false, copy: true },
+      kk: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
+      employment: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
+      kesejahteraan: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
     },
     dataPreview: {
-      penduduk: { view: true, edit: true, delete: true, copy: true, export: true },
-      employment: { view: true, edit: true, delete: true, copy: true, export: true },
-      kesejahteraan: { view: true, edit: true, delete: true, copy: true, export: true },
+      penduduk: { view: true, edit: true, delete: true, copy: true, export: false },
+      employment: { view: true, edit: true, delete: true, copy: true, export: false },
+      kesejahteraan: { view: true, edit: true, delete: true, copy: true, export: false },
     },
     lokasiZona: {
       // Full Access restored as per request

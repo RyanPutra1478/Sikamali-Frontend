@@ -139,10 +139,11 @@ export default function LandingPage() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      width: '100vw',
+      width: '100%',
       background: '#064e3b', 
       overflowX: 'hidden',
       overflowY: 'auto',
+      scrollBehavior: 'smooth',
       position: 'relative',
       fontFamily: "'Inter', sans-serif"
     }}>
@@ -385,7 +386,7 @@ export default function LandingPage() {
         {/* Statistics Grid */}
         <div className="animate-fade-in delay-1" style={{ 
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(120px, 15vw, 150px), 1fr))',
           gap: '12px',
           width: '100%',
           maxWidth: '1200px'

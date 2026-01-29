@@ -13,7 +13,7 @@ import Pagination from '@mui/material/Pagination';
 import * as XLSX from 'xlsx';
 import { kkAPI } from '../services/api';
 
-export default function AdminPrasejahtera({ readOnly = false, canCreate = false, canDelete = false }) {
+export default function AdminPrasejahtera({ readOnly = false, canCreate = false, canDelete = false, canExport = false }) {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -305,35 +305,39 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               <RefreshIcon size={20} color="#10b981" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export Excel">
-            <IconButton 
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-              sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-            >
-              <FileDownloadIconMui size={20} />
-            </IconButton>
-          </Tooltip>
+          {canExport && (
+            <>
+              <Tooltip title="Export Excel">
+                <IconButton 
+                  onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                  sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                >
+                  <FileDownloadIconMui size={20} />
+                </IconButton>
+              </Tooltip>
 
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={openExportMenu}
-            onClose={() => setExportMenuAnchor(null)}
-            PaperProps={{
-              sx: {
-                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                borderRadius: 3,
-                mt: 1,
-                border: '1px solid #e2e8f0'
-              }
-            }}
-          >
-            <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-              <FileDownloadIcon size={18} /> Export Terfilter ({filteredData.length})
-            </MenuItem>
-            <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-              <Users size={18} /> Export Semua ({data.length})
-            </MenuItem>
-          </Menu>
+              <Menu
+                anchorEl={exportMenuAnchor}
+                open={openExportMenu}
+                onClose={() => setExportMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                    borderRadius: 3,
+                    mt: 1,
+                    border: '1px solid #e2e8f0'
+                  }
+                }}
+              >
+                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                  <FileDownloadIcon size={18} /> Export Terfilter ({filteredData.length})
+                </MenuItem>
+                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                  <Users size={18} /> Export Semua ({data.length})
+                </MenuItem>
+              </Menu>
+            </>
+          )}
 
           {!readOnly && canCreate && (
             <button
@@ -355,7 +359,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                 setShowForm(true);
               }}
             >
-              + Input Data Baru
+              + Tambah Data Kesejahteraan
             </button>
           )}
         </div>

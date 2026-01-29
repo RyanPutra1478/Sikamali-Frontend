@@ -205,22 +205,12 @@ export default function AdminUsers({ currentUser }) {
             </p>
           </div>
           <div className="header-actions">
-            <Button 
-              variant="contained" 
-              startIcon={<Plus size={20} />}
+            <button 
+              className="btn-add-data"
               onClick={() => setShowModal(true)}
-              sx={{ 
-                bgcolor: '#10b981', 
-                borderRadius: '8px',
-                textTransform: 'none',
-                px: 3,
-                py: 1.2,
-                fontWeight: 600,
-                '&:hover': { bgcolor: '#059669' }
-              }}
             >
-              Tambah User Baru
-            </Button>
+              + Tambah Pengguna Baru
+            </button>
           </div>
         </div>
 

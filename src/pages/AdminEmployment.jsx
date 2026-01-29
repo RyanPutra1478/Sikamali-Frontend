@@ -80,6 +80,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     edit: false,
     delete: false,
     copy: false,
+    export: false,
   };
 
   const isReadOnlyMode = readOnly || !employmentPerm.edit;
@@ -401,52 +402,47 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                 <RefreshIcon size={20} color="#10b981" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Export Excel">
-              <IconButton 
-                onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-                sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-              >
-                <FileDownloadIconMui size={20} />
-              </IconButton>
-            </Tooltip>
+            {employmentPerm.export && (
+              <>
+                <Tooltip title="Export Excel">
+                  <IconButton 
+                    onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                    sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                  >
+                    <FileDownloadIconMui size={20} />
+                  </IconButton>
+                </Tooltip>
 
-            <Menu
-              anchorEl={exportMenuAnchor}
-              open={openExportMenu}
-              onClose={() => setExportMenuAnchor(null)}
-              PaperProps={{
-                sx: {
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  borderRadius: 3,
-                  mt: 1,
-                  border: '1px solid #e2e8f0'
-                }
-              }}
-            >
-              <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-                <FileDownloadIcon size={18} /> Export Terfilter ({filteredList.length})
-              </MenuItem>
-              <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-                <Users size={18} /> Export Semua ({dataList.length})
-              </MenuItem>
-            </Menu>
+                <Menu
+                  anchorEl={exportMenuAnchor}
+                  open={openExportMenu}
+                  onClose={() => setExportMenuAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                      borderRadius: 3,
+                      mt: 1,
+                      border: '1px solid #e2e8f0'
+                    }
+                  }}
+                >
+                  <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                    <FileDownloadIcon size={18} /> Export Terfilter ({filteredList.length})
+                  </MenuItem>
+                  <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                    <Users size={18} /> Export Semua ({dataList.length})
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
 
             {activeTab === 'list' && !isReadOnlyMode && employmentPerm.edit && (
-              <Button 
-                variant="contained" 
-                startIcon={<Box component="span" sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>+</Box>}
+              <button
+                className="btn-add-data"
                 onClick={() => openEditForm(null)}
-                sx={{ 
-                  bgcolor: '#10b981', 
-                  '&:hover': { bgcolor: '#059669' },
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  px: 3,
-                  fontWeight: 600
-                }}
               >
-                Tambah Anggota
-              </Button>
+                + Tambah Angkatan Kerja
+              </button>
             )}
             
             {activeTab === 'create' && (

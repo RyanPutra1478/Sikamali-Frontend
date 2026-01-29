@@ -100,22 +100,12 @@ export default function AdminAnnouncements({ readOnly }) {
           </div>
           <div className="header-actions">
             {!readOnly && (
-              <Button
-                variant="contained"
-                startIcon={<Plus size={20} />}
+              <button
+                className="btn-add-data"
                 onClick={() => setShowModal(true)}
-                sx={{
-                  bgcolor: '#10b981',
-                  '&:hover': { bgcolor: '#059669' },
-                  borderRadius: '8px',
-                  px: 3,
-                  py: 1.2,
-                  textTransform: 'none',
-                  fontWeight: 600
-                }}
               >
-                Buat Pengumuman
-              </Button>
+                + Buat Pengumuman Baru
+              </button>
             )}
           </div>
         </div>

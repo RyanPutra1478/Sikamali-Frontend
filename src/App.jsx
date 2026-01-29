@@ -321,6 +321,7 @@ function App() {
               readOnly={!perms?.database?.kesejahteraan?.edit}
               canCreate={perms?.database?.kesejahteraan?.insert}
               canDelete={perms?.database?.kesejahteraan?.delete}
+              canExport={perms?.database?.kesejahteraan?.export}
             />
           )}
         />

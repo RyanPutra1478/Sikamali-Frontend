@@ -567,42 +567,46 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
               <RefreshIcon size={20} color="#10b981" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export Excel">
-            <IconButton 
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-              sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-            >
-              <FileDownloadIconMui size={20} />
-            </IconButton>
-          </Tooltip>
+          {kkPerm.export && (
+            <>
+              <Tooltip title="Export Excel">
+                <IconButton 
+                  onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                  sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                >
+                  <FileDownloadIconMui size={20} />
+                </IconButton>
+              </Tooltip>
 
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={openExportMenu}
-            onClose={() => setExportMenuAnchor(null)}
-            PaperProps={{
-              sx: {
-                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                borderRadius: 3,
-                mt: 1,
-                border: '1px solid #e2e8f0'
-              }
-            }}
-          >
-            <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-              <FileDownloadIcon size={18} /> Export Terfilter ({filteredKK.length})
-            </MenuItem>
-            <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-              <Users size={18} /> Export Semua ({kkList.length})
-            </MenuItem>
-          </Menu>
+              <Menu
+                anchorEl={exportMenuAnchor}
+                open={openExportMenu}
+                onClose={() => setExportMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                    borderRadius: 3,
+                    mt: 1,
+                    border: '1px solid #e2e8f0'
+                  }
+                }}
+              >
+                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                  <FileDownloadIcon size={18} /> Export Terfilter ({filteredKK.length})
+                </MenuItem>
+                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                  <Users size={18} /> Export Semua ({kkList.length})
+                </MenuItem>
+              </Menu>
+            </>
+          )}
 
           {mode === "full" && activeTab === "list" && kkPerm.insert && (
             <button
               className="btn-add-data"
               onClick={() => setActiveTab("create")}
             >
-              + Input KK Baru
+              + Tambah Kartu Keluarga
             </button>
           )}
           {mode === "full" && activeTab !== "list" && (
