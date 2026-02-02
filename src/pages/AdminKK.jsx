@@ -74,7 +74,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
           kabupaten: parsed.kabupaten || "",
           kecamatan: parsed.kecamatan || "",
           desa: parsed.desa || "",
-          zona_lingkar_tambang: parsed.zona_lingkar_tambang || ""
+          zona: parsed.zona || ""
         };
       } catch (e) {
         return baseForm;
@@ -152,7 +152,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       kabupaten: "",
       kecamatan: "",
       desa: "",
-      zona_lingkar_tambang: "",
+      zona: "",
       ring: "",
     });
     setRegencies([]);
@@ -214,7 +214,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       kabupaten: regName,
       kecamatan: "",
       desa: "",
-      zona_lingkar_tambang: "",
+      zona: "",
       ring: "",
     });
     setDistricts([]);
@@ -229,7 +229,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     ...new Set(kkList.map((item) => item.kecamatan).filter(Boolean)),
   ].sort();
   const uniqueZona = [
-    ...new Set(kkList.map((item) => item.zona_lingkar_tambang).filter(Boolean)),
+    ...new Set(kkList.map((item) => item.zona).filter(Boolean)),
   ].sort();
 
   const filteredKK = kkList.filter((kk) => {
@@ -247,7 +247,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     if (filterCategory === "Desa") return kk.desa === filterValue;
     if (filterCategory === "Kecamatan") return kk.kecamatan === filterValue;
     if (filterCategory === "Zona Lingkar")
-      return kk.zona_lingkar_tambang === filterValue;
+      return kk.zona === filterValue;
 
     return true;
   });
@@ -259,7 +259,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       ...createForm,
       kecamatan: distName,
       desa: "",
-      zona_lingkar_tambang: "",
+      zona: "",
       ring: "",
     });
     setVillages([]);
@@ -275,7 +275,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     setCreateForm({
       ...createForm,
       desa: villageName,
-      zona_lingkar_tambang: zona,
+      zona: zona,
     });
   };
 
@@ -351,7 +351,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       tanggal_diterbitkan: "",
       status_hard_copy: "BELUM ADA",
       keterangan: "",
-      zona_lingkar_tambang: "",
+      zona: "",
     };
     if (lastData) {
       try {
@@ -363,7 +363,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
           kabupaten: parsed.kabupaten || "",
           kecamatan: parsed.kecamatan || "",
           desa: parsed.desa || "",
-          zona_lingkar_tambang: parsed.zona_lingkar_tambang || ""
+          zona: parsed.zona || ""
         };
       } catch (e) {
         return baseForm;
@@ -384,7 +384,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
         kabupaten: createForm.kabupaten,
         kecamatan: createForm.kecamatan,
         desa: createForm.desa,
-        zona_lingkar_tambang: createForm.zona_lingkar_tambang
+        zona: createForm.zona
       }));
 
       setSuccessDialogOpen(true);
@@ -428,7 +428,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       kabupaten: kk.kabupaten,
       kecamatan: kk.kecamatan,
       desa: kk.desa,
-      zona_lingkar_tambang: kk.zona_lingkar_tambang,
+      zona: kk.zona,
       tanggal_diterbitkan: formatDateInput(kk.tanggal_diterbitkan),
       status_hard_copy: kk.status_hard_copy || "Tidak Ada",
       keterangan: kk.keterangan || "",
@@ -465,7 +465,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
         kabupaten: "",
         kecamatan: "",
         desa: "",
-        zona_lingkar_tambang: "",
+        zona: "",
         latitude: "",
         longitude: "",
       });
@@ -520,7 +520,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       'Kecamatan': row.kecamatan || '-',
       'Kabupaten/Kota': row.kabupaten || '-',
       'Provinsi': row.provinsi || '-',
-      'Zona Lingkar Tambang': row.zona_lingkar_tambang || '-',
+      'ZONA': row.zona || '-',
       'Latitude': row.latitude || row.lat || '-',
       'Longitude': row.longitude || row.lng || '-',
       'Tanggal Diterbitkan': row.tanggal_diterbitkan ? new Date(row.tanggal_diterbitkan).toLocaleDateString("id-ID") : '-',
@@ -558,46 +558,50 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
           </p>
         </div>
         <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Tooltip title="Refresh Data">
-            <IconButton 
-              type="button"
-              onClick={() => handleRefresh()} 
-              sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}
-            >
-              <RefreshIcon size={20} color="#10b981" />
-            </IconButton>
-          </Tooltip>
-          {kkPerm.export && (
+          {activeTab === "list" && (
             <>
-              <Tooltip title="Export Excel">
+              <Tooltip title="Refresh Data">
                 <IconButton 
-                  onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-                  sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                  type="button"
+                  onClick={() => handleRefresh()} 
+                  sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}
                 >
-                  <FileDownloadIconMui size={20} />
+                  <RefreshIcon size={20} color="#10b981" />
                 </IconButton>
               </Tooltip>
+              {kkPerm.export && (
+                <>
+                  <Tooltip title="Export Excel">
+                    <IconButton 
+                      onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                      sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                    >
+                      <FileDownloadIconMui size={20} />
+                    </IconButton>
+                  </Tooltip>
 
-              <Menu
-                anchorEl={exportMenuAnchor}
-                open={openExportMenu}
-                onClose={() => setExportMenuAnchor(null)}
-                PaperProps={{
-                  sx: {
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    borderRadius: 3,
-                    mt: 1,
-                    border: '1px solid #e2e8f0'
-                  }
-                }}
-              >
-                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-                  <FileDownloadIcon size={18} /> Export Terfilter ({filteredKK.length})
-                </MenuItem>
-                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-                  <Users size={18} /> Export Semua ({kkList.length})
-                </MenuItem>
-              </Menu>
+                  <Menu
+                    anchorEl={exportMenuAnchor}
+                    open={openExportMenu}
+                    onClose={() => setExportMenuAnchor(null)}
+                    PaperProps={{
+                      sx: {
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        borderRadius: 3,
+                        mt: 1,
+                        border: '1px solid #e2e8f0'
+                      }
+                    }}
+                  >
+                    <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                      <FileDownloadIcon size={18} /> Export Terfilter ({filteredKK.length})
+                    </MenuItem>
+                    <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                      <Users size={18} /> Export Semua ({kkList.length})
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
             </>
           )}
 
@@ -610,12 +614,20 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
             </button>
           )}
           {mode === "full" && activeTab !== "list" && (
-            <button
-              className="btn-secondary"
+            <Button 
+              variant="outlined" 
               onClick={() => setActiveTab("list")}
+              sx={{ 
+                textTransform: 'none',
+                borderRadius: '8px',
+                px: 3,
+                borderColor: '#9ca3af',
+                color: '#4b5563',
+                '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
+              }}
             >
               Kembali ke List
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -754,8 +766,8 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                   <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>KECAMATAN</th>
                   <th style={{ width: "180px", fontSize: "0.8rem", fontWeight: "800" }}>KABUPATEN/ KOTA</th>
                   <th style={{ width: "150px", fontSize: "0.8rem", fontWeight: "800" }}>PROVINSI</th>
-                  <th style={{ width: "220px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
-                    ZONA LINGKAR TAMBANG
+                  <th style={{ width: "120px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
+                    ZONA
                   </th>
                   <th style={{ width: "180px", textAlign: "left", fontSize: "0.8rem", fontWeight: "800" }}>
                     KOORDINAT
@@ -792,7 +804,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                         <span
                           style={{
                             color: (() => {
-                              const z = (kk.zona_lingkar_tambang || "").toUpperCase();
+                              const z = (kk.zona || "").toUpperCase();
                               if (z.includes("RING 1")) return "#3b82f6";
                               if (z.includes("RING 2")) return "#10b981";
                               if (z.includes("RING 3")) return "#000000";
@@ -801,7 +813,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                             })()
                           }}
                         >
-                          {kk.zona_lingkar_tambang || "-"}
+                          {kk.zona || "-"}
                         </span>
                       </td>
                       <td style={{ textAlign: "left", fontSize: "0.75rem", color: "#64748b" }}>
@@ -1039,9 +1051,9 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
             {/* Zona Lingkar Tambang & Koordinat */}
             <div className="form-row">
               <div className="form-group">
-                <label>Zona Lingkar Tambang (Otomatis)</label>
+                <label>ZONA (Otomatis)</label>
                 <input
-                  value={createForm.zona_lingkar_tambang}
+                  value={createForm.zona}
                   readOnly
                   placeholder="Terisi otomatis berdasarkan Lokasi"
                 />
@@ -1179,33 +1191,31 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 gap: "10px",
               }}
             >
-              {editingKKId && (
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setActiveTab("list");
-                    setEditingKKId(null);
-                    setCreateForm({
-                      nomor_kk: "",
-                      kepala_keluarga: "",
-                      alamat: "",
-                      provinsi: "",
-                      kabupaten: "",
-                      kecamatan: "",
-                      desa: "",
-                      zona_lingkar_tambang: "",
-                      tanggal_diterbitkan: "",
-                      status_hard_copy: "BELUM ADA",
-                      keterangan: "",
-                      latitude: "",
-                      longitude: "",
-                    });
-                  }}
-                >
-                  Batal
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  setActiveTab("list");
+                  setEditingKKId(null);
+                  setCreateForm({
+                    nomor_kk: "",
+                    kepala_keluarga: "",
+                    alamat: "",
+                    provinsi: "",
+                    kabupaten: "",
+                    kecamatan: "",
+                    desa: "",
+                    zona: "",
+                    tanggal_diterbitkan: "",
+                    status_hard_copy: "BELUM ADA",
+                    keterangan: "",
+                    latitude: "",
+                    longitude: "",
+                  });
+                }}
+              >
+                Batal
+              </button>
               <button type="submit" className="btn-save" disabled={loading}>
                 {loading
                   ? "Menyimpan..."
@@ -1398,12 +1408,12 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                 >
                   <span
                     className={`status-badge-lg ${
-                      selectedKK.zona_lingkar_tambang === "Ring 1"
+                      selectedKK.zona === "Ring 1"
                         ? "status-danger"
                         : "status-success"
                     }`}
                   >
-                    {selectedKK.zona_lingkar_tambang || "-"}
+                    {selectedKK.zona || "-"}
                   </span>
                   {selectedKK.ring && (
                     <span className="kk-badge">RING {selectedKK.ring}</span>

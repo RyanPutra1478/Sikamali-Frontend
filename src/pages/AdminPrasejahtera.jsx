@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, RefreshCw as RefreshIcon, Download as FileDownloadIcon, Users } from 'lucide-react';
-import { adminAPI } from '../services/api';
 import './AdminPage.css';
 import './AdminPrasejahtera.css';
-import { FormControl, InputLabel, Select, MenuItem, TextField, InputAdornment, Box, Tooltip, IconButton, Menu } from '@mui/material';
+import { Button, FormControl, InputLabel, Select, MenuItem, TextField, InputAdornment, Box, Tooltip, IconButton, Menu } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIconMui from '@mui/icons-material/FileDownload';
 import Pagination from '@mui/material/Pagination';
 import * as XLSX from 'xlsx';
-import { kkAPI } from '../services/api';
+import { adminAPI, kkAPI } from '../services/api';
 
 export default function AdminPrasejahtera({ readOnly = false, canCreate = false, canDelete = false, canExport = false }) {
   const [data, setData] = useState([]);
@@ -300,67 +299,86 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
           </p>
         </div>
         <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Tooltip title="Refresh Data">
-            <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
-              <RefreshIcon size={20} color="#10b981" />
-            </IconButton>
-          </Tooltip>
-          {canExport && (
-            <>
-              <Tooltip title="Export Excel">
-                <IconButton 
-                  onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-                  sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-                >
-                  <FileDownloadIconMui size={20} />
-                </IconButton>
-              </Tooltip>
-
-              <Menu
-                anchorEl={exportMenuAnchor}
-                open={openExportMenu}
-                onClose={() => setExportMenuAnchor(null)}
-                PaperProps={{
-                  sx: {
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    borderRadius: 3,
-                    mt: 1,
-                    border: '1px solid #e2e8f0'
-                  }
-                }}
-              >
-                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-                  <FileDownloadIcon size={18} /> Export Terfilter ({filteredData.length})
-                </MenuItem>
-                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-                  <Users size={18} /> Export Semua ({data.length})
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-
-          {!readOnly && canCreate && (
-            <button
-              className="btn-add-data"
-              onClick={() => {
-                setEditingRecord(null);
-                setFormData({
-                  user_id: '',
-                  kk_id: '',
-                  member_id: '',
-                  income_per_month: '',
-                  house_condition: '',
-                  access_listrik_air: 'false',
-                  status_kesejahteraan: 'sejahtera',
-                  tingkat_sosial: '',
-                  assessment_notes: '',
-                });
-                setUserSearch('');
-                setShowForm(true);
+          {showForm ? (
+            <Button 
+              variant="outlined" 
+              onClick={handleCloseModal}
+              sx={{ 
+                textTransform: 'none',
+                borderRadius: '8px',
+                px: 3,
+                borderColor: '#9ca3af',
+                color: '#4b5563',
+                '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
               }}
             >
-              + Tambah Data Kesejahteraan
-            </button>
+              Kembali ke List
+            </Button>
+          ) : (
+            <>
+              <Tooltip title="Refresh Data">
+                <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+                  <RefreshIcon size={20} color="#10b981" />
+                </IconButton>
+              </Tooltip>
+              {canExport && (
+                <>
+                  <Tooltip title="Export Excel">
+                    <IconButton 
+                      onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                      sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                    >
+                      <FileDownloadIconMui size={20} />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Menu
+                    anchorEl={exportMenuAnchor}
+                    open={openExportMenu}
+                    onClose={() => setExportMenuAnchor(null)}
+                    PaperProps={{
+                      sx: {
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        borderRadius: 3,
+                        mt: 1,
+                        border: '1px solid #e2e8f0'
+                      }
+                    }}
+                  >
+                    <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                      <FileDownloadIcon size={18} /> Export Terfilter ({filteredData.length})
+                    </MenuItem>
+                    <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                      <Users size={18} /> Export Semua ({data.length})
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
+
+              {!readOnly && canCreate && (
+                <button
+                  className="btn-add-data"
+                  onClick={() => {
+                    setEditingRecord(null);
+                    setFormData({
+                      user_id: '',
+                      kk_id: '',
+                      member_id: '',
+                      income_per_month: '',
+                      house_condition: '',
+                      access_listrik_air: 'false',
+                      status_kesejahteraan: 'sejahtera',
+                      tingkat_sosial: '',
+                      assessment_notes: '',
+                    });
+                    setUserSearch('');
+                    setShowForm(true);
+                  }}
+                >
+                  + Tambah Data Kesejahteraan
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -370,7 +388,230 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
       ) : error ? (
         <p className="error-text">{error}</p>
       ) : (
-        /* TABLE */
+        /* CONDITIONAL RENDER: FORM OR TABLE */
+        showForm ? (
+          <div className="form-page-wrapper" style={{ animation: 'fadeIn 0.3s ease' }}>
+            <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+              <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>
+                {editingRecord ? 'Edit Penilaian Sosial' : 'Input Penilaian Sosial Baru'}
+              </h3>
+              
+              <form onSubmit={handleSubmit}>
+                {/* SELECT USER + SEARCH (AUTOCOMPLETE) */}
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, fontSize: '0.9rem', color: '#374151' }}>
+                    Pilih Anggota Keluarga (NIK / Nama) <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      className="input-modern"
+                      placeholder="Cari nama KK / nama warga / No Kartu Keluarga..."
+                      value={userSearch}
+                      onChange={(e) => {
+                        setUserSearch(e.target.value);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                      style={{ paddingLeft: '12px' }}
+                    />
+                    <SearchIcon style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                  </div>
+                  <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>Masukkan NIK penduduk yang ingin ditambahkan data penilaian kesejahteraannya.</p>
+
+                  {showSuggestions && userSearch.trim() && (
+                    <ul className="user-suggestions" style={{ position: 'absolute', width: '100%', zIndex: 50 }}>
+                      {filteredUsers.length === 0 ? (
+                        <li className="empty">Tidak ada hasil.</li>
+                      ) : (
+                        filteredUsers.map((user) => (
+                          <li
+                            key={user.id}
+                            className="item"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setShowSuggestions(false);
+                              handleUserSelect(user.id);
+                            }}
+                          >
+                            <div className="primary">{user.nama}</div>
+                            <div className="secondary">
+                              Kepala Keluarga: {user.kepala_keluarga || '-'} • KK: {user.nomor_kk || '-'} • NIK: {user.nik || '-'}
+                            </div>
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  )}
+                </div>
+
+                {/* Read-only KK Info */}
+                <div className="form-row" style={{ marginBottom: '20px' }}>
+                  <div className="form-group">
+                    <label>No Kartu Keluarga</label>
+                    <input className="input-modern" value={selectedUser?.nomor_kk || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
+                  </div>
+                  <div className="form-group">
+                    <label>Kepala Keluarga</label>
+                    <input className="input-modern" value={selectedUser?.kepala_keluarga || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
+                  </div>
+                </div>
+
+                {/* CARD CONTAINER FOR FORM FIELDS */}
+                <div style={{ 
+                  border: '1px solid #e2e8f0', 
+                  borderRadius: '12px', 
+                  padding: '24px', 
+                  backgroundColor: '#f8fafc' 
+                }}>
+                  <h4 style={{ 
+                    borderBottom: '1px solid #e2e8f0', 
+                    paddingBottom: '12px', 
+                    marginBottom: '20px', 
+                    color: '#1e293b', 
+                    marginTop: '0',
+                    fontSize: '1rem',
+                    fontWeight: 600
+                  }}>Data Penilaian</h4>
+
+                  {selectedUser && (
+                    <div className="user-info-box" style={{ background: '#f0f9ff', padding: '16px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #e0f2fe' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div><span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>NAMA PENERIMA</span><strong>{selectedUser.nama}</strong></div>
+                        <div><span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>NIK PENERIMA</span><strong>{selectedUser.nik || '-'}</strong></div>
+                        <div><span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>KEPALA KELUARGA</span><strong>{selectedUser.kepala_keluarga || '-'}</strong></div>
+                        <div><span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>NOMOR KK</span><strong>{selectedUser.nomor_kk || '-'}</strong></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Pendapatan / Bulan (Rp) *</label>
+                      <input
+                        className="input-modern"
+                        type="number"
+                        value={formData.income_per_month}
+                        onChange={(e) => setFormData({ ...formData, income_per_month: e.target.value })}
+                        required
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Kondisi Hunian / Rumah</label>
+                      <select
+                        className="input-modern"
+                        value={formData.house_condition}
+                        onChange={(e) => setFormData({ ...formData, house_condition: e.target.value })}
+                      >
+                        <option value="">Pilih...</option>
+                        <option value="Layak Huni">Layak Huni</option>
+                        <option value="Tidak Layak Huni">Tidak Layak Huni</option>
+                        <option value="Menumpang">Menumpang</option>
+                        <option value="Sewa">Sewa</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Akses Fasilitas (Air & Listrik)</label>
+                      <select
+                        className="input-modern"
+                        value={formData.access_listrik_air}
+                        onChange={(e) => setFormData({ ...formData, access_listrik_air: e.target.value })}
+                      >
+                        <option value="true">Memadai</option>
+                        <option value="false">Tidak / Kurang Memadai</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Status Kesejahteraan</label>
+                      <select
+                        className={`input-modern ${formData.status_kesejahteraan === 'prasejahtera' ? 'border-red' : 'border-green'}`}
+                        value={formData.status_kesejahteraan}
+                        onChange={(e) => {
+                          const newStatus = e.target.value;
+                          setFormData({
+                            ...formData,
+                            status_kesejahteraan: newStatus,
+                            tingkat_sosial: newStatus === 'prasejahtera' ? formData.tingkat_sosial : ''
+                          });
+                        }}
+                      >
+                        <option value="sejahtera">Sejahtera</option>
+                        <option value="prasejahtera">Prasejahtera</option>
+                        <option value="sejahtera mandiri">Sejahtera Mandiri</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Tingkat Sosial / Prioritas</label>
+                      <select
+                        className="input-modern"
+                        value={formData.tingkat_sosial}
+                        onChange={(e) => setFormData({ ...formData, tingkat_sosial: e.target.value })}
+                        disabled={formData.status_kesejahteraan !== 'prasejahtera'}
+                      >
+                        <option value="">Pilih Tingkat...</option>
+                        <option value="Rentan Ekstrem">Rentan Ekstrem</option>
+                        <option value="Rentan Prioritas">Rentan Prioritas</option>
+                        <option value="Rentan Transisi">Rentan Transisi</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Catatan Penilaian / Keterangan</label>
+                    <textarea
+                      className="input-modern"
+                      rows="3"
+                      value={formData.assessment_notes}
+                      onChange={(e) => setFormData({ ...formData, assessment_notes: e.target.value })}
+                      placeholder="Tambahkan detail hasil survey atau catatan lainnya..."
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <Button 
+                    variant="outlined" 
+                    onClick={handleCloseModal}
+                    sx={{ 
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      px: 3,
+                      borderColor: '#9ca3af',
+                      color: '#4b5563',
+                      '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
+                    }}
+                  >
+                    Batal
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    disabled={submitting}
+                    sx={{ 
+                      bgcolor: '#10b981', 
+                      '&:hover': { bgcolor: '#059669' },
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      px: 3,
+                      fontWeight: 600
+                    }}
+                  >
+                    {submitting ? 'Menyimpan...' : (editingRecord ? 'Update Data' : 'Simpan Data Penilaian')}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : (
+        /* TABLE SECTION */
         <div className="table-wrapper">
           {/* TOOLBAR */}
           <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: '#fcfcfc', flexWrap: 'wrap', gap: 2, mb: 2 }}>
@@ -468,7 +709,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
             <tbody>
               {filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data">
+                  <td colSpan="10" className="no-data">
                     Tidak ada data ditemukan.
                   </td>
                 </tr>
@@ -572,7 +813,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                             {status}
                           </span>
                         );
-                      })()}
+                       })()}
                     </td>
                     <td style={{ fontSize: '0.75rem' }}>
                       {(() => {
@@ -611,45 +852,35 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                                   user_id: row.user_id,
                                   kk_id: row.kk_id,
                                   member_id: row.member_id || '',
-                                  income_per_month:
-                                    row.income_per_month || '',
-                                  house_condition:
-                                    row.house_condition || '',
-                                  access_listrik_air: row.access_listrik_air
-                                    ? 'true'
-                                    : 'false',
+                                  income_per_month: row.income_per_month || '',
+                                  house_condition: row.house_condition || '',
+                                  access_listrik_air: row.access_listrik_air ? 'true' : 'false',
                                   status_kesejahteraan: row.status_kesejahteraan || (row.is_prasejahtera ? 'prasejahtera' : 'sejahtera'),
                                   tingkat_sosial: row.tingkat_sosial || '',
-                                  assessment_notes:
-                                    row.assessment_notes || '',
+                                  assessment_notes: row.assessment_notes || '',
                                 });
 
-                                const foundMember = users.find(
-                                  (m) => m.id == row.member_id
-                                );
+                                const foundMember = users.find((m) => m.id == row.member_id);
                                 if (foundMember) {
                                   setSelectedUser(foundMember);
-                                  setUserSearch(
-                                    `${foundMember.nama} (KK: ${foundMember.nomor_kk || '-'
-                                    })`
-                                  );
+                                  setUserSearch(`${foundMember.nama} (KK: ${foundMember.nomor_kk || '-'})`);
                                 }
                               }}
-                              title="Edit Data"
+                              title="Edit Penilaian"
                             >
                               <EditIcon fontSize="small" />
                             </button>
-                        {canDelete && (
-                          <button
-                            className="btn-icon delete"
-                            onClick={() => setDeleteTarget(row)}
-                            title="Hapus Data"
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </button>
+                            {canDelete && (
+                              <button
+                                className="btn-icon delete"
+                                onClick={() => setDeleteTarget(row)}
+                                title="Hapus Penilaian"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </button>
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
                       </div>
                     </td>
                   </tr>
@@ -667,333 +898,35 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               onChange={(e, v) => setPage(v)}
               color="primary"
               size="large"
-              showFirstButton
-              showLastButton
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                },
-                '& .Mui-selected': {
-                  bgcolor: '#10b981 !important',
-                  color: 'white',
-                }
-              }}
+              sx={{ '& .MuiPaginationItem-root': { fontWeight: 600, borderRadius: '8px' }, '& .Mui-selected': { bgcolor: '#10b981 !important', color: 'white' } }}
             />
           </Box>
         )}
         </div>
+        )
       )}
 
-      {/* --- MODAL FORM (INPUT / EDIT) --- */}
-      {!readOnly && showForm && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>
-                {editingRecord
-                  ? 'Edit Penilaian Sosial'
-                  : 'Input Penilaian Sosial'}
-              </h3>
-              <button className="btn-close" onClick={handleCloseModal}>
-                ×
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <form onSubmit={handleSubmit} className="form-scroller">
-              {/* SELECT USER + SEARCH (AUTOCOMPLETE) */}
-              <div className="form-group">
-                <label>Pilih Kepala Keluarga *</label>
-
-                <input
-                  type="text"
-                  className="input-modern"
-                  placeholder="Cari nama KK / nama warga / No Kartu Keluarga..."
-                  value={userSearch}
-                  onChange={(e) => {
-                    setUserSearch(e.target.value);
-                    setShowSuggestions(true);
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => {
-                    // Beri jeda sedikit agar klik suggestion sempat diproses
-                    setTimeout(() => setShowSuggestions(false), 200);
-                  }}
-                />
-
-                {showSuggestions && userSearch.trim() && (
-                  <ul className="user-suggestions">
-                    {filteredUsers.length === 0 ? (
-                      <li className="empty">Tidak ada hasil.</li>
-                    ) : (
-                      filteredUsers.map((user) => {
-                        const labelName =
-                          user.kepala_keluarga ||
-                          user.nama ||
-                          '(Tanpa Nama)';
-                        return (
-                          <li
-                            key={user.id}
-                            className="item"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              setShowSuggestions(false);
-                              handleUserSelect(user.id);
-                            }}
-                          >
-                            <div className="primary">{user.nama}</div>
-                            <div className="secondary">
-                              Kepala Keluarga: {user.kepala_keluarga || '-'} • KK: {user.nomor_kk || '-'} • NIK:{' '}
-                              {user.nik || '-'}
-                            </div>
-                          </li>
-                        );
-                      })
-                    )}
-                  </ul>
-                )}
-              </div>
-
-              {selectedUser && (
-                <div className="user-info-box">
-                  <div className="user-info-row">
-                    <span className="user-info-label">NAMA PENERIMA:</span>
-                    <span className="user-info-value">
-                      {selectedUser.nama}
-                    </span>
-                  </div>
-                  <div className="user-info-row">
-                    <span className="user-info-label">NIK PENERIMA:</span>
-                    <span className="user-info-value">
-                      {selectedUser.nik || '-'}
-                    </span>
-                  </div>
-                  <div className="user-info-row">
-                    <span className="user-info-label">KEPALA KELUARGA:</span>
-                    <span className="user-info-value">
-                      {selectedUser.kepala_keluarga || '-'}
-                    </span>
-                  </div>
-                  <div className="user-info-row">
-                    <span className="user-info-label">NOMOR KK:</span>
-                    <span className="user-info-value">
-                      {selectedUser.nomor_kk || '-'}
-                    </span>
-                  </div>
-                  <div className="user-info-row">
-                    <span className="user-info-label">ALAMAT:</span>
-                    <span className="user-info-value">
-                      {selectedUser.alamat || '-'}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Pendapatan / Bulan (Rp) *</label>
-                  <input
-                    className="input-modern"
-                    type="number"
-                    value={formData.income_per_month}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        income_per_month: e.target.value,
-                      })
-                    }
-                    placeholder="0"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Kondisi Rumah</label>
-                  <select
-                    className="input-modern"
-                    value={formData.house_condition}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        house_condition: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Pilih...</option>
-                    <option value="Permanen">Permanen (Layak)</option>
-                    <option value="Semi Permanen">Semi Permanen</option>
-                    <option value="Tidak Layak Huni">
-                      Tidak Layak Huni
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Akses Listrik & Air</label>
-                  <select
-                    className="input-modern"
-                    value={formData.access_listrik_air}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        access_listrik_air: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="false">
-                      ❌ Kurang / Tidak Ada
-                    </option>
-                    <option value="true">
-                      ✅ Memadai / Ada
-                    </option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Kategori Sosial *</label>
-                  <select
-                    className={`input-modern ${formData.status_kesejahteraan === 'prasejahtera'
-                      ? 'border-red'
-                      : 'border-green'
-                      }`}
-                    value={formData.status_kesejahteraan}
-                    onChange={(e) => {
-                      const newStatus = e.target.value;
-                      setFormData({
-                        ...formData,
-                        status_kesejahteraan: newStatus,
-                        // Kosongkan tingkat sosial jika status bukan prasejahtera
-                        ...(newStatus !== 'prasejahtera' && { tingkat_sosial: '' })
-                      });
-                    }}
-                    required
-                  >
-                    <option value="sejahtera">🟢 SEJAHTERA</option>
-                    <option value="sejahtera mandiri">🔵 SEJAHTERA MANDIRI</option>
-                    <option value="prasejahtera">🔴 PRASEJAHTERA</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Tingkat Sosial</label>
-                <select
-                  className="input-modern"
-                  value={formData.tingkat_sosial}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      tingkat_sosial: e.target.value,
-                    })
-                  }
-                  disabled={formData.status_kesejahteraan !== 'prasejahtera'}
-                >
-                  <option value="">Pilih Tingkat...</option>
-                  <option value="Rentan Ekstrem">Rentan Ekstrem</option>
-                  <option value="Rentan Prioritas">Rentan Prioritas</option>
-                  <option value="Rentan Transisi">Rentan Transisi</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Catatan Penilaian</label>
-                <textarea
-                  className="input-modern"
-                  rows="3"
-                  value={formData.assessment_notes}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      assessment_notes: e.target.value,
-                    })
-                  }
-                  placeholder="Keterangan tambahan..."
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={handleCloseModal}
-                  disabled={submitting}
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? editingRecord
-                      ? 'Menyimpan Perubahan...'
-                      : 'Menyimpan...'
-                    : editingRecord
-                      ? 'Simpan Perubahan'
-                      : 'Simpan Data'}
-                </button>
-              </div>
-            </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DELETE */}
+      {/* --- MODAL DELETE & DETAIL (HIDDEN FOR NOW AS NOT REQUESTED) --- */}
       {deleteTarget && (
-        <div
-          className="modal-backdrop"
-          onClick={() => !actionLoading && setDeleteTarget(null)}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '400px' }}>
             <div className="modal-header">
-              <h3>Hapus Penilaian</h3>
-              <button
-                className="btn-close"
-                onClick={() => !actionLoading && setDeleteTarget(null)}
-              >
-                ×
-              </button>
+              <h3>Hapus Data</h3>
             </div>
-            <div className="modal-body">
-              <p>
-                Hapus data prasejahtera untuk{' '}
-                <strong>{deleteTarget.kepala_keluarga}</strong>?
-              </p>
+            <div className="modal-body-delete">
+              <p>Apakah Anda yakin ingin menghapus data penilaian untuk <strong>{deleteTarget.nama_penerima || deleteTarget.user_nama}</strong>?</p>
             </div>
             <div className="modal-footer">
-              <button
-                className="btn-secondary"
-                onClick={() => !actionLoading && setDeleteTarget(null)}
-                disabled={actionLoading}
-              >
-                Batal
-              </button>
-              <button
-                className="btn-danger"
-                disabled={actionLoading}
-                onClick={async () => {
-                  setActionLoading(true);
-                  try {
-                    await adminAPI.deletePrasejahtera(deleteTarget.id);
-                    await loadData();
-                    setDeleteTarget(null);
-                  } catch (err) {
-                    alert(
-                      err.message || 'Gagal menghapus data'
-                    );
-                  } finally {
-                    setActionLoading(false);
-                  }
-                }}
-              >
-                {actionLoading ? 'Menghapus...' : 'Hapus'}
-              </button>
+              <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>Batal</button>
+              <button className="btn-danger" onClick={async () => {
+                try {
+                  await adminAPI.deleteKesejahteraan(deleteTarget.id);
+                  loadData();
+                  setDeleteTarget(null);
+                } catch (err) {
+                  alert('Gagal menghapus: ' + err.message);
+                }
+              }}>Hapus</button>
             </div>
           </div>
         </div>
@@ -1001,3 +934,4 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     </div>
   );
 }
+

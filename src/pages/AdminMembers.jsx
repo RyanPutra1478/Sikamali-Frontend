@@ -177,12 +177,12 @@ export default function AdminMembers({ user }) {
     const [memberForms, setMemberForms] = useState([initialFormState]);
 
     useEffect(() => {
-        if (activeTab === 'list') {
+        if (activeTab === 'list' && !editModalOpen) {
             loadMembers();
-        } else if (activeTab === 'create') {
-            loadAllKK(); // Load KKs for search when in create mode
+        } else if (activeTab === 'create' || editModalOpen) {
+            loadAllKK(); // Load KKs for search when in create mode or edit modal
         }
-    }, [activeTab]);
+    }, [activeTab, editModalOpen]);
 
     useEffect(() => {
         setPage(1);
@@ -201,9 +201,10 @@ export default function AdminMembers({ user }) {
                 const kk = kkData.find(k => k.id === member.kk_id || k.nomor_kk === member.nomor_kk) || {};
                 return {
                     ...member,
-                    kepala_keluarga: member.kk_kepala || kk.kepala_keluarga || '',
-                    desa: kk.desa || '',
-                    kecamatan: kk.kecamatan || ''
+                    nomor_kk: member.kk_nomor || kk.nomor_kk || member.nomor_kk || '-',
+                    kepala_keluarga: member.kk_kepala || kk.kepala_keluarga || member.kepala_keluarga || '',
+                    desa: kk.desa || member.desa || '',
+                    kecamatan: kk.kecamatan || member.kecamatan || ''
                 };
             });
 
@@ -375,42 +376,46 @@ export default function AdminMembers({ user }) {
                     </p>
                 </div>
                 <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <Tooltip title="Refresh Data">
-                        <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
-                            <RefreshIcon size={20} color="#10b981" />
-                        </IconButton>
-                    </Tooltip>
-                    {membersPerm.export && (
+                    {activeTab === 'list' && (
                         <>
-                            <Tooltip title="Export Excel">
-                                <IconButton 
-                                    onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-                                    sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-                                >
-                                    <FileDownloadIconMui size={20} />
+                            <Tooltip title="Refresh Data">
+                                <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+                                    <RefreshIcon size={20} color="#10b981" />
                                 </IconButton>
                             </Tooltip>
+                            {membersPerm.export && (
+                                <>
+                                    <Tooltip title="Export Excel">
+                                        <IconButton 
+                                            onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                                            sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                                        >
+                                            <FileDownloadIconMui size={20} />
+                                        </IconButton>
+                                    </Tooltip>
 
-                            <Menu
-                                anchorEl={exportMenuAnchor}
-                                open={openExportMenu}
-                                onClose={() => setExportMenuAnchor(null)}
-                                PaperProps={{
-                                    sx: {
-                                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                                        borderRadius: 3,
-                                        mt: 1,
-                                        border: '1px solid #e2e8f0'
-                                    }
-                                }}
-                            >
-                                <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-                                    <FileDownloadIcon size={18} /> Export Terfilter ({filteredMembers.length})
-                                </MenuItem>
-                                <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-                                    <Users size={18} /> Export Semua ({members.length})
-                                </MenuItem>
-                            </Menu>
+                                    <Menu
+                                        anchorEl={exportMenuAnchor}
+                                        open={openExportMenu}
+                                        onClose={() => setExportMenuAnchor(null)}
+                                        PaperProps={{
+                                            sx: {
+                                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                                borderRadius: 3,
+                                                mt: 1,
+                                                border: '1px solid #e2e8f0'
+                                            }
+                                        }}
+                                    >
+                                        <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                                            <FileDownloadIcon size={18} /> Export Terfilter ({filteredMembers.length})
+                                        </MenuItem>
+                                        <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                                            <Users size={18} /> Export Semua ({members.length})
+                                        </MenuItem>
+                                    </Menu>
+                                </>
+                            )}
                         </>
                     )}
 
@@ -420,9 +425,20 @@ export default function AdminMembers({ user }) {
                         </button>
                     )}
                     {activeTab === 'create' && (
-                        <button className="btn-secondary" onClick={() => setActiveTab('list')}>
-                            Kembali ke List
-                        </button>
+                        <Button 
+                          variant="outlined" 
+                          onClick={() => setActiveTab('list')}
+                          sx={{ 
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                            px: 3,
+                            borderColor: '#9ca3af',
+                            color: '#4b5563',
+                            '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
+                          }}
+                        >
+                          Kembali ke List
+                        </Button>
                     )}
                 </div>
             </div>
@@ -627,9 +643,22 @@ export default function AdminMembers({ user }) {
                             >
                                 Tambah Anggota Lain
                             </Button>
-                            <button type="submit" className="btn-save" disabled={loading}>
-                                {loading ? 'Menyimpan...' : `Simpan ${memberForms.length} Anggota`}
-                            </button>
+                             <button 
+                                 type="button" 
+                                 className="btn-secondary" 
+                                 onClick={() => {
+                                     setActiveTab('list');
+                                     setSelectedKK(null);
+                                     setKkSearch('');
+                                     setMemberForms([getInitialFormState()]);
+                                 }}
+                                 style={{ marginRight: '10px' }}
+                             >
+                                 Batal
+                             </button>
+                             <button type="submit" className="btn-save" disabled={loading}>
+                                 {loading ? 'Menyimpan...' : `Simpan ${memberForms.length} Anggota`}
+                             </button>
                         </div>
                     </form>
                 </div>
@@ -885,6 +914,7 @@ export default function AdminMembers({ user }) {
                     initialData={editingMember}
                     isEdit={!isViewMode}
                     viewMode={isViewMode}
+                    allKK={allKK}
                 />
             )}
         </div>

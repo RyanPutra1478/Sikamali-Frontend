@@ -173,7 +173,7 @@ const DataPreviewKeluarga = ({ user }) => {
         'Alamat': row.alamat,
         'Desa': row.desa_kelurahan,
         'Kecamatan': row.kecamatan,
-        'Zona': row.zona_lingkar,
+        'Zona': row.zona,
         'Koordinat': `${row.koordinat_latitude || '-'}, ${row.koordinat_longitude || '-'}`,
         'Jumlah Anggota': row.anggota_keluarga,
         'Angkatan Kerja': row.angkatan_kerja,
@@ -388,7 +388,7 @@ const DataPreviewKeluarga = ({ user }) => {
               <tr>
                 {[
                   'NO', 'NO KARTU KELUARGA', 'KEPALA KELUARGA', 'ALAMAT', 'DESA', 'KECAMATAN',
-                  'ZONA LINGKAR TAMBANG', 'KOORDINAT', 'JUMLAH ANGGOTA', 'ANGKATAN KERJA', 'BEKERJA', 'BELUM BEKERJA', 'KATEGORI SOSIAL', 'TINGKAT SOSIAL'
+                  'ZONA', 'KOORDINAT', 'JUMLAH ANGGOTA', 'ANGKATAN KERJA', 'BEKERJA', 'BELUM BEKERJA', 'KATEGORI SOSIAL', 'TINGKAT SOSIAL'
                 ].map((head) => {
                   const centeredHeads = ['NO', 'JUMLAH ANGGOTA', 'ANGKATAN KERJA', 'BEKERJA', 'BELUM BEKERJA'];
                   const isCentered = centeredHeads.includes(head);
@@ -398,7 +398,7 @@ const DataPreviewKeluarga = ({ user }) => {
                       fontWeight: '800',
                       textAlign: isCentered ? 'center' : 'left',
                       padding: '8px 12px',
-                      paddingLeft: isCentered ? '12px' : (head === 'ZONA LINGKAR TAMBANG' || head === 'KOORDINAT') ? '40px' : '12px'
+                      paddingLeft: isCentered ? '12px' : (head === 'ZONA' || head === 'KOORDINAT') ? '12px' : '12px'
                     }}>
                       {head}
                     </th>
@@ -424,10 +424,10 @@ const DataPreviewKeluarga = ({ user }) => {
                       <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem', padding: '5px 12px' }} title={row.alamat}>{row.alamat}</td>
                       <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.desa_kelurahan}</td>
                       <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.kecamatan}</td>
-                      <td style={{ fontSize: '0.75rem', padding: '5px 40px' }}>
+                      <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
                         <span style={{ 
                           color: (() => {
-                            const z = (row.zona_lingkar || "").toUpperCase();
+                            const z = (row.zona || "").toUpperCase();
                             if (z.includes("RING 1")) return "#3b82f6";
                             if (z.includes("RING 2")) return "#10b981";
                             if (z.includes("RING 3")) return "#000000";
@@ -435,10 +435,10 @@ const DataPreviewKeluarga = ({ user }) => {
                             return "inherit";
                           })()
                         }}>
-                          {row.zona_lingkar || '-'}
+                          {row.zona || '-'}
                         </span>
                       </td>
-                      <td style={{ fontSize: '0.75rem', color: '#64748b', padding: '5px 40px' }}>
+                      <td style={{ fontSize: '0.75rem', color: '#64748b', padding: '5px 12px' }}>
                         {row.koordinat_latitude && row.koordinat_longitude ? `${row.koordinat_latitude}, ${row.koordinat_longitude}` : '-'}
                       </td>
                       <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{row.anggota_keluarga}</td>

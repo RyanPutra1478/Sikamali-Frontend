@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const formatDateInput = (dateString) => dateString ? new Date(dateString).toISOString().split('T')[0] : '';
 
-const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode }) => {
+const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK }) => {
     const [form, setForm] = useState({
+        kk_id: '',
         nik: '', nama: '', status_domisili: 'Penduduk Asli',
         hubungan_keluarga: '', jenis_kelamin: '', tempat_lahir: '', tanggal_lahir: '',
         agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
@@ -12,6 +14,10 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
         golongan_darah: '', kewarganegaraan: 'WNI', no_paspor: '', no_kitap: '', nama_ayah: '', nama_ibu: '',
         status_data: 'AKTIF', keterangan: ''
     });
+
+    const [kkSearch, setKkSearch] = useState('');
+    const [kkSearchResults, setKkSearchResults] = useState([]);
+    const [selectedKK, setSelectedKK] = useState(null);
 
     const getInitialForm = () => {
         const lastData = localStorage.getItem('sikamali_last_member');
@@ -54,10 +60,47 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                 tanggal_lahir: formatDateInput(initialData.tanggal_lahir),
                 tanggal_perkawinan: formatDateInput(initialData.tanggal_perkawinan)
             });
+            // Update KK Search and selectedKK based on initialData
+            if (initialData.nomor_kk || initialData.kepala_keluarga) {
+                setKkSearch(`${initialData.kepala_keluarga || ''} (${initialData.nomor_kk || ''})`);
+                if (allKK) {
+                    const found = allKK.find(k => k.id === initialData.kk_id || k.nomor_kk === initialData.nomor_kk);
+                    if (found) setSelectedKK(found);
+                }
+            }
         } else {
-            setForm(getInitialForm());
+            setForm({ ...getInitialForm(), kk_id: kkId });
+            setKkSearch('');
+            setSelectedKK(null);
+            if (kkId && allKK) {
+                const found = allKK.find(k => k.id === kkId);
+                if (found) {
+                    setSelectedKK(found);
+                    setKkSearch(`${found.kepala_keluarga} (${found.nomor_kk})`);
+                }
+            }
         }
-    }, [initialData, isOpen]);
+    }, [initialData, isOpen, allKK, kkId]);
+
+    const handleKKSearch = (term) => {
+        setKkSearch(term);
+        if (term.length > 1 && allKK) {
+            const results = allKK.filter(k =>
+                (k.nomor_kk && k.nomor_kk.includes(term)) || 
+                (k.kepala_keluarga && k.kepala_keluarga.toLowerCase().includes(term.toLowerCase()))
+            );
+            setKkSearchResults(results);
+        } else {
+            setKkSearchResults([]);
+        }
+    };
+
+    const selectKK = (kk) => {
+        setSelectedKK(kk);
+        setKkSearch(`${kk.kepala_keluarga} (${kk.nomor_kk})`);
+        setKkSearchResults([]);
+        setForm(prev => ({ ...prev, kk_id: kk.id }));
+    };
 
     const handleChange = (e) => {
         if (viewMode) return;
@@ -82,7 +125,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
             status_data: form.status_data
         }));
 
-        onSubmit({ ...form, kk_id: kkId });
+        onSubmit(form);
     };
 
     if (!isOpen) return null;
@@ -99,91 +142,101 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
 
                 <div className="modal-body">
                     {viewMode ? (
-                        <div className="detail-view">
-                            <div className="detail-item">
-                                <div className="detail-label">NIK</div>
-                                <div className="detail-value">{form.nik || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Nama Lengkap</div>
-                                <div className="detail-value">{form.nama || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Hubungan Keluarga</div>
-                                <div className="detail-value">{form.hubungan_keluarga || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Jenis Kelamin</div>
-                                <div className="detail-value">{form.jenis_kelamin || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Tempat, Tanggal Lahir</div>
+                        <div className="modal-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '10px' }}>
+                            <div className="detail-item"><label>NIK</label><div className="detail-value highlight">{form.nik || '-'}</div></div>
+                            <div className="detail-item"><label>Nama Lengkap</label><div className="detail-value highlight">{form.nama || '-'}</div></div>
+                            <div className="detail-item"><label>Jenis Kelamin</label><div className="detail-value">{form.jenis_kelamin || '-'}</div></div>
+                            <div className="detail-item"><label>Umur</label><div className="detail-value">{form.tanggal_lahir ? (new Date().getFullYear() - new Date(form.tanggal_lahir).getFullYear()) + ' Tahun' : '-'}</div></div>
+                            <div className="detail-item"><label>No Kartu Keluarga</label><div className="detail-value">{initialData?.nomor_kk || '-'}</div></div>
+                            <div className="detail-item"><label>Kepala Keluarga</label><div className="detail-value">{initialData?.kepala_keluarga || '-'}</div></div>
+                            <div className="detail-item" style={{ gridColumn: 'span 2' }}>
+                                <label>Tempat, Tanggal Lahir</label>
                                 <div className="detail-value">
                                     {form.tempat_lahir || '-'}, {form.tanggal_lahir ? new Date(form.tanggal_lahir).toLocaleDateString('id-ID') : '-'}
                                 </div>
                             </div>
+                            <div className="detail-item"><label>Agama</label><div className="detail-value">{form.agama || '-'}</div></div>
+                            <div className="detail-item"><label>Pendidikan Terakhir</label><div className="detail-value">{form.pendidikan || '-'}</div></div>
+                            <div className="detail-item"><label>Pekerjaan</label><div className="detail-value">{form.pekerjaan || '-'}</div></div>
+                            <div className="detail-item"><label>Status Perkawinan</label><div className="detail-value">{form.status_perkawinan || '-'}</div></div>
+                            <div className="detail-item"><label>Nama Ayah</label><div className="detail-value">{form.nama_ayah || '-'}</div></div>
+                            <div className="detail-item"><label>Nama Ibu</label><div className="detail-value">{form.nama_ibu || '-'}</div></div>
+                            <div className="detail-item"><label>No HP / WA</label><div className="detail-value">{form.no_hp || '-'}</div></div>
+                            <div className="detail-item"><label>E-mail</label><div className="detail-value">{form.email || '-'}</div></div>
                             <div className="detail-item">
-                                <div className="detail-label">Agama</div>
-                                <div className="detail-value">{form.agama || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Pendidikan Terakhir</div>
-                                <div className="detail-value">{form.pendidikan || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Pekerjaan</div>
-                                <div className="detail-value">{form.pekerjaan || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Status Perkawinan</div>
-                                <div className="detail-value">{form.status_perkawinan || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Status Domisili</div>
+                                <label>Status Domisili</label>
                                 <div className="detail-value">
-                                    <span className="badge-count" style={{ 
-                                        background: (() => {
-                                            const s = (form.status_domisili || '').toLowerCase();
-                                            if (s.includes('meninggal')) return 'var(--danger-bg)';
-                                            if (s.includes('pindah')) return 'rgba(245, 158, 11, 0.1)';
-                                            if (s.includes('pendatang')) return 'rgba(59, 130, 246, 0.1)';
-                                            return 'var(--success-bg)';
-                                        })(), 
+                                    <span style={{ 
                                         color: (() => {
                                             const s = (form.status_domisili || '').toLowerCase();
-                                            if (s.includes('meninggal')) return 'var(--danger)';
+                                            if (s.includes('meninggal')) return '#ef4444';
                                             if (s.includes('pindah')) return '#f59e0b';
                                             if (s.includes('pendatang')) return '#3b82f6';
-                                            return 'var(--success)';
-                                        })() 
+                                            return '#10b981';
+                                        })(),
+                                        fontWeight: 'bold'
                                     }}>
                                         {form.status_domisili || '-'}
                                     </span>
                                 </div>
                             </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Nama Ayah</div>
-                                <div className="detail-value">{form.nama_ayah || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Nama Ibu</div>
-                                <div className="detail-value">{form.nama_ibu || '-'}</div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Status Data</div>
-                                <div className="detail-value">{form.status_data || 'AKTIF'}</div>
-                            </div>
+                            <div className="detail-item"><label>Status Data</label><div className="detail-value">{form.status_data || 'AKTIF'}</div></div>
                             <div className="detail-item" style={{ gridColumn: 'span 2' }}>
-                                <div className="detail-label">Keterangan</div>
+                                <label>Keterangan</label>
                                 <div className="detail-value">{form.keterangan || '-'}</div>
                             </div>
                         </div>
                     ) : (
-                        <form id="memberForm" onSubmit={handleSubmit} className="form-grid">
-                            <div className="form-group">
-                                <label>NIK *</label>
-                                <input name="nik" value={form.nik} onChange={handleChange} required maxLength="16" className="input-field" />
+                        <form id="memberForm" onSubmit={handleSubmit}>
+                            {/* KK Selection Section */}
+                            <div className="form-group" style={{ position: 'relative', marginBottom: '1.5rem', gridColumn: 'span 2' }}>
+                                <label>Cari Kepala Keluarga / No Kartu Keluarga *</label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Ketik nama atau nomor KK..."
+                                        value={kkSearch}
+                                        onChange={e => handleKKSearch(e.target.value)}
+                                        autoComplete="off"
+                                        style={{ flex: 1 }}
+                                    />
+                                    {selectedKK && (
+                                        <div style={{ display: 'flex', alignItems: 'center', background: '#ecfdf5', padding: '0 12px', borderRadius: '8px', color: '#065f46', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #a7f3d0' }}>
+                                            <CheckCircleIcon style={{ fontSize: 16, marginRight: 4 }} /> Terpilih
+                                        </div>
+                                    )}
+                                </div>
+                                {kkSearchResults.length > 0 && (
+                                    <ul className="user-suggestions" style={{ top: '100%', left: 0, right: 0, zIndex: 10 }}>
+                                        {kkSearchResults.slice(0, 5).map(kk => (
+                                            <li key={kk.id} className="item" onClick={() => selectKK(kk)}>
+                                                <div className="primary">{kk.kepala_keluarga}</div>
+                                                <div className="secondary">{kk.nomor_kk} - {kk.desa}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
+
+                            {selectedKK && (
+                                <div className="user-info-box" style={{ gridColumn: 'span 2', marginBottom: '1.5rem', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>Kepala Keluarga</p>
+                                        <p style={{ margin: 0, fontWeight: 600 }}>{selectedKK.kepala_keluarga}</p>
+                                    </div>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>No Kartu Keluarga</p>
+                                        <p style={{ margin: 0, fontWeight: 600 }}>{selectedKK.nomor_kk}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>NIK *</label>
+                                    <input name="nik" value={form.nik} onChange={handleChange} required maxLength="16" className="input-field" />
+                                </div>
                             <div className="form-group">
                                 <label>Nama Lengkap *</label>
                                 <input name="nama" value={form.nama} onChange={handleChange} required className="input-field" />
@@ -323,7 +376,8 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <label>Keterangan</label>
                                 <textarea name="keterangan" value={form.keterangan} onChange={handleChange} className="input-field" rows="2" style={{ resize: 'vertical' }} />
                             </div>
-                        </form>
+                        </div>
+                    </form>
                     )}
                 </div>
 

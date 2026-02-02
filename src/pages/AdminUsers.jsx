@@ -295,7 +295,10 @@ export default function AdminUsers({ currentUser }) {
                     <TextField label="Email (Opsional)" name="email" type="email" fullWidth size="small" value={formData.email} onChange={handleChange} />
                     <TextField label="Password" name="password" type="password" fullWidth size="small" value={formData.password} onChange={handleChange} required error={formData.password.length > 0 && formData.password.length < 6} helperText={formData.password.length > 0 && formData.password.length < 6 ? "Minimal 6 karakter" : ""} />
                     <FormControl fullWidth size="small"><InputLabel>Role</InputLabel><Select name="role" value={formData.role} onChange={handleChange} label="Role">{ROLE_OPTIONS.map((opt) => (<MenuItem key={opt.value} value={opt.value}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>{opt.icon}{opt.label}</Box></MenuItem>))}</Select></FormControl>
-                    <Box sx={{ mt: 2 }}><button type="submit" className="btn-green-premium" disabled={submitting} style={{ width: '100%', justifyContent: 'center' }}>{submitting ? 'Menyimpan...' : 'SIMPAN USER →'}</button></Box>
+                    <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                      <button type="button" className="btn-secondary" onClick={() => setShowModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
+                      <button type="submit" className="btn-green-premium" disabled={submitting} style={{ flex: 2, justifyContent: 'center' }}>{submitting ? 'Menyimpan...' : 'SIMPAN USER →'}</button>
+                    </Box>
                   </Box>
                 </form>
               </div>
@@ -312,7 +315,10 @@ export default function AdminUsers({ currentUser }) {
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <TextField label="Username" type="text" fullWidth size="small" value={passwordData.username} disabled sx={{ bgcolor: '#f8fafc' }} />
                     <TextField label="Password Baru *" type="password" fullWidth size="small" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} required autoFocus error={passwordData.newPassword.length > 0 && passwordData.newPassword.length < 6} helperText={passwordData.newPassword.length > 0 && passwordData.newPassword.length < 6 ? "Minimal 6 karakter" : ""} />
-                    <Box sx={{ mt: 1 }}><button type="submit" className="btn-green-premium" disabled={updatingPassword} style={{ width: '100%', justifyContent: 'center' }}>{updatingPassword ? 'Menyimpan...' : 'SIMPAN PASSWORD →'}</button></Box>
+                    <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
+                      <button type="button" className="btn-secondary" onClick={() => setShowPasswordModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
+                      <button type="submit" className="btn-green-premium" disabled={updatingPassword} style={{ flex: 2, justifyContent: 'center' }}>{updatingPassword ? 'Menyimpan...' : 'SIMPAN PASSWORD →'}</button>
+                    </Box>
                   </Box>
                 </form>
               </div>

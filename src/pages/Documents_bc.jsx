@@ -451,7 +451,7 @@ export default function Documents({ user, readOnly }) {
     kabupaten: '',
     kecamatan: '',
     desa: '',
-    zona_lingkar_tambang: '',
+    zona: '',
     status_domisili: 'Penduduk Asli',
     tanggal_diterbitkan: '',
     members: [createDefaultKKMember()],
@@ -486,8 +486,8 @@ export default function Documents({ user, readOnly }) {
   useEffect(() => {
     setKkForm((prev) => {
       const ring = determineRing(prev);
-      if (prev.zona_lingkar_tambang === ring) return prev;
-      return { ...prev, zona_lingkar_tambang: ring };
+      if (prev.zona === ring) return prev;
+      return { ...prev, zona: ring };
     });
   }, [kkForm.provinsi, kkForm.kabupaten, kkForm.kecamatan, kkForm.desa]);
 
@@ -689,7 +689,7 @@ export default function Documents({ user, readOnly }) {
           kabupaten: '',
           kecamatan: '',
           desa: '',
-          zona_lingkar_tambang: '',
+          zona: '',
           status_domisili: 'Penduduk Asli',
           tanggal_diterbitkan: '',
           members: [createDefaultKKMember()],
@@ -740,7 +740,7 @@ export default function Documents({ user, readOnly }) {
           kecamatan: doc.kecamatan,
           kabupaten: doc.kabupaten,
           provinsi: doc.provinsi,
-          zona_lingkar_tambang: doc.zona_lingkar_tambang,
+          zona: doc.zona,
           status_domisili: doc.kk_domisili || doc.status_domisili,
           tanggal_diterbitkan: doc.tanggal_diterbitkan,
           members: doc.members || [],
@@ -806,7 +806,7 @@ export default function Documents({ user, readOnly }) {
       kabupaten: item.kabupaten || '',
       kecamatan: item.kecamatan || '',
       desa: item.desa || '',
-      zona_lingkar_tambang: item.zona_lingkar_tambang || '',
+      zona: item.zona || '',
       status_domisili: item.status_domisili || '',
       tanggal_diterbitkan: formatDateInput(item.tanggal_diterbitkan),
       members: membersCopy,
@@ -1021,8 +1021,8 @@ export default function Documents({ user, readOnly }) {
               <label>Zona Lingkar Tambang</label>
               <input
                 type="text"
-                name="zona_lingkar_tambang"
-                value={kkForm.zona_lingkar_tambang}
+                name="zona"
+                value={kkForm.zona}
                 readOnly
                 style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
                 placeholder="Otomatis"
@@ -1158,7 +1158,7 @@ export default function Documents({ user, readOnly }) {
                     <td>{item.kepala_keluarga}</td>
                     <td>{item.alamat}</td>
                     <td>{item.desa_kelurahan}</td>
-                    <td>{item.zona_lingkar_tambang}</td>
+                    <td>{item.zona}</td>
                     <td>{item.status_domisili}</td>
                     <td>
                       <span className="badge-count">
@@ -1268,7 +1268,7 @@ export default function Documents({ user, readOnly }) {
                       </div>
                       <div className="info-item">
                         <label>Zona Lingkar</label>
-                        <p>{selectedKK.zona_lingkar_tambang}</p>
+                        <p>{selectedKK.zona}</p>
                       </div>
                       <div className="info-item">
                         <label>Status Domisili</label>
@@ -1688,11 +1688,11 @@ export default function Documents({ user, readOnly }) {
                         <label>Zona Lingkar</label>
                         <input
                           className="input-field"
-                          value={editKK.zona_lingkar_tambang}
+                          value={editKK.zona}
                           onChange={(e) =>
                             setEditKK({
                               ...editKK,
-                              zona_lingkar_tambang: e.target.value,
+                              zona: e.target.value,
                             })
                           }
                         />

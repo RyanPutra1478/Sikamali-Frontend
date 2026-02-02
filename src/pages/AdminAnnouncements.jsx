@@ -92,7 +92,7 @@ export default function AdminAnnouncements({ readOnly }) {
     <ThemeProvider theme={theme}>
       <div className="admin-page">
         <div className="admin-header">
-          <div className="header-title-section">
+          <div className="header-title-section">  
             <h2><Megaphone size={32} /> Pengumuman Desa</h2>
             <p className="header-subtitle">
               Sampaikan informasi penting, jadwal kegiatan, dan berita terkini kepada seluruh elemen warga lingkar tambang.
@@ -179,7 +179,10 @@ export default function AdminAnnouncements({ readOnly }) {
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <TextField label="Judul Utama" fullWidth variant="outlined" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
                     <TextField label="Isi Informasi" fullWidth variant="outlined" multiline rows={8} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
-                    <Box sx={{ mt: 1 }}><button type="submit" className="btn-green-premium" disabled={submitting} style={{ width: '100%', justifyContent: 'center' }}>{submitting ? 'MENERBITKAN...' : 'TERBITKAN INFO →'}</button></Box>
+                    <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
+                      <button type="button" className="btn-secondary" onClick={() => setShowModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
+                      <button type="submit" className="btn-green-premium" disabled={submitting} style={{ flex: 2, justifyContent: 'center' }}>{submitting ? 'MENERBITKAN...' : 'TERBITKAN INFO →'}</button>
+                    </Box>
                   </Box>
                 </form>
               </div>

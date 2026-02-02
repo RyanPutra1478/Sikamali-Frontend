@@ -201,7 +201,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       // 3. Lokasi
       alamat: (item?.alamat && item.alamat.trim() !== '') ? item.alamat : (item?.alamat_kk || ''),
       desa: item?.desa || '',
-      zona_lingkar_tambang: item?.zona_lingkar_tambang || '',
+      zona: item?.zona || '',
 
       // 4. Kompetensi
       pendidikan_terakhir: item?.pendidikan_terakhir || (item ? '' : (parsed.pendidikan_terakhir || '')),
@@ -397,42 +397,46 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
           </div>
 
           <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <Tooltip title="Refresh Data">
-              <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
-                <RefreshIcon size={20} color="#10b981" />
-              </IconButton>
-            </Tooltip>
-            {employmentPerm.export && (
+            {activeTab === 'list' && (
               <>
-                <Tooltip title="Export Excel">
-                  <IconButton 
-                    onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
-                    sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
-                  >
-                    <FileDownloadIconMui size={20} />
+                <Tooltip title="Refresh Data">
+                  <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1 }}>
+                    <RefreshIcon size={20} color="#10b981" />
                   </IconButton>
                 </Tooltip>
+                {employmentPerm.export && (
+                  <>
+                    <Tooltip title="Export Excel">
+                      <IconButton 
+                        onClick={(e) => setExportMenuAnchor(e.currentTarget)} 
+                        sx={{ bgcolor: '#ecfdf5', color: '#10b981', border: '1px solid #d1fae5', p: 1 }}
+                      >
+                        <FileDownloadIconMui size={20} />
+                      </IconButton>
+                    </Tooltip>
 
-                <Menu
-                  anchorEl={exportMenuAnchor}
-                  open={openExportMenu}
-                  onClose={() => setExportMenuAnchor(null)}
-                  PaperProps={{
-                    sx: {
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                      borderRadius: 3,
-                      mt: 1,
-                      border: '1px solid #e2e8f0'
-                    }
-                  }}
-                >
-                  <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
-                    <FileDownloadIcon size={18} /> Export Terfilter ({filteredList.length})
-                  </MenuItem>
-                  <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
-                    <Users size={18} /> Export Semua ({dataList.length})
-                  </MenuItem>
-                </Menu>
+                    <Menu
+                      anchorEl={exportMenuAnchor}
+                      open={openExportMenu}
+                      onClose={() => setExportMenuAnchor(null)}
+                      PaperProps={{
+                        sx: {
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                          borderRadius: 3,
+                          mt: 1,
+                          border: '1px solid #e2e8f0'
+                        }
+                      }}
+                    >
+                      <MenuItem onClick={() => handleExportExcel(true)} sx={{ fontWeight: 600, color: '#1e293b', gap: 1 }}>
+                        <FileDownloadIcon size={18} /> Export Terfilter ({filteredList.length})
+                      </MenuItem>
+                      <MenuItem onClick={() => handleExportExcel(false)} sx={{ fontWeight: 600, color: '#10b981', gap: 1 }}>
+                        <Users size={18} /> Export Semua ({dataList.length})
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )}
               </>
             )}
 
@@ -691,7 +695,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
               <div className="detail-item"><label>Kepala Keluarga</label><div className="detail-value">{selectedItem.kepala_keluarga}</div></div>
               <div className="detail-item" style={{ gridColumn: 'span 2' }}><label>Alamat</label><div className="detail-value">{selectedItem.alamat || selectedItem.alamat_kk || '-'}</div></div>
               <div className="detail-item"><label>Desa/Kelurahan</label><div className="detail-value">{selectedItem.desa}</div></div>
-              <div className="detail-item"><label>Zona Lingkar Tambang</label><div className="detail-value badge-zona">{selectedItem.zona_lingkar_tambang}</div></div>
+              <div className="detail-item"><label>ZONA</label><div className="detail-value badge-zona">{selectedItem.zona}</div></div>
               <div className="detail-item"><label>Pendidikan Terakhir</label><div className="detail-value">{selectedItem.pendidikan_terakhir || selectedItem.pendidikan || '-'}</div></div>
               <div className="detail-item"><label>Skill</label><div className="detail-value">{selectedItem.skill_tags || selectedItem.skill || '-'}</div></div>
               <div className="detail-item"><label>Status Kerja</label>
@@ -728,7 +732,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
         <div className="form-page-wrapper" style={{ animation: 'fadeIn 0.3s ease' }}>
              <form onSubmit={handleUpdate}>
                 <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: 'var(--shadow-md)' }}>
-                <h3>Input Anggota Keluarga Baru</h3>
+                <h3>Input Data Angkatan Kerja Baru</h3>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
                   <label>Cari Penduduk (NIK / Nama) <span style={{ color: '#ef4444' }}>*</span></label>
                   <div style={{ position: 'relative' }}>
@@ -743,6 +747,18 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     {!editItem.id && <SearchIcon style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />}
                   </div>
                   {!editItem.id && <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>Masukkan NIK penduduk yang ingin ditambahkan data kerjanya.</p>}
+                </div>
+
+                {/* Read-only KK Info */}
+                <div className="form-row" style={{ marginBottom: '20px' }}>
+                  <div className="form-group">
+                    <label>No Kartu Keluarga</label>
+                    <input className="input-modern" value={editItem.nomor_kk || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
+                  </div>
+                  <div className="form-group">
+                    <label>Kepala Keluarga</label>
+                    <input className="input-modern" value={editItem.kepala_keluarga || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
+                  </div>
                 </div>
 
                 {/* CARD CONTAINER */}
@@ -891,40 +907,41 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                   <textarea className="input-modern" value={editItem.keterangan} onChange={(e) => setEditItem({ ...editItem, keterangan: e.target.value })} placeholder="Catatan tambahan..." rows="3" />
                 </div>
                 
-                </div> {/* End Card */}
+                
+                <div className="form-actions" style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <Button 
+                    variant="outlined" 
+                    onClick={() => { setActiveTab('list'); setEditItem(null); }} 
+                    disabled={submitStatus === 'loading'}
+                    sx={{ 
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      px: 3,
+                      borderColor: '#9ca3af',
+                      color: '#4b5563',
+                      '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
+                    }}
+                  >
+                    Batal
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    disabled={submitStatus === 'loading'}
+                    sx={{ 
+                      bgcolor: '#10b981', 
+                      '&:hover': { bgcolor: '#059669' },
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      px: 3,
+                      fontWeight: 600
+                    }}
+                  >
+                    {submitStatus === 'loading' ? 'Menyimpan...' : 'Simpan 1 Anggota'}
+                  </Button>
+                </div>
+              </div> {/* End Card */}
 
-              </div>
-              <div className="form-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                <Button 
-                  variant="outlined" 
-                  onClick={() => { setActiveTab('list'); setEditItem(null); }} 
-                  disabled={submitStatus === 'loading'}
-                  sx={{ 
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    px: 3,
-                    borderColor: '#9ca3af',
-                    color: '#4b5563',
-                    '&:hover': { borderColor: '#6b7280', bgcolor: '#f3f4f6' }
-                  }}
-                >
-                  Batal
-                </Button>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
-                  disabled={submitStatus === 'loading'}
-                  sx={{ 
-                    bgcolor: '#10b981', 
-                    '&:hover': { bgcolor: '#059669' },
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    px: 3,
-                    fontWeight: 600
-                  }}
-                >
-                  {submitStatus === 'loading' ? 'Menyimpan...' : 'Simpan 1 Anggota'}
-                </Button>
               </div>
             </form>
         </div>

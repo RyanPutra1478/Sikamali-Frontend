@@ -292,10 +292,10 @@ const AdminLand = () => {
                       <div className="photo-frame">
                         {selectedItem.foto_rumah ? (
                           <img 
-                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.244:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
+                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.253:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
                             alt="Foto Rumah" 
                             style={{ cursor: 'pointer' }}
-                            onClick={() => setPreviewImage(`${import.meta.env.VITE_API_URL || "http://192.168.0.244:5000/api"}/land/foto/${selectedItem.foto_rumah}`)}
+                            onClick={() => setPreviewImage(`${import.meta.env.VITE_API_URL || "http://192.168.0.253:5000/api"}/land/foto/${selectedItem.foto_rumah}`)}
                           />
                         ) : (
                           <div className="no-photo-placeholder">
