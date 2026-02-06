@@ -24,14 +24,6 @@ export default function UserDropdown({ user, onLogout, onProfileClick }) {
     };
   }, [isOpen]);
 
-  const handleProfile = () => {
-    setIsOpen(false);
-    if (onProfileClick) {
-      onProfileClick();
-    } else {
-      navigate('/profile');
-    }
-  };
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -57,11 +49,6 @@ export default function UserDropdown({ user, onLogout, onProfileClick }) {
             <span className="user-name">{user?.nama || user?.username}</span>
             <span className="user-role">{user?.role?.replace('_', ' ')}</span>
           </div>
-          <button onClick={handleProfile} className="dropdown-item">
-            <User size={18} />
-            <span>Profil Saya</span>
-          </button>
-          <div className="dropdown-divider"></div>
           <button onClick={handleLogout} className="dropdown-item logout-btn">
             <LogOut size={18} />
             <span>Keluar</span>

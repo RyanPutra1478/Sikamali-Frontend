@@ -83,7 +83,7 @@ const DataPenduduk = () => {
           );
       }
     },
-    { field: 'status_data', headerName: 'Status Data', width: 120 },
+    { field: 'status_data', headerName: 'Status Kependudukan', width: 120 },
     { field: 'alamat', headerName: 'Alamat', width: 250 },
     {
       field: 'actions',

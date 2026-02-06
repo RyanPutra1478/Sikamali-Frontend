@@ -618,12 +618,11 @@ export default function AdminMembers({ user }) {
                                         <input type="email" name="email" value={form.email} onChange={(e) => handleChange(index, e)} className="input-field" />
                                     </div>
                                     <div className="form-group">
-                                        <label>Status Data</label>
+                                        <label>Status Kependudukan</label>
                                         <select name="status_data" value={form.status_data} onChange={(e) => handleChange(index, e)} className="input-field">
                                             <option value="AKTIF">AKTIF</option>
-                                            <option value="TIDAK AKTIF">TIDAK AKTIF</option>
                                             <option value="PINDAH">PINDAH</option>
-                                            <option value="MENINGGAL">MENINGGAL</option>
+                                            <option value="TIDAK AKTIF">TIDAK AKTIF</option>
                                         </select>
                                     </div>
                                     <div className="form-group" style={{ gridColumn: 'span 2' }}>
@@ -773,7 +772,7 @@ export default function AdminMembers({ user }) {
                                     <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NO KITAP</th>
                                     <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA AYAH</th>
                                     <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA IBU</th>
-                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS DATA</th>
+                                    <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>Status Kependudukan</th>
                                     <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>KETERANGAN</th>
                                     <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
                                 </tr>
@@ -823,7 +822,7 @@ export default function AdminMembers({ user }) {
                                             <td style={{ fontSize: '0.75rem' }}>{m.no_kitap || '-'}</td>
                                             <td style={{ fontSize: '0.75rem' }}>{m.nama_ayah || '-'}</td>
                                             <td style={{ fontSize: '0.75rem' }}>{m.nama_ibu || '-'}</td>
-                                            <td style={{ fontSize: '0.75rem' }}>{m.status_data || 'AKTIF'}</td>
+                                            <td style={{ fontSize: '0.75rem' }}>{m.status_kependudukan || 'AKTIF'}</td>
                                             <td style={{ fontSize: '0.75rem' }}>{m.keterangan || '-'}</td>
                                             <td>
                                                 <div className="action-buttons">

@@ -12,7 +12,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
         agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
         pekerjaan: '', status_kerja: '', tempat_bekerja: '', no_hp: '', email: '',
         golongan_darah: '', kewarganegaraan: 'WNI', no_paspor: '', no_kitap: '', nama_ayah: '', nama_ibu: '',
-        status_data: 'AKTIF', keterangan: ''
+        status_kependudukan: 'AKTIF', keterangan: ''
     });
 
     const [kkSearch, setKkSearch] = useState('');
@@ -27,7 +27,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
             agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
             pekerjaan: '', status_kerja: '', tempat_bekerja: '', no_hp: '', email: '',
             golongan_darah: '', kewarganegaraan: 'WNI', no_paspor: '', no_kitap: '', nama_ayah: '', nama_ibu: '',
-            status_data: 'AKTIF', keterangan: ''
+            status_kependudukan: 'AKTIF', keterangan: ''
         };
 
         if (lastData) {
@@ -44,7 +44,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                     kewarganegaraan: parsed.kewarganegaraan || 'WNI',
                     nama_ayah: parsed.nama_ayah || '',
                     nama_ibu: parsed.nama_ibu || '',
-                    status_data: parsed.status_data || 'AKTIF'
+                    status_kependudukan: parsed.status_kependudukan || 'AKTIF'
                 };
             } catch (e) {
                 return baseForm;
@@ -122,7 +122,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
             kewarganegaraan: form.kewarganegaraan,
             nama_ayah: form.nama_ayah,
             nama_ibu: form.nama_ibu,
-            status_data: form.status_data
+            status_kependudukan: form.status_kependudukan
         }));
 
         onSubmit(form);
@@ -180,7 +180,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                     </span>
                                 </div>
                             </div>
-                            <div className="detail-item"><label>Status Data</label><div className="detail-value">{form.status_data || 'AKTIF'}</div></div>
+                            <div className="detail-item"><label>Status Kependudukan</label><div className="detail-value">{form.status_kependudukan || 'AKTIF'}</div></div>
                             <div className="detail-item" style={{ gridColumn: 'span 2' }}>
                                 <label>Keterangan</label>
                                 <div className="detail-value">{form.keterangan || '-'}</div>
@@ -364,12 +364,11 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <input type="email" name="email" value={form.email} onChange={handleChange} className="input-field" />
                             </div>
                             <div className="form-group">
-                                <label>Status Data</label>
-                                <select name="status_data" value={form.status_data} onChange={handleChange} className="input-field">
+                                <label>Status Kependudukan</label>
+                                <select name="status_kependudukan" value={form.status_kependudukan} onChange={handleChange} className="input-field">
                                     <option value="AKTIF">AKTIF</option>
-                                    <option value="TIDAK AKTIF">TIDAK AKTIF</option>
                                     <option value="PINDAH">PINDAH</option>
-                                    <option value="MENINGGAL">MENINGGAL</option>
+                                    <option value="TIDAK AKTIF">TIDAK AKTIF</option>
                                 </select>
                             </div>
                             <div className="form-group" style={{ gridColumn: 'span 2' }}>

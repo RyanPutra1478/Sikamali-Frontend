@@ -29,6 +29,7 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyIcon from '@mui/icons-material/Key';
+import EditIcon from '@mui/icons-material/Edit';
 import PersonIcon from '@mui/icons-material/Person';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
@@ -159,6 +160,11 @@ export default function AdminUsers({ currentUser }) {
   const [passwordData, setPasswordData] = useState({ id: null, username: '', newPassword: '' });
   const [updatingPassword, setUpdatingPassword] = useState(false);
 
+  // Edit User State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ id: null, username: '', email: '', nama: '' });
+  const [updatingEdit, setUpdatingEdit] = useState(false);
+
   const openPasswordModal = (user) => {
     setPasswordData({ id: user.id, username: user.username, newPassword: '' });
     setShowPasswordModal(true);
@@ -179,6 +185,41 @@ export default function AdminUsers({ currentUser }) {
       alert(err.message);
     } finally {
       setUpdatingPassword(false);
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
+
+  // Edit User Functions
+  const openEditModal = (user) => {
+    setEditData({ 
+      id: user.id, 
+      username: user.username || '', 
+      email: user.email || '', 
+      nama: user.nama || '' 
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setUpdatingEdit(true);
+    try {
+      await adminAPI.updateUser(editData.id, {
+        username: editData.username,
+        email: editData.email,
+        nama: editData.nama
+      });
+      setMessage('Data user berhasil diperbarui.');
+      setShowEditModal(false);
+      loadUsers();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUpdatingEdit(false);
       setTimeout(() => setMessage(''), 3000);
     }
   };
@@ -217,7 +258,12 @@ export default function AdminUsers({ currentUser }) {
         {message && <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>{message}</Alert>}
         {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
 
-        <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+        <TableContainer component={Paper} sx={{ 
+          borderRadius: 3, 
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', 
+          overflow: 'hidden', 
+          border: '1px solid #e2e8f0',
+        }}>
           {loading ? (
             <Box sx={{ p: 5, textAlign: 'center' }}>
               <CircularProgress size={40} sx={{ color: '#10b981' }} />
@@ -227,20 +273,21 @@ export default function AdminUsers({ currentUser }) {
             <Table className="modern-table">
               <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>No</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center !important', width: '60px' }}>No</TableCell>
                   <TableCell sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>User & Info</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Role Saat Ini</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Ubah Akses</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Aksi</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center !important' }}>Role Saat Ini</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center !important' }}>Ubah Akses</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center !important' }}>Aksi</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
+
                 {users.length === 0 ? (
                   <TableRow><TableCell colSpan={5} align="center" sx={{ py: 4, color: '#94a3b8' }}>Tidak ada data user.</TableCell></TableRow>
                 ) : (
                   users.map((user, index) => (
                     <TableRow key={user.id} sx={{ '&:hover': { bgcolor: '#fcfcfc' }, bgcolor: isCurrentUser(user.id) ? '#f0f9ff' : 'inherit' }}>
-                      <TableCell sx={{ color: '#64748b', fontWeight: 500 }}>{index + 1}</TableCell>
+                      <TableCell align="center" sx={{ color: '#64748b', fontWeight: 500, textAlign: 'center !important' }}>{index + 1}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Box>
@@ -252,12 +299,12 @@ export default function AdminUsers({ currentUser }) {
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell>
+                      <TableCell align="center" sx={{ textAlign: 'center !important' }}>
                         <Chip label={(user.role || 'user').toUpperCase()} size="small" color={getRoleChipColor(user.role)} variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
                       </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <FormControl size="small" fullWidth sx={{ maxWidth: 200 }}>
+                      <TableCell align="center" sx={{ textAlign: 'center !important' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                          <FormControl size="small" sx={{ width: 160 }}>
                             <Select value={user.role} onChange={(e) => handleRoleChange(user.id, e.target.value)} disabled={isCurrentUser(user.id) || updatingRole[user.id]} sx={{ borderRadius: 2, fontSize: '0.75rem' }}>
                               {ROLE_OPTIONS.map((opt) => (
                                 <MenuItem key={opt.value} value={opt.value} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{opt.icon} {opt.label}</MenuItem>
@@ -267,8 +314,9 @@ export default function AdminUsers({ currentUser }) {
                           {updatingRole[user.id] && <CircularProgress size={16} />}
                         </Box>
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" sx={{ textAlign: 'center !important' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                          <Tooltip title="Edit User"><IconButton onClick={() => openEditModal(user)} color="primary" size="small" sx={{ bgcolor: '#eff6ff', '&:hover': { bgcolor: '#dbeafe' } }}><EditIcon fontSize="small" /></IconButton></Tooltip>
                           <Tooltip title="Ubah Password"><IconButton onClick={() => openPasswordModal(user)} color="warning" size="small" sx={{ bgcolor: '#fffbeb', '&:hover': { bgcolor: '#fef3c7' } }}><KeyIcon fontSize="small" /></IconButton></Tooltip>
                           <Tooltip title="Hapus User"><IconButton onClick={() => handleDelete(user.id)} disabled={isCurrentUser(user.id)} color="error" size="small" sx={{ bgcolor: '#fef2f2', '&:hover': { bgcolor: '#fee2e2' } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                         </Box>
@@ -298,6 +346,55 @@ export default function AdminUsers({ currentUser }) {
                     <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                       <button type="button" className="btn-secondary" onClick={() => setShowModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
                       <button type="submit" className="btn-green-premium" disabled={submitting} style={{ flex: 2, justifyContent: 'center' }}>{submitting ? 'Menyimpan...' : 'SIMPAN USER →'}</button>
+                    </Box>
+                  </Box>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showEditModal && (
+          <div className="modal-backdrop">
+            <div className="modal-content">
+              <div className="modal-header modal-header-green">
+                <h3>Edit Data User</h3>
+                <button className="btn-close btn-close-white" onClick={() => setShowEditModal(false)}>×</button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleEditSubmit}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    <TextField 
+                      label="Username" 
+                      name="username" 
+                      type="text" 
+                      fullWidth 
+                      size="small" 
+                      value={editData.username} 
+                      onChange={handleEditChange} 
+                      required 
+                    />
+                    <TextField 
+                      label="Email" 
+                      name="email" 
+                      type="email" 
+                      fullWidth 
+                      size="small" 
+                      value={editData.email} 
+                      onChange={handleEditChange} 
+                    />
+                    <TextField 
+                      label="Nama Lengkap" 
+                      name="nama" 
+                      type="text" 
+                      fullWidth 
+                      size="small" 
+                      value={editData.nama} 
+                      onChange={handleEditChange} 
+                    />
+                    <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                      <button type="button" className="btn-secondary" onClick={() => setShowEditModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
+                      <button type="submit" className="btn-green-premium" disabled={updatingEdit} style={{ flex: 2, justifyContent: 'center' }}>{updatingEdit ? 'Menyimpan...' : 'SIMPAN PERUBAHAN →'}</button>
                     </Box>
                   </Box>
                 </form>

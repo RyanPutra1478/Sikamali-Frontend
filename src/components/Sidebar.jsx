@@ -204,7 +204,7 @@ export default function Sidebar({ user, isOpen, onClose }) {
           <span className="sidebar-icon">{item.icon}</span>
           <span className="sidebar-label">{item.label}</span>
           <ChevronRight 
-            size={14} 
+            size={18} 
             className="chevron" 
             style={{ 
               transform: isOpenGroup ? 'rotate(90deg)' : 'rotate(0)',

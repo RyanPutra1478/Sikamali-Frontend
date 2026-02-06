@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, RefreshCw as RefreshIcon, Download as FileDownloadIcon, Users } from 'lucide-react';
-import { adminAPI } from '../services/api';
+import { adminAPI, kkAPI } from '../services/api';
 import { getRolePermissions } from '../utils/permissions';
 import './AdminTables.css';
 import './AdminPage.css';
@@ -10,6 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FileDownloadIconMui from '@mui/icons-material/FileDownload';
 import * as XLSX from 'xlsx';
@@ -119,12 +120,82 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
 
+  // SEARCH PENDUDUK STATE
+  const [allResidents, setAllResidents] = useState([]);
+  const [residentSearchTerm, setResidentSearchTerm] = useState('');
+  const [residentSuggestions, setResidentSuggestions] = useState([]);
+  const [selectedResident, setSelectedResident] = useState(null);
+
   // VIEW MODE: 'list' | 'create'
   const [activeTab, setActiveTab] = useState('list');
 
   useEffect(() => {
     loadData();
+    loadResidents();
   }, []);
+
+  const loadResidents = async () => {
+    try {
+      const [membersData, kkData] = await Promise.all([
+        kkAPI.getAllMembers(),
+        adminAPI.getKK()
+      ]);
+
+      const merged = membersData.map(m => {
+        const kk = kkData.find(k => k.id === m.kk_id || k.nomor_kk === m.nomor_kk) || {};
+        return {
+          ...m,
+          nomor_kk: m.kk_nomor || kk.nomor_kk || m.nomor_kk || '-',
+          kepala_keluarga: m.kk_kepala || kk.kepala_keluarga || m.kepala_keluarga || '',
+          desa: kk.desa || m.desa || '',
+          kecamatan: kk.kecamatan || m.kecamatan || ''
+        };
+      });
+      setAllResidents(merged);
+    } catch (err) {
+      console.error("Error loading residents:", err);
+    }
+  };
+
+  const handleResidentSearch = (term) => {
+    if (!!editItem.id) return; // Disable search in edit mode
+    
+    setResidentSearchTerm(term);
+    setEditItem(prev => ({ ...prev, nik: term }));
+    setSelectedResident(null);
+
+    if (term.length > 1) {
+      const results = allResidents.filter(r =>
+        (r.nik && r.nik.includes(term)) ||
+        (r.nama && r.nama.toLowerCase().includes(term.toLowerCase()))
+      );
+      setResidentSuggestions(results.slice(0, 5));
+    } else {
+      setResidentSuggestions([]);
+    }
+  };
+
+  const selectResident = (res) => {
+    setSelectedResident(res);
+    setResidentSearchTerm(`${res.nama} (${res.nik})`);
+    setResidentSuggestions([]);
+    setEditItem(prev => ({
+      ...prev,
+      nik: res.nik,
+      nama: res.nama,
+      nomor_kk: res.nomor_kk,
+      kepala_keluarga: res.kepala_keluarga,
+      alamat: res.alamat || res.alamat_kk || '',
+      desa: res.desa,
+      kecamatan: res.kecamatan,
+      tanggal_lahir: res.tanggal_lahir,
+      pendidikan_terakhir: res.pendidikan || res.pendidikan_terakhir || '',
+      status_kerja: res.pekerjaan || res.status_kerja || '',
+      tempat_bekerja: res.tempat_bekerja || '',
+      no_hp_wa: res.no_hp || res.no_hp_wa || '',
+      email: res.email || ''
+    }));
+  };
 
   useEffect(() => {
     setPage(1);
@@ -187,47 +258,24 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     const parsed = lastData ? JSON.parse(lastData) : {};
 
     return {
-      id: item?.id || null, // null means create mode
-      // 1. Identitas
+      id: item?.id || null,
       nik: item?.nik || '',
       nama: item?.nama || '',
-      jenis_kelamin: item?.jenis_kelamin || (item ? '' : (parsed.jenis_kelamin || '')),
-      tanggal_lahir: formatDateForInput(item?.tanggal_lahir),
-
-      // 2. Data KK
       nomor_kk: item?.nomor_kk || '',
       kepala_keluarga: item?.kepala_keluarga || '',
-
-      // 3. Lokasi
-      alamat: (item?.alamat && item.alamat.trim() !== '') ? item.alamat : (item?.alamat_kk || ''),
-      desa: item?.desa || '',
-      zona: item?.zona || '',
-
-      // 4. Kompetensi
-      pendidikan_terakhir: item?.pendidikan_terakhir || (item ? '' : (parsed.pendidikan_terakhir || '')),
-      skill: item?.skill_tags || (item ? '' : (parsed.skill || '')),
-
-      // 5. Pekerjaan
+      alamat: item?.alamat || item?.alamat_kk || '',
+      pendidikan_terakhir: item?.pendidikan_terakhir || item?.pendidikan || (item ? '' : (parsed.pendidikan_terakhir || '')),
+      skill: item?.skill_tags || item?.skill || (item ? '' : (parsed.skill || '')),
       status_kerja: item?.pekerjaan || item?.status_kerja || (item ? '' : (parsed.status_kerja || '')),
       tempat_bekerja: item?.tempat_bekerja || (item ? '' : (parsed.tempat_bekerja || '')),
-      experience_years: item?.experience_years || '',
-      availability: item?.availability !== undefined ? item.availability : (item ? 1 : (parsed.availability ?? 1)),
-      preferred_roles: item?.preferred_roles || (item ? '' : (parsed.preferred_roles || '')),
-
-      // 6. Kontak
-      telepon: item?.telepon || '',
-      email: item?.email || '',
-
-      // 7. Catatan
+      no_hp_wa: item?.no_hp_wa || item?.telepon || (item ? '' : (parsed.no_hp_wa || '')),
+      email: item?.email || (item ? '' : (parsed.email || '')),
       keterangan: item?.keterangan || (item ? '' : (parsed.keterangan || '')),
-
-      // Tambahan
-      agama: item?.agama || (item ? '' : (parsed.agama || '')),
-      status_perkawinan: item?.status_perkawinan || (item ? '' : (parsed.status_perkawinan || '')),
-      nama_ayah: item?.nama_ayah || '',
-      nama_ibu: item?.nama_ibu || '',
-      no_passport: item?.no_passport || '',
-      no_kitap: item?.no_kitap || '',
+      // Hidden/Background fields to maintain logic
+      desa: item?.desa || '',
+      kecamatan: item?.kecamatan || '',
+      tanggal_lahir: item?.tanggal_lahir || null,
+      availability: item?.availability !== undefined ? item.availability : (item ? 1 : (parsed.availability ?? 1))
     };
   };
 
@@ -238,6 +286,13 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
     setActiveTab('create');
     setEditItem(getInitialEmploymentForm(item));
+    if (item) {
+      setSelectedResident({ nik: item.nik, nama: item.nama });
+      setResidentSearchTerm(`${item.nama} (${item.nik})`);
+    } else {
+      setSelectedResident(null);
+      setResidentSearchTerm('');
+    }
   };
 
   // --- UPDATE ---
@@ -256,14 +311,12 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       const payload = {
         ...editItem,
         skill_tags: editItem.skill,
+        tanggal_lahir: editItem.tanggal_lahir ? new Date(editItem.tanggal_lahir).toISOString().split('T')[0] : null,
         pekerjaan: getComputedStatus({
           tanggal_lahir: editItem.tanggal_lahir,
           tempat_bekerja: editItem.tempat_bekerja,
           pekerjaan: editItem.status_kerja
         }),
-        experience_years: editItem.experience_years || null,
-        availability: editItem.availability !== undefined ? editItem.availability : 1,
-        preferred_roles: editItem.preferred_roles || null,
         keterangan: editItem.keterangan || null,
       };
 
@@ -271,16 +324,11 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
       // Save defaults to history
       localStorage.setItem('sikamali_last_employment', JSON.stringify({
-        jenis_kelamin: editItem.jenis_kelamin,
         pendidikan_terakhir: editItem.pendidikan_terakhir,
         skill: editItem.skill,
         status_kerja: editItem.status_kerja,
         tempat_bekerja: editItem.tempat_bekerja,
-        availability: editItem.availability,
-        preferred_roles: editItem.preferred_roles,
-        keterangan: editItem.keterangan,
-        agama: editItem.agama,
-        status_perkawinan: editItem.status_perkawinan
+        no_hp_wa: editItem.no_hp_wa
       }));
 
       setSubmitStatus('success');
@@ -733,33 +781,87 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
              <form onSubmit={handleUpdate}>
                 <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: 'var(--shadow-md)' }}>
                 <h3>Input Data Angkatan Kerja Baru</h3>
-                <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label>Cari Penduduk (NIK / Nama) <span style={{ color: '#ef4444' }}>*</span></label>
-                  <div style={{ position: 'relative' }}>
-                     <input 
-                      className="input-modern" 
-                      value={editItem.nik} 
-                      onChange={(e) => !editItem.id && setEditItem({ ...editItem, nik: e.target.value })} 
-                      disabled={!!editItem.id} 
-                      placeholder="Ketik NIK atau Nama..."
-                      style={{ paddingLeft: '12px' }}
-                    />
-                    {!editItem.id && <SearchIcon style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />}
+                <div className="search-section" style={{ 
+                  background: '#f8fafc', 
+                  padding: '24px', 
+                  borderRadius: '12px', 
+                  border: '1px solid #e2e8f0',
+                  marginBottom: '24px'
+                }}>
+                  <div className="form-group" style={{ marginBottom: '0', position: 'relative' }}>
+                    <label style={{ color: '#475569', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '12px' }}>
+                      Cari Penduduk (NIK / Nama) <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div style={{ position: 'relative', flex: 1 }}>
+                        <input 
+                          className="input-modern" 
+                          value={residentSearchTerm} 
+                          onChange={(e) => handleResidentSearch(e.target.value)} 
+                          disabled={!!editItem.id} 
+                          placeholder="Ketik NIK atau Nama..."
+                          style={{ 
+                            paddingLeft: '40px',
+                            background: editItem.id ? '#f1f5f9' : 'white',
+                            borderColor: selectedResident ? '#10b981' : '#d1d5db'
+                          }}
+                        />
+                        <SearchIcon style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                      </div>
+                      {selectedResident && (
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          background: '#ecfdf5', 
+                          padding: '0 16px', 
+                          height: '46px',
+                          borderRadius: '8px', 
+                          color: '#065f46', 
+                          fontSize: '0.85rem', 
+                          fontWeight: 600, 
+                          border: '1px solid #a7f3d0' 
+                        }}>
+                          <CheckCircleIcon style={{ fontSize: 18, marginRight: 8 }} /> Terpilih
+                        </div>
+                      )}
+                    </div>
+                    
+                    {residentSuggestions.length > 0 && (
+                      <ul className="user-suggestions" style={{ top: '100%', left: 0, right: 0, zIndex: 1000 }}>
+                        {residentSuggestions.map(res => (
+                          <li key={res.id} className="item" onClick={() => selectResident(res)}>
+                            <div className="primary">{res.nama}</div>
+                            <div className="secondary">{res.nik} - {res.nomor_kk}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {!editItem.id && <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '8px', marginBottom: 0 }}>Masukkan NIK atau Nama penduduk untuk mengambil data otomatis.</p>}
                   </div>
-                  {!editItem.id && <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>Masukkan NIK penduduk yang ingin ditambahkan data kerjanya.</p>}
                 </div>
 
-                {/* Read-only KK Info */}
-                <div className="form-row" style={{ marginBottom: '20px' }}>
-                  <div className="form-group">
-                    <label>No Kartu Keluarga</label>
-                    <input className="input-modern" value={editItem.nomor_kk || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
+                {/* Read-only KK Info Card */}
+                {selectedResident && (
+                  <div className="kk-info-card" style={{ 
+                    background: '#f0f9ff', 
+                    padding: '20px', 
+                    borderRadius: '12px', 
+                    border: '1px solid #e0f2fe',
+                    marginBottom: '24px'
+                  }}>
+                    <div className="form-row" style={{ marginBottom: '0' }}>
+                      <div className="form-group" style={{ marginBottom: '0' }}>
+                        <label style={{ color: '#0369a1', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>No Kartu Keluarga</label>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0c4a6e', marginTop: '4px' }}>{editItem.nomor_kk || '-'}</div>
+                      </div>
+                      <div className="form-group" style={{ marginBottom: '0' }}>
+                        <label style={{ color: '#0369a1', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>Kepala Keluarga</label>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0c4a6e', marginTop: '4px' }}>{editItem.kepala_keluarga || '-'}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label>Kepala Keluarga</label>
-                    <input className="input-modern" value={editItem.kepala_keluarga || '-'} disabled style={{ backgroundColor: '#f1f5f9' }} />
-                  </div>
-                </div>
+                )}
 
                 {/* CARD CONTAINER */}
                 <div style={{ 
@@ -778,59 +880,28 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     fontWeight: 600
                   }}>Data Tenaga Kerja</h4>
 
-                {/* SECTION 1: IDENTITAS */}
                 <div className="form-row">
                   <div className="form-group">
                     <label>Nama Lengkap <RequiredMark /></label>
                     <input className="input-modern" value={editItem.nama} onChange={(e) => setEditItem({ ...editItem, nama: e.target.value })} required />
                   </div>
-                   <div className="form-group">
-                    <label>Jenis Kelamin</label>
-                    <select className="input-modern" value={editItem.jenis_kelamin} onChange={(e) => setEditItem({ ...editItem, jenis_kelamin: e.target.value })}>
-                      <option value="">Pilih...</option>
-                      <option value="Laki-laki">Laki-laki</option>
-                      <option value="Perempuan">Perempuan</option>
-                    </select>
+                  <div className="form-group">
+                    <label>NIK <RequiredMark /></label>
+                    <input className="input-modern" value={editItem.nik} onChange={(e) => setEditItem({ ...editItem, nik: e.target.value })} required disabled={!!editItem.id} />
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Tempat Lahir</label>
-                    <input className="input-modern" value={editItem.desa || ''} disabled placeholder="Diambil dari data penduduk" /> 
-                  </div>
-                  <div className="form-group">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" className="input-modern" value={editItem.tanggal_lahir} onChange={(e) => setEditItem({ ...editItem, tanggal_lahir: e.target.value })} />
-                  </div>
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label>Alamat Lengkap</label>
+                  <textarea 
+                    className="input-modern" 
+                    value={editItem.alamat} 
+                    onChange={(e) => setEditItem({ ...editItem, alamat: e.target.value })} 
+                    placeholder="Alamat domisili saat ini..."
+                    rows="2"
+                  />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Agama</label>
-                    <select className="input-modern" value={editItem.agama} onChange={(e) => setEditItem({ ...editItem, agama: e.target.value })}>
-                      <option value="">Pilih...</option>
-                      <option value="Islam">Islam</option>
-                      <option value="Kristen">Kristen</option>
-                      <option value="Katolik">Katolik</option>
-                      <option value="Hindu">Hindu</option>
-                      <option value="Buddha">Buddha</option>
-                      <option value="Khonghucu">Khonghucu</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Status Perkawinan</label>
-                    <select className="input-modern" value={editItem.status_perkawinan} onChange={(e) => setEditItem({ ...editItem, status_perkawinan: e.target.value })}>
-                      <option value="">Pilih...</option>
-                      <option value="Belum Kawin">Belum Kawin</option>
-                      <option value="Kawin">Kawin</option>
-                      <option value="Cerai Hidup">Cerai Hidup</option>
-                      <option value="Cerai Mati">Cerai Mati</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Additional Info */}
                 <div className="form-row">
                   <div className="form-group">
                     <label>Pendidikan Terakhir</label>
@@ -855,7 +926,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Pekerjaan (Status)</label>
-                    <input className="input-modern" value={editItem.status_kerja} onChange={(e) => setEditItem({ ...editItem, status_kerja: e.target.value })} />
+                    <input className="input-modern" value={editItem.status_kerja} onChange={(e) => setEditItem({ ...editItem, status_kerja: e.target.value })} placeholder="Contoh: Siap Kerja, Honorer, dll" />
                   </div>
                   <div className="form-group">
                      <label>Tempat Bekerja</label>
@@ -864,42 +935,14 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                 </div>
 
                 <div className="form-row">
-                   <div className="form-group">
-                    <label>Pengalaman (Tahun)</label>
-                    <input type="number" className="input-modern" value={editItem.experience_years} onChange={(e) => setEditItem({ ...editItem, experience_years: e.target.value })} placeholder="Contoh: 5" min="0" />
-                  </div>
-                  <div className="form-group">
-                    <label>Posisi yang Diinginkan</label>
-                    <input className="input-modern" value={editItem.preferred_roles} onChange={(e) => setEditItem({ ...editItem, preferred_roles: e.target.value })} placeholder="Contoh: Senior Developer" />
-                  </div>
-                </div>
-
-                  <div className="form-group">
-                    <label>Ketersediaan</label>
-                    <select className="input-modern" value={editItem.availability} onChange={(e) => setEditItem({ ...editItem, availability: parseInt(e.target.value) })}>
-                      <option value={1}>Tersedia</option>
-                      <option value={0}>Tidak Tersedia</option>
-                    </select>
-                  </div>
-
-                <div className="form-row">
                   <div className="form-group">
                     <label>No HP / WA</label>
-                    <input className="input-modern" value={editItem.no_hp_wa || editItem.telepon || ''} onChange={(e) => setEditItem({ ...editItem, no_hp_wa: e.target.value })} />
+                    <input className="input-modern" value={editItem.no_hp_wa} onChange={(e) => setEditItem({ ...editItem, no_hp_wa: e.target.value })} placeholder="08xxxxxxxxxx" />
                   </div>
                   <div className="form-group">
                     <label>Email</label>
-                    <input type="email" className="input-modern" value={editItem.email} onChange={(e) => setEditItem({ ...editItem, email: e.target.value })} />
+                    <input type="email" className="input-modern" value={editItem.email} onChange={(e) => setEditItem({ ...editItem, email: e.target.value })} placeholder="example@mail.com" />
                   </div>
-                </div>
-                
-                 <div className="form-group">
-                  <label>Nama Ayah</label>
-                  <input className="input-modern" value={editItem.nama_ayah} onChange={(e) => setEditItem({ ...editItem, nama_ayah: e.target.value })} />
-                </div>
-                 <div className="form-group">
-                  <label>Nama Ibu</label>
-                  <input className="input-modern" value={editItem.nama_ibu} onChange={(e) => setEditItem({ ...editItem, nama_ibu: e.target.value })} />
                 </div>
 
                 <div className="form-group">

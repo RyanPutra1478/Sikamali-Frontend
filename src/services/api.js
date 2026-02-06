@@ -6,9 +6,11 @@ const API_BASE_URL =
 
 // Token Refresh Management
 let refreshTimer = null;
+let refreshInterval = null;
 let lastActivity = Date.now();
 const ACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-const REFRESH_BEFORE_EXPIRY = 2 * 60 * 1000; // Refresh 2 minutes before expiry
+const REFRESH_BEFORE_EXPIRY = 30 * 1000; // Refresh 30 seconds before expiry (reduced for short-lived tokens)
+const REFRESH_CHECK_INTERVAL = 60 * 1000; // Check every 60 seconds as fallback
 
 /**
  * Decode JWT token to get expiration time
@@ -25,13 +27,81 @@ function decodeToken(token) {
     );
     return JSON.parse(jsonPayload);
   } catch (error) {
-    console.error('Failed to decode token:', error);
+    console.error('[Token Refresh] Failed to decode token:', error);
     return null;
   }
 }
 
 /**
- * Schedule automatic token refresh
+ * Check if token needs refresh and perform refresh if needed
+ */
+async function checkAndRefreshToken() {
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  if (!token || !refreshToken) {
+    console.log('[Token Refresh] No tokens found, skipping refresh check');
+    return false;
+  }
+
+  const decoded = decodeToken(token);
+  if (!decoded || !decoded.exp) {
+    console.log('[Token Refresh] Could not decode token');
+    return false;
+  }
+
+  const expiryTime = decoded.exp * 1000;
+  const now = Date.now();
+  const timeUntilExpiry = expiryTime - now;
+
+  console.log(`[Token Refresh] Token expires in ${Math.round(timeUntilExpiry / 1000)} seconds`);
+
+  // Only refresh if token is close to expiry or already expired
+  if (timeUntilExpiry > REFRESH_BEFORE_EXPIRY) {
+    return false; // Token still valid, no refresh needed
+  }
+
+  // Check user activity before refreshing
+  const timeSinceActivity = Date.now() - lastActivity;
+  if (timeSinceActivity > ACTIVITY_TIMEOUT) {
+    console.log('[Token Refresh] User inactive, skipping refresh');
+    return false;
+  }
+
+  console.log('[Token Refresh] Token expiring soon, refreshing...');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        console.log('[Token Refresh] ✅ Token refreshed successfully');
+        return true;
+      }
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Token Refresh] ❌ Failed to refresh:', errorData.error || response.status);
+      
+      // If refresh token is expired, trigger logout
+      if (response.status === 401 || response.status === 403) {
+        window.dispatchEvent(new CustomEvent('token-expired'));
+      }
+    }
+  } catch (error) {
+    console.error('[Token Refresh] ❌ Network error during refresh:', error);
+  }
+
+  return false;
+}
+
+/**
+ * Schedule automatic token refresh based on token expiry
  */
 function scheduleTokenRefresh() {
   // Clear existing timer
@@ -56,47 +126,17 @@ function scheduleTokenRefresh() {
   const expiryTime = decoded.exp * 1000;
   const now = Date.now();
   const timeUntilExpiry = expiryTime - now;
-  const timeUntilRefresh = timeUntilExpiry - REFRESH_BEFORE_EXPIRY;
-
-  // If token is already close to expiry or expired, don't schedule
-  if (timeUntilRefresh <= 0) {
-    console.log('[Token Refresh] Token too close to expiry, will refresh on next API call');
-    return;
-  }
+  
+  // Schedule refresh for 30 seconds before expiry, or immediately if already close
+  const timeUntilRefresh = Math.max(timeUntilExpiry - REFRESH_BEFORE_EXPIRY, 1000);
 
   console.log(`[Token Refresh] Scheduled in ${Math.round(timeUntilRefresh / 1000)} seconds`);
 
   refreshTimer = setTimeout(async () => {
-    // Check if user has been active recently
-    const timeSinceActivity = Date.now() - lastActivity;
-    
-    if (timeSinceActivity > ACTIVITY_TIMEOUT) {
-      console.log('[Token Refresh] Skipping refresh - user inactive');
-      return;
-    }
-
-    console.log('[Token Refresh] Refreshing token...');
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        console.log('[Token Refresh] Token refreshed successfully');
-        
-        // Schedule next refresh
-        scheduleTokenRefresh();
-      } else {
-        console.error('[Token Refresh] Failed to refresh token');
-        // Token might be expired, let the next API call handle it
-      }
-    } catch (error) {
-      console.error('[Token Refresh] Error refreshing token:', error);
+    const success = await checkAndRefreshToken();
+    if (success) {
+      // Schedule next refresh after successful refresh
+      scheduleTokenRefresh();
     }
   }, timeUntilRefresh);
 }
@@ -109,19 +149,49 @@ function trackActivity() {
 }
 
 /**
+ * Handle visibility change - refresh token when tab becomes visible
+ */
+function handleVisibilityChange() {
+  if (document.visibilityState === 'visible') {
+    console.log('[Token Refresh] Tab became visible, checking token...');
+    trackActivity(); // User is active
+    checkAndRefreshToken().then(refreshed => {
+      if (refreshed) {
+        scheduleTokenRefresh(); // Reschedule after refresh
+      }
+    });
+  }
+}
+
+/**
  * Initialize token refresh mechanism
  */
 export function initTokenRefresh() {
   // Schedule initial refresh
   scheduleTokenRefresh();
 
+  // Start periodic check as fallback
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+  refreshInterval = setInterval(() => {
+    checkAndRefreshToken().then(refreshed => {
+      if (refreshed) {
+        scheduleTokenRefresh();
+      }
+    });
+  }, REFRESH_CHECK_INTERVAL);
+
   // Track user activity
-  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-  events.forEach(event => {
+  const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  activityEvents.forEach(event => {
     window.addEventListener(event, trackActivity, { passive: true });
   });
 
-  console.log('[Token Refresh] Initialized');
+  // Listen for visibility changes
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  console.log('[Token Refresh] ✅ Initialized with scheduled refresh, periodic check, and visibility trigger');
 }
 
 /**
@@ -133,13 +203,21 @@ export function cleanupTokenRefresh() {
     refreshTimer = null;
   }
 
-  const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-  events.forEach(event => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+
+  const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+  activityEvents.forEach(event => {
     window.removeEventListener(event, trackActivity);
   });
 
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+
   console.log('[Token Refresh] Cleaned up');
 }
+
 
 /**
  * Helper utama untuk melakukan fetch API dengan otorisasi JWT.
@@ -398,6 +476,11 @@ const adminAPI = {
     fetchWithAuth(`/admin/users/${id}/password`, {
       method: "PUT",
       body: { password },
+    }),
+  updateUser: async (id, data) =>
+    fetchWithAuth(`/admin/users/${id}`, {
+      method: "PUT",
+      body: data,
     }),
 
   // Land Management (Admin)
