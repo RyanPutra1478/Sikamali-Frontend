@@ -6,6 +6,76 @@ import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, M
 import { format } from 'date-fns';
 import id from 'date-fns/locale/id';
 
+const OCCUPATION_OPTIONS = [
+  "APOTEKER",
+  "BELUM/ TIDAK BEKERJA",
+  "BURUH HARIAN LEPAS",
+  "BURUH TANI/ PERKEBUNAN",
+  "CERAI MATI BELUM TERCATAT",
+  "DOKTER",
+  "GURU",
+  "GURU PPPK",
+  "KARYAWAN HONORER",
+  "KARYAWAN SWASTA",
+  "KEPOLISIAN RI (POLRI)",
+  "LANJUT USIA (LANSIA)",
+  "MENGURUS RUMAH TANGGA",
+  "NELAYAN/ PERIKANAN",
+  "PARAMEDIK/ BIDAN/ PERAWAT",
+  "PEDAGANG",
+  "PEGAWAI HONORER",
+  "PEGAWAI NEGERI SIPIL (PNS)",
+  "PEKERJAAN LAINNYA",
+  "PELAJAR/ MAHASISWA",
+  "PENSIUNAN",
+  "PETANI/ PEKEBUN",
+  "SOPIR",
+  "TENTARA NASIONAL INDONESIA (TNI)",
+  "TUKANG JAHIT",
+  "WARTAWAN/ JURNALIS",
+  "WIRASWASTA"
+];
+
+const MARITAL_STATUS_OPTIONS = [
+  "BELUM KAWIN",
+  "CERAI",
+  "CERAI HIDUP",
+  "CERAI HIDUP BELUM TERCATAT",
+  "CERAI HIDUP TERCATAT",
+  "CERAI MATI",
+  "CERAI MATI BELUM TERCATAT",
+  "CERAI MATI TERCATAT",
+  "KAWIN",
+  "KAWIN BELUM TERCATAT",
+  "KAWIN TERCATAT"
+];
+
+const EDUCATION_OPTIONS = [
+  "AKADEMI/ DIPLOMA III/ SARJANA MUDA",
+  "BELUM TAMAT SD/ SEDERAJAT",
+  "DIPLOMA I/II",
+  "DIPLOMA IV/ STRATA 1",
+  "DOKTORAL/ STRATA 3",
+  "GURU HONORER",
+  "MAGISTER/ STRATA 2",
+  "SLTA/ SEDERAJAT",
+  "SLTP/ SEDERAJAT",
+  "TAMAT SD/ SEDERAJAT",
+  "TIDAK/ BELUM SEKOLAH"
+];
+
+const FAMILY_RELATIONSHIP_OPTIONS = [
+  "ANAK",
+  "CUCU",
+  "FAMILI LAN",
+  "ISTRI",
+  "KEPALA KELUARGA",
+  "LAINNYA",
+  "MERTUA",
+  "ORANG TUA",
+  "SAUDARA"
+];
+
 const DataPenduduk = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -293,15 +363,20 @@ const DataPenduduk = () => {
                   <MenuItem value="P">Perempuan</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
-                name="hubungan_keluarga"
-                label="Hubungan Keluarga"
-                value={formData.hubungan_keluarga}
-                onChange={handleInputChange}
-                required
-                fullWidth
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Hubungan Keluarga</InputLabel>
+                <Select
+                  name="hubungan_keluarga"
+                  value={formData.hubungan_keluarga}
+                  onChange={handleInputChange}
+                  label="Hubungan Keluarga"
+                >
+                  <MenuItem value=""><em>Pilih Hubungan</em></MenuItem>
+                  {FAMILY_RELATIONSHIP_OPTIONS.map(opt => (
+                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 name="tempat_lahir"
                 label="Tempat Lahir"
@@ -330,30 +405,48 @@ const DataPenduduk = () => {
                 fullWidth
                 margin="normal"
               />
-              <TextField
-                name="pendidikan"
-                label="Pendidikan"
-                value={formData.pendidikan}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                name="pekerjaan"
-                label="Pekerjaan"
-                value={formData.pekerjaan}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                name="status_perkawinan"
-                label="Status Perkawinan"
-                value={formData.status_perkawinan}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Pendidikan</InputLabel>
+                <Select
+                  name="pendidikan"
+                  value={formData.pendidikan}
+                  onChange={handleInputChange}
+                  label="Pendidikan"
+                >
+                  <MenuItem value=""><em>Pilih Pendidikan</em></MenuItem>
+                  {EDUCATION_OPTIONS.map(opt => (
+                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Pekerjaan</InputLabel>
+                <Select
+                  name="pekerjaan"
+                  value={formData.pekerjaan}
+                  onChange={handleInputChange}
+                  label="Pekerjaan"
+                >
+                  <MenuItem value=""><em>Pilih Pekerjaan</em></MenuItem>
+                  {OCCUPATION_OPTIONS.map(opt => (
+                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Status Perkawinan</InputLabel>
+                <Select
+                  name="status_perkawinan"
+                  value={formData.status_perkawinan}
+                  onChange={handleInputChange}
+                  label="Status Perkawinan"
+                >
+                  <MenuItem value=""><em>Pilih Status</em></MenuItem>
+                  {MARITAL_STATUS_OPTIONS.map(opt => (
+                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 name="nama_ayah"
                 label="Nama Ayah"

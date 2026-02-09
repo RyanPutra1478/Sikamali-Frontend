@@ -121,7 +121,7 @@ const AdminLand = () => {
     if (selectedItem && (selectedItem.latitude || selectedItem.lat)) {
       return {
         center: [parseFloat(selectedItem.latitude || selectedItem.lat), parseFloat(selectedItem.longitude || selectedItem.lng)],
-        zoom: 18
+        zoom: 20
       };
     }
     const withCoords = filteredData.find(d => (d.latitude || d.lat) && (d.longitude || d.lng));
@@ -167,7 +167,8 @@ const AdminLand = () => {
               <MapContainer
                 center={mapViewState.center}
                 zoom={mapViewState.zoom}
-                scrollWheelZoom={false}
+                maxZoom={22}
+                scrollWheelZoom={true}
                 style={{ height: "100%", width: "100%" }}
                 attributionControl={false}
               >
@@ -177,6 +178,7 @@ const AdminLand = () => {
                   attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
                   url="https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
                   subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                  maxZoom={22}
                 />
                 {filteredData.map((item) => {
                   const lat = parseFloat(item.latitude || item.lat);
@@ -292,10 +294,10 @@ const AdminLand = () => {
                       <div className="photo-frame">
                         {selectedItem.foto_rumah ? (
                           <img 
-                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.253:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
+                            src={`${import.meta.env.VITE_API_URL || "http://192.168.0.254:5000/api"}/land/foto/${selectedItem.foto_rumah}`} 
                             alt="Foto Rumah" 
                             style={{ cursor: 'pointer' }}
-                            onClick={() => setPreviewImage(`${import.meta.env.VITE_API_URL || "http://192.168.0.253:5000/api"}/land/foto/${selectedItem.foto_rumah}`)}
+                            onClick={() => setPreviewImage(`${import.meta.env.VITE_API_URL || "http://192.168.0.254:5000/api"}/land/foto/${selectedItem.foto_rumah}`)}
                           />
                         ) : (
                           <div className="no-photo-placeholder">

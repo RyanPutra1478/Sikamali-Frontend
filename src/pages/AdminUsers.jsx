@@ -305,7 +305,21 @@ export default function AdminUsers({ currentUser }) {
                       <TableCell align="center" sx={{ textAlign: 'center !important' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                           <FormControl size="small" sx={{ width: 160 }}>
-                            <Select value={user.role} onChange={(e) => handleRoleChange(user.id, e.target.value)} disabled={isCurrentUser(user.id) || updatingRole[user.id]} sx={{ borderRadius: 2, fontSize: '0.75rem' }}>
+                            <Select 
+                              value={user.role} 
+                              onChange={(e) => handleRoleChange(user.id, e.target.value)} 
+                              disabled={isCurrentUser(user.id) || updatingRole[user.id]} 
+                              sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                              renderValue={(selected) => {
+                                const option = ROLE_OPTIONS.find(opt => opt.value === selected);
+                                return (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {option?.icon}
+                                    {option?.label}
+                                  </Box>
+                                );
+                              }}
+                            >
                               {ROLE_OPTIONS.map((opt) => (
                                 <MenuItem key={opt.value} value={opt.value} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{opt.icon} {opt.label}</MenuItem>
                               ))}
@@ -342,7 +356,30 @@ export default function AdminUsers({ currentUser }) {
                     <TextField label="Username" name="username" type="text" fullWidth size="small" value={formData.username} onChange={handleChange} required />
                     <TextField label="Email (Opsional)" name="email" type="email" fullWidth size="small" value={formData.email} onChange={handleChange} />
                     <TextField label="Password" name="password" type="password" fullWidth size="small" value={formData.password} onChange={handleChange} required error={formData.password.length > 0 && formData.password.length < 6} helperText={formData.password.length > 0 && formData.password.length < 6 ? "Minimal 6 karakter" : ""} />
-                    <FormControl fullWidth size="small"><InputLabel>Role</InputLabel><Select name="role" value={formData.role} onChange={handleChange} label="Role">{ROLE_OPTIONS.map((opt) => (<MenuItem key={opt.value} value={opt.value}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>{opt.icon}{opt.label}</Box></MenuItem>))}</Select></FormControl>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Role</InputLabel>
+                      <Select 
+                        name="role" 
+                        value={formData.role} 
+                        onChange={handleChange} 
+                        label="Role"
+                        renderValue={(selected) => {
+                          const option = ROLE_OPTIONS.find(opt => opt.value === selected);
+                          return (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {option?.icon}
+                              {option?.label}
+                            </Box>
+                          );
+                        }}
+                      >
+                        {ROLE_OPTIONS.map((opt) => (
+                          <MenuItem key={opt.value} value={opt.value}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>{opt.icon}{opt.label}</Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                       <button type="button" className="btn-secondary" onClick={() => setShowModal(false)} style={{ flex: 1, justifyContent: 'center' }}>BATAL</button>
                       <button type="submit" className="btn-green-premium" disabled={submitting} style={{ flex: 2, justifyContent: 'center' }}>{submitting ? 'Menyimpan...' : 'SIMPAN USER →'}</button>

@@ -3,6 +3,64 @@ import { useLocation } from 'react-router-dom'; // Import useLocation
 import { profileAPI } from '../services/api';
 import './Profile.css';
 
+const OCCUPATION_OPTIONS = [
+  "APOTEKER",
+  "BELUM/ TIDAK BEKERJA",
+  "BURUH HARIAN LEPAS",
+  "BURUH TANI/ PERKEBUNAN",
+  "CERAI MATI BELUM TERCATAT",
+  "DOKTER",
+  "GURU",
+  "GURU PPPK",
+  "KARYAWAN HONORER",
+  "KARYAWAN SWASTA",
+  "KEPOLISIAN RI (POLRI)",
+  "LANJUT USIA (LANSIA)",
+  "MENGURUS RUMAH TANGGA",
+  "NELAYAN/ PERIKANAN",
+  "PARAMEDIK/ BIDAN/ PERAWAT",
+  "PEDAGANG",
+  "PEGAWAI HONORER",
+  "PEGAWAI NEGERI SIPIL (PNS)",
+  "PEKERJAAN LAINNYA",
+  "PELAJAR/ MAHASISWA",
+  "PENSIUNAN",
+  "PETANI/ PEKEBUN",
+  "SOPIR",
+  "TENTARA NASIONAL INDONESIA (TNI)",
+  "TUKANG JAHIT",
+  "WARTAWAN/ JURNALIS",
+  "WIRASWASTA"
+];
+
+const MARITAL_STATUS_OPTIONS = [
+  "BELUM KAWIN",
+  "CERAI",
+  "CERAI HIDUP",
+  "CERAI HIDUP BELUM TERCATAT",
+  "CERAI HIDUP TERCATAT",
+  "CERAI MATI",
+  "CERAI MATI BELUM TERCATAT",
+  "CERAI MATI TERCATAT",
+  "KAWIN",
+  "KAWIN BELUM TERCATAT",
+  "KAWIN TERCATAT"
+];
+
+const EDUCATION_OPTIONS = [
+  "AKADEMI/ DIPLOMA III/ SARJANA MUDA",
+  "BELUM TAMAT SD/ SEDERAJAT",
+  "DIPLOMA I/II",
+  "DIPLOMA IV/ STRATA 1",
+  "DOKTORAL/ STRATA 3",
+  "GURU HONORER",
+  "MAGISTER/ STRATA 2",
+  "SLTA/ SEDERAJAT",
+  "SLTP/ SEDERAJAT",
+  "TAMAT SD/ SEDERAJAT",
+  "TIDAK/ BELUM SEKOLAH"
+];
+
 // Terima props onUpdateUser dari App.jsx
 export default function Profile({ onUpdateUser }) {
   const location = useLocation();
@@ -163,17 +221,28 @@ export default function Profile({ onUpdateUser }) {
             <label>Pendidikan</label>
             <select name="pendidikan" value={formData.pendidikan} onChange={handleChange}>
               <option value="">Pilih Pendidikan</option>
-              <option value="SD">SD</option>
-              <option value="SMP">SMP</option>
-              <option value="SMA">SMA/SMK</option>
-              <option value="D3">D3</option>
-              <option value="S1">S1</option>
-              <option value="S2">S2</option>
+              {EDUCATION_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Status Perkawinan</label>
+            <select name="status_perkawinan" value={formData.status_perkawinan} onChange={handleChange}>
+              <option value="">Pilih Status</option>
+              {MARITAL_STATUS_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </div>
           <div className="form-group">
             <label>Pekerjaan</label>
-            <input type="text" name="pekerjaan" value={formData.pekerjaan} onChange={handleChange} />
+            <select name="pekerjaan" value={formData.pekerjaan} onChange={handleChange}>
+              <option value="">Pilih Pekerjaan</option>
+              {OCCUPATION_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
         </div>
 

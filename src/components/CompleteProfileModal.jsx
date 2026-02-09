@@ -2,6 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { profileAPI } from '../services/api';
 import './CompleteProfileModal.css'; // Kita buat CSS-nya nanti
 
+const OCCUPATION_OPTIONS = [
+  "APOTEKER",
+  "BELUM/ TIDAK BEKERJA",
+  "BURUH HARIAN LEPAS",
+  "BURUH TANI/ PERKEBUNAN",
+  "CERAI MATI BELUM TERCATAT",
+  "DOKTER",
+  "GURU",
+  "GURU PPPK",
+  "KARYAWAN HONORER",
+  "KARYAWAN SWASTA",
+  "KEPOLISIAN RI (POLRI)",
+  "LANJUT USIA (LANSIA)",
+  "MENGURUS RUMAH TANGGA",
+  "NELAYAN/ PERIKANAN",
+  "PARAMEDIK/ BIDAN/ PERAWAT",
+  "PEDAGANG",
+  "PEGAWAI HONORER",
+  "PEGAWAI NEGERI SIPIL (PNS)",
+  "PEKERJAAN LAINNYA",
+  "PELAJAR/ MAHASISWA",
+  "PENSIUNAN",
+  "PETANI/ PEKEBUN",
+  "SOPIR",
+  "TENTARA NASIONAL INDONESIA (TNI)",
+  "TUKANG JAHIT",
+  "WARTAWAN/ JURNALIS",
+  "WIRASWASTA"
+];
+
 export default function CompleteProfileModal({ user, onComplete, onClose }) {
   const [formData, setFormData] = useState({
     nama: '',
@@ -108,19 +138,36 @@ export default function CompleteProfileModal({ user, onComplete, onClose }) {
             <div className="form-group">
               <label>Pendidikan</label>
               <select name="pendidikan" value={formData.pendidikan} onChange={handleChange}>
-                <option value="">Pilih...</option>
-                <option value="SD">SD</option>
-                <option value="SMP">SMP</option>
-                <option value="SMA">SMA/SMK</option>
-                <option value="D3">D3</option>
-                <option value="S1">S1</option>
-                <option value="S2">S2</option>
+                <option value="">Pilih Pendidikan</option>
+                {EDUCATION_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
               <label>Telepon / WA</label>
               <input name="telepon" value={formData.telepon} onChange={handleChange} />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label>Status Perkawinan</label>
+            <select name="status_perkawinan" value={formData.status_perkawinan} onChange={handleChange}>
+              <option value="">Pilih Status</option>
+              {MARITAL_STATUS_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Pekerjaan</label>
+            <select name="pekerjaan" value={formData.pekerjaan} onChange={handleChange}>
+              <option value="">Pilih Pekerjaan</option>
+              {OCCUPATION_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
 
           <button type="submit" className="btn-save-modal" disabled={loading}>

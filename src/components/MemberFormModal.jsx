@@ -4,6 +4,76 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const formatDateInput = (dateString) => dateString ? new Date(dateString).toISOString().split('T')[0] : '';
 
+const OCCUPATION_OPTIONS = [
+    "APOTEKER",
+    "BELUM/ TIDAK BEKERJA",
+    "BURUH HARIAN LEPAS",
+    "BURUH TANI/ PERKEBUNAN",
+    "CERAI MATI BELUM TERCATAT",
+    "DOKTER",
+    "GURU",
+    "GURU PPPK",
+    "KARYAWAN HONORER",
+    "KARYAWAN SWASTA",
+    "KEPOLISIAN RI (POLRI)",
+    "LANJUT USIA (LANSIA)",
+    "MENGURUS RUMAH TANGGA",
+    "NELAYAN/ PERIKANAN",
+    "PARAMEDIK/ BIDAN/ PERAWAT",
+    "PEDAGANG",
+    "PEGAWAI HONORER",
+    "PEGAWAI NEGERI SIPIL (PNS)",
+    "PEKERJAAN LAINNYA",
+    "PELAJAR/ MAHASISWA",
+    "PENSIUNAN",
+    "PETANI/ PEKEBUN",
+    "SOPIR",
+    "TENTARA NASIONAL INDONESIA (TNI)",
+    "TUKANG JAHIT",
+    "WARTAWAN/ JURNALIS",
+    "WIRASWASTA"
+];
+
+const MARITAL_STATUS_OPTIONS = [
+    "BELUM KAWIN",
+    "CERAI",
+    "CERAI HIDUP",
+    "CERAI HIDUP BELUM TERCATAT",
+    "CERAI HIDUP TERCATAT",
+    "CERAI MATI",
+    "CERAI MATI BELUM TERCATAT",
+    "CERAI MATI TERCATAT",
+    "KAWIN",
+    "KAWIN BELUM TERCATAT",
+    "KAWIN TERCATAT"
+];
+
+const EDUCATION_OPTIONS = [
+    "AKADEMI/ DIPLOMA III/ SARJANA MUDA",
+    "BELUM TAMAT SD/ SEDERAJAT",
+    "DIPLOMA I/II",
+    "DIPLOMA IV/ STRATA 1",
+    "DOKTORAL/ STRATA 3",
+    "GURU HONORER",
+    "MAGISTER/ STRATA 2",
+    "SLTA/ SEDERAJAT",
+    "SLTP/ SEDERAJAT",
+    "TAMAT SD/ SEDERAJAT",
+    "TIDAK/ BELUM SEKOLAH"
+];
+
+const FAMILY_RELATIONSHIP_OPTIONS = [
+    "ANAK",
+    "CUCU",
+    "FAMILI LAIN",
+    "ISTRI",
+    "KEPALA KELUARGA",
+    "LAINNYA",
+    "MERTUA",
+    "ORANG TUA",
+    "SAUDARA"
+];
+
 const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK }) => {
     const [form, setForm] = useState({
         kk_id: '',
@@ -252,12 +322,16 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             </div>
                             <div className="form-group">
                                 <label>Hubungan Keluarga</label>
-                                <select name="hubungan_keluarga" value={form.hubungan_keluarga} onChange={handleChange} className="input-field">
-                                    <option value="">Pilih</option>
-                                    <option value="Kepala Keluarga">Kepala Keluarga</option>
-                                    <option value="Istri">Istri</option>
-                                    <option value="Anak">Anak</option>
-                                    <option value="Famili Lain">Famili Lain</option>
+                                <select 
+                                    name="hubungan_keluarga" 
+                                    value={form.hubungan_keluarga} 
+                                    onChange={handleChange} 
+                                    className="input-field"
+                                >
+                                    <option value="">Pilih Hubungan</option>
+                                    {FAMILY_RELATIONSHIP_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="form-group">
@@ -291,21 +365,31 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             </div>
                             <div className="form-group">
                                 <label>Pendidikan</label>
-                                <select name="pendidikan" value={form.pendidikan} onChange={handleChange} className="input-field">
-                                    <option value="">Pilih</option>
-                                    <option value="SD">SD</option>
-                                    <option value="SMP">SMP</option>
-                                    <option value="SMA/SMK">SMA/SMK</option>
-                                    <option value="D3">D3</option>
-                                    <option value="S1">S1</option>
-                                    <option value="S2">S2</option>
-                                    <option value="S3">S3</option>
-                                    <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option>
+                                <select 
+                                    name="pendidikan" 
+                                    value={form.pendidikan} 
+                                    onChange={handleChange} 
+                                    className="input-field"
+                                >
+                                    <option value="">Pilih Pendidikan</option>
+                                    {EDUCATION_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Pekerjaan</label>
-                                <input name="pekerjaan" value={form.pekerjaan} onChange={handleChange} placeholder="Contoh: Petani, PNS, Swasta" className="input-field" />
+                                <select 
+                                    name="pekerjaan" 
+                                    value={form.pekerjaan} 
+                                    onChange={handleChange} 
+                                    className="input-field"
+                                >
+                                    <option value="">Pilih Pekerjaan</option>
+                                    {OCCUPATION_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="form-group">
                                 <label>Golongan Darah</label>
@@ -320,12 +404,16 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             </div>
                             <div className="form-group">
                                 <label>Status Perkawinan</label>
-                                <select name="status_perkawinan" value={form.status_perkawinan} onChange={handleChange} className="input-field">
-                                    <option value="">Pilih</option>
-                                    <option value="Belum Kawin">Belum Kawin</option>
-                                    <option value="Kawin">Kawin</option>
-                                    <option value="Cerai Hidup">Cerai Hidup</option>
-                                    <option value="Cerai Mati">Cerai Mati</option>
+                                <select 
+                                    name="status_perkawinan" 
+                                    value={form.status_perkawinan} 
+                                    onChange={handleChange} 
+                                    className="input-field"
+                                >
+                                    <option value="">Pilih Status</option>
+                                    {MARITAL_STATUS_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="form-group">
