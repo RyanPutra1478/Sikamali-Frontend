@@ -540,9 +540,9 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                           });
                         }}
                       >
-                        <option value="sejahtera">Sejahtera</option>
-                        <option value="prasejahtera">Prasejahtera</option>
-                        <option value="sejahtera mandiri">Sejahtera Mandiri</option>
+                        <option value="sejahtera">SEJAHTERA</option>
+                        <option value="prasejahtera">PRASEJAHTERA</option>
+                        <option value="sejahtera mandiri">SEJAHTERA MANDIRI</option>
                       </select>
                     </div>
                   </div>
@@ -557,9 +557,9 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                         disabled={formData.status_kesejahteraan !== 'prasejahtera'}
                       >
                         <option value="">Pilih Tingkat...</option>
-                        <option value="Rentan Ekstrem">Rentan Ekstrem</option>
-                        <option value="Rentan Prioritas">Rentan Prioritas</option>
-                        <option value="Rentan Transisi">Rentan Transisi</option>
+                        <option value="Rentan Ekstrem">RENTAN EKSTREM</option>
+                        <option value="Rentan Prioritas">RENTAN PRIORITAS</option>
+                        <option value="Rentan Transisi">RENTAN TRANSISI</option>
                       </select>
                     </div>
                   </div>

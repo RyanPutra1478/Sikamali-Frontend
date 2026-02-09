@@ -314,10 +314,8 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             <div className="form-group">
                                 <label>Status Domisili</label>
                                 <select name="status_domisili" value={form.status_domisili} onChange={handleChange} className="input-field">
-                                    <option value="Penduduk Asli">Penduduk Asli</option>
-                                    <option value="Pendatang">Pendatang</option>
-                                    <option value="Meninggal">Meninggal</option>
-                                    <option value="Pindah">Pindah</option>
+                                    <option value="Penduduk Asli">PENDUDUK ASLI</option>
+                                    <option value="Pendatang">PENDATANG</option>
                                 </select>
                             </div>
                             <div className="form-group">
@@ -338,8 +336,8 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <label>Jenis Kelamin</label>
                                 <select name="jenis_kelamin" value={form.jenis_kelamin} onChange={handleChange} className="input-field">
                                     <option value="">Pilih</option>
-                                    <option value="Laki-laki">Laki-laki</option>
-                                    <option value="Perempuan">Perempuan</option>
+                                    <option value="Laki-laki">LAKI-LAKI</option>
+                                    <option value="Perempuan">PEREMPUAN</option>
                                 </select>
                             </div>
                             <div className="form-group">
@@ -354,12 +352,12 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <label>Agama</label>
                                 <select name="agama" value={form.agama} onChange={handleChange} className="input-field">
                                     <option value="">Pilih</option>
-                                    <option value="Islam">Islam</option>
-                                    <option value="Kristen">Kristen</option>
-                                    <option value="Katolik">Katolik</option>
-                                    <option value="Hindu">Hindu</option>
-                                    <option value="Buddha">Buddha</option>
-                                    <option value="Konghucu">Konghucu</option>
+                                    <option value="Islam">ISLAM</option>
+                                    <option value="Kristen">KRISTEN PROTESTAN</option>
+                                    <option value="Katolik">KATOLIK</option>
+                                    <option value="Hindu">HINDU</option>
+                                    <option value="Buddha">BUDDHA</option>
+                                    <option value="Konghucu">KONGHUCU</option>
                                     <option value="Lainnya">Lainnya</option>
                                 </select>
                             </div>
