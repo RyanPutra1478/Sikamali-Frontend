@@ -79,7 +79,7 @@ const FAMILY_RELATIONSHIP_OPTIONS = [
 const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK, members = [] }) => {
     const [form, setForm] = useState({
         kk_id: '',
-        nik: '', nama: '', status_domisili: 'Penduduk Asli',
+        nik: '', nama: '', status_domisili: 'PENDUDUK TETAP',
         hubungan_keluarga: '', jenis_kelamin: '', tempat_lahir: '', tanggal_lahir: '',
         agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
         pekerjaan: '', status_kerja: '', tempat_bekerja: '', no_hp: '', email: '',
@@ -96,7 +96,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
     const getInitialForm = () => {
         const lastData = localStorage.getItem('sikamali_last_member');
         const baseForm = {
-            nik: '', nama: '', status_domisili: 'Penduduk Asli',
+            nik: '', nama: '', status_domisili: 'PENDUDUK TETAP',
             hubungan_keluarga: '', jenis_kelamin: '', tempat_lahir: '', tanggal_lahir: '',
             agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
             pekerjaan: '', status_kerja: '', tempat_bekerja: '', no_hp: '', email: '',
@@ -109,7 +109,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                 const parsed = JSON.parse(lastData);
                 return {
                     ...baseForm,
-                    status_domisili: parsed.status_domisili || 'Penduduk Asli',
+                    status_domisili: parsed.status_domisili || 'PENDUDUK TETAP',
                     tempat_lahir: parsed.tempat_lahir || '',
                     agama: parsed.agama || '',
                     pendidikan: parsed.pendidikan || '',
@@ -254,15 +254,16 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <div className="detail-value">
                                     <span style={{ 
                                         color: (() => {
-                                            const s = (form.status_domisili || '').toLowerCase();
-                                            if (s.includes('meninggal')) return '#ef4444';
-                                            if (s.includes('pindah')) return '#f59e0b';
-                                            if (s.includes('pendatang')) return '#3b82f6';
-                                            return '#10b981';
-                                        })(),
-                                        fontWeight: 'bold'
+                                            const s = (form.status_domisili || '').toUpperCase().trim();
+                                            if (s.includes('PENDATANG')) return '#3b82f6';
+                                            return '#10b981'; // Default Green for TETAP
+                                        })()
                                     }}>
-                                        {form.status_domisili || '-'}
+                                        {(() => {
+                                            const s = (form.status_domisili || '').toUpperCase().trim();
+                                            if (s === 'PENDUDUK ASLI' || s === 'ASLI') return 'PENDUDUK TETAP';
+                                            return s || '-';
+                                        })()}
                                     </span>
                                 </div>
                             </div>
@@ -338,8 +339,8 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             <div className="form-group">
                                 <label>Status Domisili</label>
                                 <select name="status_domisili" value={form.status_domisili} onChange={handleChange} className="input-field">
-                                    <option value="Penduduk Asli">PENDUDUK ASLI</option>
-                                    <option value="Pendatang">PENDATANG</option>
+                                    <option value="PENDUDUK TETAP">PENDUDUK TETAP</option>
+                                    <option value="PENDATANG">PENDATANG</option>
                                 </select>
                             </div>
                             <div className="form-group">
@@ -403,8 +404,11 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                 <label>Pekerjaan</label>
                                 <select 
                                     name="pekerjaan" 
-                                    value={form.pekerjaan} 
-                                    onChange={handleChange} 
+                                    value={OCCUPATION_OPTIONS.includes(form.pekerjaan) ? form.pekerjaan : (form.pekerjaan ? "PEKERJAAN LAINNYA" : "")} 
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setForm({ ...form, pekerjaan: val });
+                                    }} 
                                     className="input-field"
                                 >
                                     <option value="">Pilih Pekerjaan</option>
@@ -412,6 +416,19 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                                         <option key={opt} value={opt}>{opt}</option>
                                     ))}
                                 </select>
+
+                                {/* Manual Input if "PEKERJAAN LAINNYA" is selected OR if the value is not in the predefined list */}
+                                {((form.pekerjaan === "PEKERJAAN LAINNYA") || (form.pekerjaan && !OCCUPATION_OPTIONS.includes(form.pekerjaan))) && (
+                                    <input
+                                        type="text"
+                                        placeholder="Masukkan jenis pekerjaan..."
+                                        className="input-field"
+                                        style={{ marginTop: '10px' }}
+                                        value={form.pekerjaan === "PEKERJAAN LAINNYA" ? "" : form.pekerjaan}
+                                        onChange={(e) => setForm({ ...form, pekerjaan: e.target.value.toUpperCase() })}
+                                        autoFocus
+                                    />
+                                )}
                             </div>
                             <div className="form-group">
                                 <label>Golongan Darah</label>
@@ -548,7 +565,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             }
                         }}
                     >
-                        1. Lanjutkan proses dengan mengedit no KK lama
+                        Lanjutkan proses dengan mengedit no KK lama
                     </Button>
                     <Button 
                         fullWidth
@@ -571,7 +588,7 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             }
                         }}
                     >
-                        2. Lanjutkan dengan input no KK baru
+                        Lanjutkan dengan input no KK baru
                     </Button>
                 </DialogActions>
             </Dialog>

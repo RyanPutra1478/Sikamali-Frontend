@@ -130,27 +130,29 @@ const DataPenduduk = () => {
       headerName: 'Domisili', 
       width: 130,
       renderCell: (params) => {
-          const s = (params.value || '').toLowerCase();
-          let color = '#10b981'; // Green
-          let bgcolor = '#f0fdf4';
-          
-          if (s.includes('meninggal')) { color = '#e11d48'; bgcolor = '#fff1f2'; }
-          else if (s.includes('pindah')) { color = '#c2410c'; bgcolor = '#fff7ed'; }
-          else if (s.includes('pendatang')) { color = '#1d4ed8'; bgcolor = '#eff6ff'; }
-          
-          return (
-            <span style={{ 
-              backgroundColor: bgcolor, 
-              color: color, 
-              padding: '2px 8px', 
-              borderRadius: '99px', 
-              fontSize: '0.7rem', 
-              fontWeight: 700,
-              textTransform: 'uppercase'
-            }}>
-              {params.value}
-            </span>
-          );
+        const val = (params.value || '').toUpperCase().trim();
+        const displayValue = (val === 'PENDUDUK ASLI' || val === 'ASLI') ? 'PENDUDUK TETAP' : val;
+        
+        let color = '#10b981'; // Green for TETAP
+        let bgcolor = '#f0fdf4';
+        
+        if (displayValue.includes('PENDATANG')) { 
+            color = '#3b82f6'; // Blue for PENDATANG
+            bgcolor = '#eff6ff'; 
+        }
+        
+        return (
+          <span style={{ 
+            backgroundColor: bgcolor, 
+            color: color, 
+            padding: '2px 8px', 
+            borderRadius: '99px', 
+            fontSize: '0.7rem', 
+            textTransform: 'uppercase'
+          }}>
+            {displayValue || '-'}
+          </span>
+        );
       }
     },
     { field: 'status_data', headerName: 'Status Kependudukan', width: 120 },
@@ -423,7 +425,7 @@ const DataPenduduk = () => {
                 <InputLabel>Pekerjaan</InputLabel>
                 <Select
                   name="pekerjaan"
-                  value={formData.pekerjaan}
+                  value={OCCUPATION_OPTIONS.includes(formData.pekerjaan) ? formData.pekerjaan : (formData.pekerjaan ? "PEKERJAAN LAINNYA" : "")}
                   onChange={handleInputChange}
                   label="Pekerjaan"
                 >
@@ -433,6 +435,17 @@ const DataPenduduk = () => {
                   ))}
                 </Select>
               </FormControl>
+              {((formData.pekerjaan === "PEKERJAAN LAINNYA") || (formData.pekerjaan && !OCCUPATION_OPTIONS.includes(formData.pekerjaan))) && (
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Jenis Pekerjaan Lainnya"
+                  value={formData.pekerjaan === "PEKERJAAN LAINNYA" ? "" : formData.pekerjaan}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pekerjaan: e.target.value.toUpperCase() }))}
+                  placeholder="Masukkan jenis pekerjaan..."
+                  autoFocus
+                />
+              )}
               <FormControl fullWidth margin="normal">
                 <InputLabel>Status Perkawinan</InputLabel>
                 <Select
@@ -463,14 +476,18 @@ const DataPenduduk = () => {
                 fullWidth
                 margin="normal"
               />
-              <TextField
-                name="status_domisili"
-                label="Status Domisili"
-                value={formData.status_domisili}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Status Domisili</InputLabel>
+                <Select
+                  name="status_domisili"
+                  value={formData.status_domisili}
+                  onChange={handleInputChange}
+                  label="Status Domisili"
+                >
+                  <MenuItem value="PENDUDUK TETAP">PENDUDUK TETAP</MenuItem>
+                  <MenuItem value="PENDATANG">PENDATANG</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 name="alamat"
                 label="Alamat Detail"

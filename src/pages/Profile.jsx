@@ -237,12 +237,29 @@ export default function Profile({ onUpdateUser }) {
           </div>
           <div className="form-group">
             <label>Pekerjaan</label>
-            <select name="pekerjaan" value={formData.pekerjaan} onChange={handleChange}>
+            <select 
+              name="pekerjaan" 
+              value={OCCUPATION_OPTIONS.includes(formData.pekerjaan) ? formData.pekerjaan : (formData.pekerjaan ? "PEKERJAAN LAINNYA" : "")} 
+              onChange={handleChange}
+            >
               <option value="">Pilih Pekerjaan</option>
               {OCCUPATION_OPTIONS.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
+
+            {/* Manual Input if "PEKERJAAN LAINNYA" is selected OR if the value is not in the predefined list */}
+            {((formData.pekerjaan === "PEKERJAAN LAINNYA") || (formData.pekerjaan && !OCCUPATION_OPTIONS.includes(formData.pekerjaan))) && (
+              <input
+                type="text"
+                placeholder="Masukkan jenis pekerjaan..."
+                className="input-field"
+                style={{ marginTop: '10px' }}
+                value={formData.pekerjaan === "PEKERJAAN LAINNYA" ? "" : formData.pekerjaan}
+                onChange={(e) => setFormData({ ...formData, pekerjaan: e.target.value.toUpperCase() })}
+                autoFocus
+              />
+            )}
           </div>
         </div>
 

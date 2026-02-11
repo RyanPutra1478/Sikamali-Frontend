@@ -223,7 +223,7 @@ export default function AdminMembers({ user }) {
     const getInitialFormState = () => {
         const lastData = localStorage.getItem('sikamali_last_member');
         const baseForm = {
-            nik: '', nama: '', status_domisili: 'Penduduk Asli',
+            nik: '', nama: '', status_domisili: 'PENDUDUK TETAP',
             hubungan_keluarga: '', jenis_kelamin: '', tempat_lahir: '', tanggal_lahir: '',
             agama: '', status_perkawinan: '', tanggal_perkawinan: '', pendidikan: '', pendidikan_terakhir: '',
             pekerjaan: '', status_kerja: '', tempat_bekerja: '', no_hp: '', email: '',
@@ -236,7 +236,7 @@ export default function AdminMembers({ user }) {
                 const parsed = JSON.parse(lastData);
                 return {
                     ...baseForm,
-                    status_domisili: parsed.status_domisili || 'Penduduk Asli',
+                    status_domisili: parsed.status_domisili || 'PENDUDUK TETAP',
                     tempat_lahir: parsed.tempat_lahir || '',
                     agama: parsed.agama || '',
                     pendidikan: parsed.pendidikan || '',
@@ -560,7 +560,7 @@ export default function AdminMembers({ user }) {
 
                     <form onSubmit={handleSubmitAll}>
                         {memberForms.map((form, index) => (
-                            <div key={index} className="member-form-card" style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+                            <div key={index} className="member-form-card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                     <h4>Anggota #{index + 1}</h4>
                                     {memberForms.length > 1 && (
@@ -590,8 +590,8 @@ export default function AdminMembers({ user }) {
                                         <label>Status Domisili</label>
                                         <select name="status_domisili" value={form.status_domisili} onChange={(e) => handleChange(index, e)} className="input-field">
                                             <option value="">Pilih</option>
-                                            <option value="Penduduk Asli">PENDUDUK ASLI</option>
-                                            <option value="Pendatang">PENDATANG</option>
+                                            <option value="PENDUDUK TETAP">PENDUDUK TETAP</option>
+                                            <option value="PENDATANG">PENDATANG</option>
                                         </select>
                                     </div>
                                     <div className="form-group">
@@ -655,7 +655,7 @@ export default function AdminMembers({ user }) {
                                         <label>Pekerjaan</label>
                                         <select 
                                             name="pekerjaan" 
-                                            value={form.pekerjaan} 
+                                            value={OCCUPATION_OPTIONS.includes(form.pekerjaan) ? form.pekerjaan : (form.pekerjaan ? "PEKERJAAN LAINNYA" : "")} 
                                             onChange={(e) => handleChange(index, e)} 
                                             className="input-field"
                                         >
@@ -664,6 +664,23 @@ export default function AdminMembers({ user }) {
                                                 <option key={opt} value={opt}>{opt}</option>
                                             ))}
                                         </select>
+
+                                        {/* Manual Input for other jobs */}
+                                        {((form.pekerjaan === "PEKERJAAN LAINNYA") || (form.pekerjaan && !OCCUPATION_OPTIONS.includes(form.pekerjaan))) && (
+                                            <input
+                                                type="text"
+                                                placeholder="Masukkan jenis pekerjaan..."
+                                                className="input-field"
+                                                style={{ marginTop: '10px' }}
+                                                value={form.pekerjaan === "PEKERJAAN LAINNYA" ? "" : form.pekerjaan}
+                                                onChange={(e) => {
+                                                    const newForms = [...memberForms];
+                                                    newForms[index] = { ...newForms[index], pekerjaan: e.target.value.toUpperCase() };
+                                                    setMemberForms(newForms);
+                                                }}
+                                                autoFocus
+                                            />
+                                        )}
                                     </div>
                                     <div className="form-group">
                                         <label>Golongan Darah</label>
@@ -912,12 +929,15 @@ export default function AdminMembers({ user }) {
                                                 <span style={{
                                                    color: (() => {
                                                        const s = (m.status_domisili || '').toUpperCase().trim();
-                                                       if (s.includes('PENDUDUK TETAP')) return '#10b981';
-                                                       if (s.includes('WARGA PENDATANG')) return '#3b82f6';
-                                                       return 'inherit';
+                                                       if (s.includes('PENDATANG')) return '#3b82f6';
+                                                       return '#10b981'; // Green for TETAP and others
                                                    })()
                                                 }}>
-                                                    {m.status_domisili || '-'}
+                                                    {(() => {
+                                                        const s = (m.status_domisili || '').toUpperCase().trim();
+                                                        if (s === 'PENDUDUK ASLI' || s === 'ASLI') return 'PENDUDUK TETAP';
+                                                        return s || '-';
+                                                    })()}
                                                 </span>
                                             </td>
                                             <td style={{ fontSize: '0.75rem' }}>{m.kewarganegaraan || 'WNI'}</td>
@@ -1053,7 +1073,7 @@ export default function AdminMembers({ user }) {
                             }
                         }}
                     >
-                        1. Lanjutkan proses dengan mengedit no KK lama
+                        Lanjutkan proses dengan mengedit no KK lama
                     </Button>
                     <Button 
                         fullWidth
@@ -1080,7 +1100,7 @@ export default function AdminMembers({ user }) {
                             }
                         }}
                     >
-                        2. Lanjutkan dengan input no KK baru
+                        Lanjutkan dengan input no KK baru
                     </Button>
                 </DialogActions>
             </Dialog>

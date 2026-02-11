@@ -1315,7 +1315,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
               }
             }}
           >
-            1. Lanjutkan proses dengan mengedit no KK lama
+            Lanjutkan proses dengan mengedit no KK lama
           </Button>
           <Button 
             fullWidth
@@ -1338,7 +1338,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
               }
             }}
           >
-            2. Lanjutkan dengan input no KK baru
+            Lanjutkan dengan input no KK baru
           </Button>
         </DialogActions>
       </Dialog>
@@ -1628,10 +1628,17 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                         <td>
                           <span style={{ 
                               fontSize: "0.75rem", 
-                              fontWeight: "700",
-                              color: "#000000"
+                              color: (() => {
+                                  const s = (member.status_domisili || '').toUpperCase().trim();
+                                  if (s.includes('PENDATANG')) return '#3b82f6';
+                                  return '#10b981';
+                              })()
                           }}>
-                              {member.status_domisili || '-'}
+                              {(() => {
+                                  const s = (member.status_domisili || '').toUpperCase().trim();
+                                  if (s === 'PENDUDUK ASLI' || s === 'ASLI') return 'PENDUDUK TETAP';
+                                  return s || '-';
+                              })()}
                           </span>
                         </td>
                       </tr>

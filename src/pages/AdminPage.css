@@ -460,3 +460,51 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+/* Responsive Grids & Forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.member-form-card {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .admin-page {
+        padding: 1rem;
+    }
+
+    .admin-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-row, 
+    .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    .member-form-card {
+        padding: 1rem !important;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-actions {
+        padding: 0 1.5rem 1.5rem;
+    }
+}

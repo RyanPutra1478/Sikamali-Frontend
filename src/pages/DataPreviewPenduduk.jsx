@@ -300,9 +300,13 @@ const DataPreviewPenduduk = ({ user }) => {
           mb: 3, 
           overflowX: 'auto',
           pb: 1,
-          '&::-webkit-scrollbar': { height: '4px' },
+          '&::-webkit-scrollbar': { height: '6px' },
           '&::-webkit-scrollbar-track': { bgcolor: '#f1f5f9' },
-          '&::-webkit-scrollbar-thumb': { bgcolor: '#cbd5e1', borderRadius: '10px' }
+          '&::-webkit-scrollbar-thumb': { 
+            bgcolor: '#94a3b8', 
+            borderRadius: '10px',
+            '&:hover': { bgcolor: '#64748b' }
+          }
         }}
       >
         <Box sx={{ flex: 1, minWidth: '200px' }}>
