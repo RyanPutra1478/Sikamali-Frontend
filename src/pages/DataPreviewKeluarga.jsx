@@ -20,7 +20,7 @@ import {
   Menu,
   Button
 } from '@mui/material';
-import { Search as SearchIcon, Home as HomeIcon, VerifiedUser as VerifiedUserIcon, People as PeopleIcon, FilterList as FilterListIcon } from '@mui/icons-material';
+import { Search as SearchIcon, Home as HomeIcon, VerifiedUser as VerifiedUserIcon, People as PeopleIcon } from '@mui/icons-material';
 import { Home, Download as FileDownloadIcon, RefreshCw as RefreshIcon } from 'lucide-react';
 import { previewAPI } from '../services/api';
 import { getRolePermissions } from '../utils/permissions';
@@ -234,7 +234,14 @@ const DataPreviewKeluarga = ({ user }) => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-      <div className="admin-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+      <Box className="admin-header" sx={{ 
+        flexDirection: { xs: 'column', md: 'row' }, 
+        alignItems: { xs: 'flex-start', md: 'flex-end' },
+        gap: { xs: 2, md: 0 },
+        mb: '1.5rem', 
+        borderBottom: '1px solid #e2e8f0', 
+        paddingBottom: '1rem' 
+      }}>
         <div className="header-title-section">
           <h2 style={{ fontSize: '1.75rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Home size={28} /> Data Preview Keluarga
@@ -243,7 +250,11 @@ const DataPreviewKeluarga = ({ user }) => {
             Ringkasan data Kartu Keluarga dan statistik kesejahteraan desa lingkar tambang.
           </p>
         </div>
-        <div className="header-actions">
+        <Box className="header-actions" sx={{ 
+          width: { xs: '100%', md: 'auto' }, 
+          justifyContent: { xs: 'flex-start', md: 'flex-end' },
+          gap: 1.5 
+        }}>
            <Tooltip title="Refresh Data">
             <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
               <RefreshIcon size={24} color="#10b981" />
@@ -282,8 +293,8 @@ const DataPreviewKeluarga = ({ user }) => {
               </Menu>
             </>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       <Box 
         sx={{ 
@@ -314,14 +325,22 @@ const DataPreviewKeluarga = ({ user }) => {
 
       {/* MAIN TABLE PAPER */}
       <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)' }}>
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#fcfcfc', borderBottom: '1px solid #f1f5f9' }}>
+        <Box sx={{ 
+          p: 2, 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          alignItems: 'center', 
+          gap: 2, 
+          bgcolor: '#fcfcfc', 
+          borderBottom: '1px solid #f1f5f9' 
+        }}>
           <TextField
             size="small"
             placeholder="Cari No KK, Kepala Keluarga, dsb..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              width: 300,
+              width: { xs: '100%', sm: 300 },
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2.5,
                 bgcolor: 'white',
@@ -335,7 +354,7 @@ const DataPreviewKeluarga = ({ user }) => {
               ),
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
             <InputLabel>Filter Status</InputLabel>
             <Select
               value={filterValue}
@@ -356,7 +375,7 @@ const DataPreviewKeluarga = ({ user }) => {
             </Select>
           </FormControl>
 
-          <FormControl size="small" sx={{ minWidth: 180 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 180 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
             <InputLabel>Filter Desa</InputLabel>
             <Select
               value={selectedDesa}
@@ -376,10 +395,7 @@ const DataPreviewKeluarga = ({ user }) => {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton sx={{ border: '1px solid #e2e8f0', borderRadius: 2 }}>
-            <FilterListIcon />
-          </IconButton>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }} />
         </Box>
 
         <Box sx={{ overflowX: 'auto' }}>

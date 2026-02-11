@@ -11,7 +11,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import FileDownloadIconMui from '@mui/icons-material/FileDownload';
 import * as XLSX from 'xlsx';
 
@@ -593,11 +592,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
             )}
           </Box>
 
-          <Tooltip title="Filter List">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
         </Box>
 
             {loading ? (

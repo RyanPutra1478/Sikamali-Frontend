@@ -366,7 +366,12 @@ export default function Sidebar({ user, isOpen, onClose }) {
           </div>
           <div className="help-text">
             <p>Butuh Bantuan?</p>
-            <button className="help-button">Hubungi Admin</button>
+            <button 
+              className="help-button"
+              onClick={() => window.open('https://wa.me/6282192840313', '_blank')}
+            >
+              Hubungi Admin
+            </button>
           </div>
         </div>
       </div>

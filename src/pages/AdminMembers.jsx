@@ -9,10 +9,10 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import FileDownloadIconMui from '@mui/icons-material/FileDownload';
 import { getRolePermissions } from '../utils/permissions';
 import { Users, RefreshCw as RefreshIcon, Download as FileDownloadIcon } from 'lucide-react';
+import WarningIcon from '@mui/icons-material/Warning';
 import MemberFormModal from '../components/MemberFormModal';
 import * as XLSX from 'xlsx';
 
@@ -120,6 +120,9 @@ export default function AdminMembers({ user }) {
     const [kkSearchResults, setKkSearchResults] = useState([]);
     const [allKK, setAllKK] = useState([]); // Store all KKs for real-time search
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+    const [duplicateMemberData, setDuplicateMemberData] = useState(null);
+    const [duplicateRowIndex, setDuplicateRowIndex] = useState(null);
 
     // Delete Confirmation State
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -146,6 +149,16 @@ export default function AdminMembers({ user }) {
         setEditingMember(member);
         setIsViewMode(false);
         setEditModalOpen(true);
+    };
+
+    const checkDuplicateNIK = (val, index) => {
+        if (!val) return;
+        const duplicate = members.find(m => m.nik === val);
+        if (duplicate) {
+            setDuplicateMemberData(duplicate);
+            setDuplicateRowIndex(index);
+            setDuplicateDialogOpen(true);
+        }
     };
 
     const handleUpdateMember = async (data) => {
@@ -559,7 +572,15 @@ export default function AdminMembers({ user }) {
                                 <div className="form-grid">
                                     <div className="form-group">
                                         <label>NIK *</label>
-                                        <input name="nik" value={form.nik} onChange={(e) => handleChange(index, e)} required maxLength="16" className="input-field" />
+                                        <input 
+                                            name="nik" 
+                                            value={form.nik} 
+                                            onChange={(e) => handleChange(index, e)} 
+                                            onBlur={(e) => checkDuplicateNIK(e.target.value, index)}
+                                            required 
+                                            maxLength="16" 
+                                            className="input-field" 
+                                        />
                                     </div>
                                     <div className="form-group">
                                         <label>Nama Lengkap *</label>
@@ -826,11 +847,6 @@ export default function AdminMembers({ user }) {
                             )}
                         </Box>
 
-                        <Tooltip title="Filter List">
-                            <IconButton>
-                                <FilterListIcon />
-                            </IconButton>
-                        </Tooltip>
                     </Box>
 
                     <div className="table-wrapper">
@@ -991,6 +1007,84 @@ export default function AdminMembers({ user }) {
                 </DialogActions>
             </Dialog>
 
+            {/* DUPLICATE NIK DIALOG */}
+            <Dialog 
+                open={duplicateDialogOpen} 
+                onClose={() => setDuplicateDialogOpen(false)}
+                PaperProps={{ sx: { borderRadius: 4, maxWidth: 450, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' } }}
+            >
+                <DialogTitle sx={{ 
+                    bgcolor: '#ecfdf5', 
+                    color: '#065f46', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1.5,
+                    fontWeight: 'bold',
+                    borderBottom: '4px solid #10b981'
+                }}>
+                    <WarningIcon sx={{ color: '#10b981' }} /> Peringatan: Data Duplikat
+                </DialogTitle>
+                <DialogContent sx={{ mt: 3, px: 3 }}>
+                    <Typography variant="h6" sx={{ color: '#065f46', mb: 2, fontWeight: '800', lineHeight: 1.3, letterSpacing: '-0.02em' }}>
+                        NOMOR KK/ NIK YANG ANDA INPUT SUDAH TERDAFTAR*
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#374151', lineHeight: 1.6 }}>
+                        NIK <strong style={{ color: '#10b981' }}>{duplicateRowIndex !== null ? memberForms[duplicateRowIndex]?.nik : ''}</strong> sudah ada di database atas nama <strong>{duplicateMemberData?.nama}</strong>.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, flexDirection: 'column', gap: 1.5 }}>
+                    <Button 
+                        fullWidth
+                        variant="contained" 
+                        onClick={() => {
+                            setDuplicateDialogOpen(false);
+                            handleEditMember(duplicateMemberData);
+                        }}
+                        sx={{ 
+                            textTransform: 'none', 
+                            fontWeight: 'bold', 
+                            py: 1.8, 
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                            boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.4)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
+                                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.5)',
+                            }
+                        }}
+                    >
+                        1. Lanjutkan proses dengan mengedit no KK lama
+                    </Button>
+                    <Button 
+                        fullWidth
+                        variant="outlined" 
+                        onClick={() => {
+                            setDuplicateDialogOpen(false);
+                            if (duplicateRowIndex !== null) {
+                                const newForms = [...memberForms];
+                                newForms[duplicateRowIndex] = { ...newForms[duplicateRowIndex], nik: '' };
+                                setMemberForms(newForms);
+                            }
+                        }}
+                        sx={{ 
+                            textTransform: 'none', 
+                            py: 1.5, 
+                            borderRadius: '12px', 
+                            borderColor: '#d1d5db', 
+                            color: '#4b5563',
+                            fontWeight: '600',
+                            '&:hover': {
+                                borderColor: '#10b981',
+                                color: '#10b981',
+                                bgcolor: '#ecfdf5'
+                            }
+                        }}
+                    >
+                        2. Lanjutkan dengan input no KK baru
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             {/* EDIT MODAL */}
             {editModalOpen && (
                 <MemberFormModal
@@ -1001,6 +1095,7 @@ export default function AdminMembers({ user }) {
                     isEdit={!isViewMode}
                     viewMode={isViewMode}
                     allKK={allKK}
+                    members={members}
                 />
             )}
         </div>

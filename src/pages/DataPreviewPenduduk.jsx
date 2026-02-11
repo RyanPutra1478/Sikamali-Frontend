@@ -230,7 +230,14 @@ const DataPreviewPenduduk = ({ user }) => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-      <div className="admin-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+      <Box className="admin-header" sx={{ 
+        flexDirection: { xs: 'column', md: 'row' }, 
+        alignItems: { xs: 'flex-start', md: 'flex-end' },
+        gap: { xs: 2, md: 0 },
+        mb: '1.5rem', 
+        borderBottom: '1px solid #e2e8f0', 
+        paddingBottom: '1rem' 
+      }}>
         <div className="header-title-section">
           <h2 style={{ fontSize: '1.75rem', fontWeight: 850, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Users size={28} /> Data Preview Penduduk
@@ -239,7 +246,11 @@ const DataPreviewPenduduk = ({ user }) => {
             Ringkasan detail kependudukan, demografi desa, dan profil pekerjaan masyarakat.
           </p>
         </div>
-        <div className="header-actions">
+        <Box className="header-actions" sx={{ 
+          width: { xs: '100%', md: 'auto' }, 
+          justifyContent: { xs: 'flex-start', md: 'flex-end' },
+          gap: 1.5 
+        }}>
           <Tooltip title="Refresh Data">
             <IconButton onClick={handleRefresh} sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', p: 1.5 }}>
               <RefreshIcon size={24} color="#10b981" />
@@ -278,8 +289,8 @@ const DataPreviewPenduduk = ({ user }) => {
               </Menu>
             </>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       <Box 
         sx={{ 
@@ -307,7 +318,15 @@ const DataPreviewPenduduk = ({ user }) => {
 
       {/* TABLE PAPER */}
       <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)' }}>
-        <Box sx={{ p: 2, bgcolor: '#fcfcfc', borderBottom: '1px solid #f1f5f9', display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ 
+          p: 2, 
+          bgcolor: '#fcfcfc', 
+          borderBottom: '1px solid #f1f5f9', 
+          display: 'flex', 
+          flexWrap: 'wrap',
+          gap: 2, 
+          alignItems: 'center' 
+        }}>
           <TextField
             size="small"
             placeholder="Cari Nama, NIK, atau No KK..."
@@ -316,11 +335,11 @@ const DataPreviewPenduduk = ({ user }) => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            sx={{ width: 400, '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: 'white' } }}
+            sx={{ width: { xs: '100%', sm: 400 }, '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: 'white' } }}
             InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>) }}
           />
           
-          <FormControl size="small" sx={{ minWidth: 200 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
             <InputLabel>Filter Desa</InputLabel>
             <Select
               value={selectedDesa}

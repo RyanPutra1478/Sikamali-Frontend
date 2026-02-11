@@ -109,7 +109,7 @@ export default function AuthForm({ onAuth }) {
                                                         </button>
                                                 </div>
                                                 <div style={{ marginTop: '5px', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>
-                                                        Lupa Password? <a href="#" onClick={(e) => { e.preventDefault(); alert('Silakan hubungi Super Admin untuk reset password.'); }} style={{ color: '#007bff', textDecoration: 'none' }}>Hubungi Super Admin</a>
+                                                        Lupa Password? <a href="#" onClick={(e) => { e.preventDefault(); window.open('https://wa.me/6282192840313', '_blank'); }} style={{ color: '#007bff', textDecoration: 'none' }}>Hubungi Super Admin</a>
                                                 </div>
                                         </div>
 

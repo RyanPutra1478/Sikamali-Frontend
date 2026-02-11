@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 
 const formatDateInput = (dateString) => dateString ? new Date(dateString).toISOString().split('T')[0] : '';
 
@@ -74,7 +76,7 @@ const FAMILY_RELATIONSHIP_OPTIONS = [
     "SAUDARA"
 ];
 
-const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK }) => {
+const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK, members = [] }) => {
     const [form, setForm] = useState({
         kk_id: '',
         nik: '', nama: '', status_domisili: 'Penduduk Asli',
@@ -88,6 +90,8 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
     const [kkSearch, setKkSearch] = useState('');
     const [kkSearchResults, setKkSearchResults] = useState([]);
     const [selectedKK, setSelectedKK] = useState(null);
+    const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+    const [duplicateMemberData, setDuplicateMemberData] = useState(null);
 
     const getInitialForm = () => {
         const lastData = localStorage.getItem('sikamali_last_member');
@@ -170,6 +174,18 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
         setKkSearch(`${kk.kepala_keluarga} (${kk.nomor_kk})`);
         setKkSearchResults([]);
         setForm(prev => ({ ...prev, kk_id: kk.id }));
+    };
+
+    const checkDuplicateNIK = (val) => {
+        if (!val || viewMode) return;
+        // Don't check if we are editing the same person
+        if (isEdit && initialData && initialData.nik === val) return;
+
+        const duplicate = members.find(m => m.nik === val);
+        if (duplicate) {
+            setDuplicateMemberData(duplicate);
+            setDuplicateDialogOpen(true);
+        }
     };
 
     const handleChange = (e) => {
@@ -305,7 +321,15 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                             <div className="form-grid">
                                 <div className="form-group">
                                     <label>NIK *</label>
-                                    <input name="nik" value={form.nik} onChange={handleChange} required maxLength="16" className="input-field" />
+                                    <input 
+                                        name="nik" 
+                                        value={form.nik} 
+                                        onChange={handleChange} 
+                                        onBlur={(e) => checkDuplicateNIK(e.target.value)}
+                                        required 
+                                        maxLength="16" 
+                                        className="input-field" 
+                                    />
                                 </div>
                             <div className="form-group">
                                 <label>Nama Lengkap *</label>
@@ -477,6 +501,80 @@ const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit,
                     )}
                 </div>
             </div>
+
+            {/* DUPLICATE NIK DIALOG */}
+            <Dialog 
+                open={duplicateDialogOpen} 
+                onClose={() => setDuplicateDialogOpen(false)}
+                PaperProps={{ sx: { borderRadius: 4, maxWidth: 450, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' } }}
+            >
+                <DialogTitle sx={{ 
+                    bgcolor: '#ecfdf5', 
+                    color: '#065f46', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1.5,
+                    fontWeight: 'bold',
+                    borderBottom: '4px solid #10b981'
+                }}>
+                    <WarningIcon sx={{ color: '#10b981' }} /> Peringatan: Data Duplikat
+                </DialogTitle>
+                <DialogContent sx={{ mt: 3, px: 3 }}>
+                    <Typography variant="h6" sx={{ color: '#065f46', mb: 2, fontWeight: '800', lineHeight: 1.3, letterSpacing: '-0.02em' }}>
+                        NOMOR KK/ NIK YANG ANDA INPUT SUDAH TERDAFTAR*
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#374151', lineHeight: 1.6 }}>
+                        NIK <strong style={{ color: '#10b981' }}>{form.nik}</strong> sudah ada di database atas nama <strong>{duplicateMemberData?.nama}</strong>.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, flexDirection: 'column', gap: 1.5 }}>
+                    <Button 
+                        fullWidth
+                        variant="contained" 
+                        onClick={() => {
+                            setDuplicateDialogOpen(false);
+                            onClose(); // Close the modal so user can find the existing one in the list
+                        }}
+                        sx={{ 
+                            textTransform: 'none', 
+                            fontWeight: 'bold', 
+                            py: 1.8, 
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                            boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.4)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
+                                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.5)',
+                            }
+                        }}
+                    >
+                        1. Lanjutkan proses dengan mengedit no KK lama
+                    </Button>
+                    <Button 
+                        fullWidth
+                        variant="outlined" 
+                        onClick={() => {
+                            setDuplicateDialogOpen(false);
+                            setForm({ ...form, nik: '' });
+                        }}
+                        sx={{ 
+                            textTransform: 'none', 
+                            py: 1.5, 
+                            borderRadius: '12px', 
+                            borderColor: '#d1d5db', 
+                            color: '#4b5563',
+                            fontWeight: '600',
+                            '&:hover': {
+                                borderColor: '#10b981',
+                                color: '#10b981',
+                                bgcolor: '#ecfdf5'
+                            }
+                        }}
+                    >
+                        2. Lanjutkan dengan input no KK baru
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

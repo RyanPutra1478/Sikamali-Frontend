@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Home, Users, Briefcase, FileText, RefreshCw as RefreshIcon, Download as FileDownloadIcon } from 'lucide-react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControl, InputLabel, Select, MenuItem, Grid, Card, Box, Tooltip, IconButton, TextField, InputAdornment, Pagination, Menu } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WarningIcon from "@mui/icons-material/Warning";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import FileDownloadIconMui from "@mui/icons-material/FileDownload";
 import { kkAPI, adminAPI, API_URL } from "../services/api";
 import { wilayahAPI } from "../services/wilayahAPI";
@@ -85,6 +85,8 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
 
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [editingKKId, setEditingKKId] = useState(null);
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [duplicateKKData, setDuplicateKKData] = useState(null);
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -140,6 +142,15 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       setProvinces(data);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const checkDuplicateKK = (val) => {
+    if (!val || editingKKId) return;
+    const duplicate = kkList.find((kk) => kk.nomor_kk === val);
+    if (duplicate) {
+      setDuplicateKKData(duplicate);
+      setDuplicateDialogOpen(true);
     }
   };
 
@@ -736,11 +747,6 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
               )}
             </Box>
 
-            <Tooltip title="Filter List">
-              <IconButton>
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
           </Box>
 
           <div
@@ -943,6 +949,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                   onChange={(e) =>
                     setCreateForm({ ...createForm, nomor_kk: e.target.value })
                   }
+                  onBlur={(e) => checkDuplicateKK(e.target.value)}
                   required
                   maxLength="16"
                 />
@@ -1257,6 +1264,81 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
             color="primary"
           >
             Lanjut Input Anggota
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={duplicateDialogOpen}
+        onClose={() => setDuplicateDialogOpen(false)}
+        PaperProps={{
+          sx: { borderRadius: 4, maxWidth: 450, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: '#ecfdf5', 
+          color: '#065f46', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1.5,
+          fontWeight: 'bold',
+          borderBottom: '4px solid #10b981'
+        }}>
+          <WarningIcon sx={{ color: '#10b981' }} /> Peringatan: Data Duplikat
+        </DialogTitle>
+        <DialogContent sx={{ mt: 3, px: 3 }}>
+          <Typography variant="h6" sx={{ color: '#065f46', mb: 2, fontWeight: '800', lineHeight: 1.3, letterSpacing: '-0.02em' }}>
+            NOMOR KK/ NIK YANG ANDA INPUT SUDAH TERDAFTAR*
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#374151', lineHeight: 1.6 }}>
+            Nomor KK <strong style={{ color: '#10b981' }}>{createForm.nomor_kk}</strong> sudah ada di database atas nama <strong>{duplicateKKData?.kepala_keluarga}</strong>.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, flexDirection: 'column', gap: 1.5 }}>
+          <Button 
+            fullWidth
+            variant="contained" 
+            onClick={() => {
+              setDuplicateDialogOpen(false);
+              handleEditKKHeader(duplicateKKData);
+            }}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 'bold', 
+              py: 1.8, 
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+              boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.4)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
+                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.5)',
+              }
+            }}
+          >
+            1. Lanjutkan proses dengan mengedit no KK lama
+          </Button>
+          <Button 
+            fullWidth
+            variant="outlined" 
+            onClick={() => {
+              setDuplicateDialogOpen(false);
+              setCreateForm({ ...createForm, nomor_kk: '' });
+            }}
+            sx={{ 
+              textTransform: 'none', 
+              py: 1.5, 
+              borderRadius: '12px', 
+              borderColor: '#d1d5db', 
+              color: '#4b5563',
+              fontWeight: '600',
+              '&:hover': {
+                borderColor: '#10b981',
+                color: '#10b981',
+                bgcolor: '#ecfdf5'
+              }
+            }}
+          >
+            2. Lanjutkan dengan input no KK baru
           </Button>
         </DialogActions>
       </Dialog>

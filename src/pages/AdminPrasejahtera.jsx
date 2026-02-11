@@ -4,7 +4,6 @@ import './AdminPage.css';
 import './AdminPrasejahtera.css';
 import { Button, FormControl, InputLabel, Select, MenuItem, TextField, InputAdornment, Box, Tooltip, IconButton, Menu } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIconMui from '@mui/icons-material/FileDownload';
@@ -683,11 +682,6 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               )}
             </Box>
 
-            <Tooltip title="Filter List">
-              <IconButton>
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
           </Box>
 
           <div className="table-container">
