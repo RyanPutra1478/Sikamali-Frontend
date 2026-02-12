@@ -271,12 +271,12 @@ export default function AdminMembers({ user }) {
         setPage(1);
     }, [searchTerm, filterCategory, filterValue]);
 
-    const loadMembers = async () => {
+    const loadMembers = async (force = false) => {
         setLoading(true);
         try {
             const [membersData, kkData] = await Promise.all([
-                kkAPI.getAllMembers(),
-                adminAPI.getKK()
+                kkAPI.getAllMembers({ forceRefresh: force }),
+                adminAPI.getKK({ forceRefresh: force })
             ]);
 
             // Merge KK info into members for filtering
@@ -304,12 +304,12 @@ export default function AdminMembers({ user }) {
         setFilterCategory('');
         setFilterValue('');
         setPage(1);
-        loadMembers();
+        loadMembers(true);
     };
 
-    const loadAllKK = async () => {
+    const loadAllKK = async (force = false) => {
         try {
-            const data = await adminAPI.getKK();
+            const data = await adminAPI.getKK({ forceRefresh: force });
             setAllKK(data);
         } catch (err) {
             console.error(err);

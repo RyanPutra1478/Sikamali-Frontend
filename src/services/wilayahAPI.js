@@ -2,7 +2,17 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://192.168.0.251:5000/api";
 const BASE_URL = `${API_BASE_URL.replace(/\/$/, "")}/regions`;
 
+const regionsCache = new Map();
+console.log('[Wilayah Cache] Module re-initialized');
+
 async function fetchJSON(endpoint) {
+  // Check cache
+  if (regionsCache.has(endpoint)) {
+    console.log(`[Wilayah Cache] HIT: ${endpoint}`);
+    return regionsCache.get(endpoint);
+  }
+
+  console.log(`[Wilayah Cache] MISS: ${endpoint}`);
   const token = localStorage.getItem("token");
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   const response = await fetch(`${BASE_URL}${endpoint}`, { headers });
@@ -12,7 +22,12 @@ async function fetchJSON(endpoint) {
     }
     throw new Error("Gagal memuat data wilayah");
   }
-  return response.json();
+  
+  const data = await response.json();
+  // Store in cache
+  console.log(`[Wilayah Cache] SET: ${endpoint}`);
+  regionsCache.set(endpoint, data);
+  return data;
 }
 
 export const wilayahAPI = {
@@ -20,4 +35,5 @@ export const wilayahAPI = {
   getRegencies: (provinceId) => fetchJSON(`/regencies/${provinceId}`),
   getDistricts: (regencyId) => fetchJSON(`/districts/${regencyId}`),
   getVillages: (districtId) => fetchJSON(`/villages/${districtId}`),
+  clearCache: () => regionsCache.clear(),
 };

@@ -4,9 +4,58 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "/api";
 
+console.log('[API Cache] Module re-initialized');
+
+// --- Caching Management ---
+const cache = new Map();
+const CACHE_TTL = 2 * 60 * 1000; // 2 minutes default TTL
+
+/**
+ * Get data from cache or return null if expired/not found
+ */
+function getFromCache(key) {
+  const cached = cache.get(key);
+  if (!cached) {
+    console.log(`[API Cache] MISS (not in map): ${key}`);
+    return null;
+  }
+  if (Date.now() > cached.expiry) {
+    console.log(`[API Cache] MISS (expired): ${key}`);
+    cache.delete(key);
+    return null;
+  }
+  console.log(`[API Cache] HIT: ${key}`);
+  return cached.data;
+}
+
+/**
+ * Set data to cache
+ */
+function setToCache(key, data, ttl = CACHE_TTL) {
+  console.log(`[API Cache] SET: ${key} (TTL: ${ttl}ms)`);
+  cache.set(key, {
+    data,
+    expiry: Date.now() + ttl
+  });
+}
+
+/**
+ * Invalidate specific cache key or all caches
+ */
+function invalidateCache(key) {
+  if (key) {
+    console.log(`[API Cache] INVALIDATE key: ${key}`);
+    cache.delete(key);
+  } else {
+    console.trace(`[API Cache] CLEAR ALL CACHE`);
+    cache.clear();
+  }
+}
+
 // Token Refresh Management
 let refreshTimer = null;
 let refreshInterval = null;
+let refreshPromise = null; // To prevent concurrent refresh calls
 let lastActivity = Date.now();
 const ACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 const REFRESH_BEFORE_EXPIRY = 30 * 1000; // Refresh 30 seconds before expiry (reduced for short-lived tokens)
@@ -34,70 +83,85 @@ function decodeToken(token) {
 
 /**
  * Check if token needs refresh and perform refresh if needed
+ * @param {boolean} force - If true, skip expiry and activity checks
  */
-async function checkAndRefreshToken() {
+async function checkAndRefreshToken(force = false) {
+  // If a refresh is already in progress, wait for it
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
   const token = localStorage.getItem('token');
   const refreshToken = localStorage.getItem('refreshToken');
 
   if (!token || !refreshToken) {
-    console.log('[Token Refresh] No tokens found, skipping refresh check');
+    if (!force) console.log('[Token Refresh] No tokens found, skipping refresh check');
     return false;
   }
 
-  const decoded = decodeToken(token);
-  if (!decoded || !decoded.exp) {
-    console.log('[Token Refresh] Could not decode token');
-    return false;
-  }
-
-  const expiryTime = decoded.exp * 1000;
-  const now = Date.now();
-  const timeUntilExpiry = expiryTime - now;
-
-  console.log(`[Token Refresh] Token expires in ${Math.round(timeUntilExpiry / 1000)} seconds`);
-
-  // Only refresh if token is close to expiry or already expired
-  if (timeUntilExpiry > REFRESH_BEFORE_EXPIRY) {
-    return false; // Token still valid, no refresh needed
-  }
-
-  // Check user activity before refreshing
-  const timeSinceActivity = Date.now() - lastActivity;
-  if (timeSinceActivity > ACTIVITY_TIMEOUT) {
-    console.log('[Token Refresh] User inactive, skipping refresh');
-    return false;
-  }
-
-  console.log('[Token Refresh] Token expiring soon, refreshing...');
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        console.log('[Token Refresh] ✅ Token refreshed successfully');
-        return true;
-      }
-    } else {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Token Refresh] ❌ Failed to refresh:', errorData.error || response.status);
-      
-      // If refresh token is expired, trigger logout
-      if (response.status === 401 || response.status === 403) {
-        window.dispatchEvent(new CustomEvent('token-expired'));
-      }
+  if (!force) {
+    const decoded = decodeToken(token);
+    if (!decoded || !decoded.exp) {
+      console.log('[Token Refresh] Could not decode token');
+      return false;
     }
-  } catch (error) {
-    console.error('[Token Refresh] ❌ Network error during refresh:', error);
+
+    const expiryTime = decoded.exp * 1000;
+    const now = Date.now();
+    const timeUntilExpiry = expiryTime - now;
+
+    console.log(`[Token Refresh] Token expires in ${Math.round(timeUntilExpiry / 1000)} seconds`);
+
+    // Only refresh if token is close to expiry or already expired
+    if (timeUntilExpiry > REFRESH_BEFORE_EXPIRY) {
+      return false; // Token still valid, no refresh needed
+    }
+
+    // Check user activity before refreshing
+    const timeSinceActivity = Date.now() - lastActivity;
+    if (timeSinceActivity > ACTIVITY_TIMEOUT) {
+      console.log('[Token Refresh] User inactive, skipping refresh');
+      return false;
+    }
+
+    console.log('[Token Refresh] Token expiring soon, refreshing...');
+  } else {
+    console.log('[Token Refresh] Forced refresh triggered...');
   }
 
-  return false;
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          console.log('[Token Refresh] ✅ Token refreshed successfully');
+          return true;
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Token Refresh] ❌ Failed to refresh:', errorData.error || response.status);
+        
+        // If refresh token is expired, trigger logout
+        if (response.status === 401 || response.status === 403) {
+          window.dispatchEvent(new CustomEvent('token-expired'));
+        }
+      }
+    } catch (error) {
+      console.error('[Token Refresh] ❌ Network error during refresh:', error);
+    } finally {
+      refreshPromise = null;
+    }
+    return false;
+  })();
+
+  return refreshPromise;
 }
 
 /**
@@ -221,11 +285,27 @@ export function cleanupTokenRefresh() {
 
 /**
  * Helper utama untuk melakukan fetch API dengan otorisasi JWT.
- * Menangani JSON otomatis dan FormData jika diperlukan.
+ * Menangani JSON otomatis, FormData, dan Caching.
+ * @param {string} url - Endpoint URL
+ * @param {object} options - Request options
+ * @param {boolean} options.useCache - Enable caching for GET requests
+ * @param {boolean} options.forceRefresh - Skip cache and fetch fresh data
  */
 async function fetchWithAuth(url, options = {}) {
   let token = localStorage.getItem("token");
   const isFormData = options.body instanceof FormData;
+  const isGet = !options.method || options.method.toUpperCase() === 'GET';
+  const forceRefresh = options.forceRefresh || false;
+  const useCache = (options.useCache !== false) && isGet; // Cache is ON by default for GET
+
+  // Check Cache
+  if (useCache && !forceRefresh) {
+    const cachedData = getFromCache(url);
+    if (cachedData) {
+      console.log(`[API Cache] Returning cached data for: ${url}`);
+      return cachedData;
+    }
+  }
 
   const headers = {
     ...(!isFormData && { "Content-Type": "application/json" }),
@@ -253,29 +333,29 @@ async function fetchWithAuth(url, options = {}) {
     
     if (refreshToken && !url.includes('/auth/login') && !url.includes('/auth/refresh-token')) {
       try {
-        // Try to refresh token
-        const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        });
+        // Try to refresh token using the centralized promise-tracked function
+        const success = await checkAndRefreshToken(true);
 
-        if (refreshRes.ok) {
-          const refreshData = await refreshRes.json();
-          localStorage.setItem("token", refreshData.token);
+        if (success) {
+          const newToken = localStorage.getItem("token");
           
           // Reschedule token refresh
           scheduleTokenRefresh();
           
           // Retry original request with new token
-          headers["Authorization"] = `Bearer ${refreshData.token}`;
+          headers["Authorization"] = `Bearer ${newToken}`;
           response = await fetch(`${API_BASE_URL}${url}`, {
             ...options,
             headers,
             body: requestBody,
           });
           
-          if (response.ok) return response.json();
+          if (response.ok) {
+            const data = response.status === 204 ? { success: true } : await response.json();
+            // Store successful retry in cache if applicable
+            if (useCache) setToCache(url, data);
+            return data;
+          }
         }
       } catch (err) {
         console.error("Auto refresh failed:", err);
@@ -292,9 +372,26 @@ async function fetchWithAuth(url, options = {}) {
     throw new Error(error.error || error.message || "Request failed");
   }
 
-  if (response.status === 204) return { success: true };
-  return response.json();
+  if (response.status === 204) {
+    // Invalidate cache on mutations
+    if (!isGet) invalidateCache();
+    return { success: true };
+  }
+
+  const result = await response.json();
+
+  // Store successful GET in cache
+  if (useCache) {
+    setToCache(url, result);
+  } else if (!isGet) {
+    // Invalidate all caches on POST/PUT/DELETE for simplicity
+    console.log(`[API Cache] Mutation detected at ${url}, invalidating cache.`);
+    invalidateCache();
+  }
+
+  return result;
 }
+
 
 // ====================================================================
 // 2. AUTHENTICATION & USER PROFILE
@@ -362,9 +459,9 @@ const documentAPI = {
 };
 
 const landAPI = {
-  get: async () => fetchWithAuth("/land"),
-  searchKK: async (query) => fetchWithAuth(`/land/search?q=${query}`),
-  getKKByNomor: async (nomor_kk) => fetchWithAuth(`/land/kk/${nomor_kk}`),
+  get: async (options = {}) => fetchWithAuth("/land", options),
+  searchKK: async (query, options = {}) => fetchWithAuth(`/land/search?q=${query}`, options),
+  getKKByNomor: async (nomor_kk, options = {}) => fetchWithAuth(`/land/kk/${nomor_kk}`, options),
 
   create: async (data, fotoRumahFile) => {
     const formData = new FormData();
@@ -402,7 +499,7 @@ const landAPI = {
 // ====================================================================
 
 const announcementAPI = {
-  get: async () => fetchWithAuth("/announcements"),
+  get: async (options = {}) => fetchWithAuth("/announcements", options),
   create: async (data) =>
     fetchWithAuth("/announcements", { method: "POST", body: data }),
   delete: async (id) =>
@@ -412,7 +509,7 @@ const announcementAPI = {
 };
 
 const complaintAPI = {
-  get: async () => fetchWithAuth("/complaints"),
+  get: async (options = {}) => fetchWithAuth("/complaints", options),
   create: async (title, message) =>
     fetchWithAuth("/complaints", { method: "POST", body: { title, message } }),
 };
@@ -445,13 +542,13 @@ const publicAPI = {
 
 const adminAPI = {
   // Dashboard Stats
-  getStats: async () => fetchWithAuth("/admin/stats"),
+  getStats: async (options = {}) => fetchWithAuth("/admin/stats", options),
 
   // Data Tables
-  getKK: async () => fetchWithAuth("/admin/kk"),
-  getEmployment: async () => fetchWithAuth("/admin/employment"),
-  getPrasejahtera: async () => fetchWithAuth("/admin/kesejahteraan"),
-  getLand: async () => fetchWithAuth("/admin/land"),
+  getKK: async (options = {}) => fetchWithAuth("/admin/kk", options),
+  getEmployment: async (options = {}) => fetchWithAuth("/admin/employment", options),
+  getPrasejahtera: async (options = {}) => fetchWithAuth("/admin/kesejahteraan", options),
+  getLand: async (options = {}) => fetchWithAuth("/admin/land", options),
 
   // Prasejahtera Actions
   createPrasejahtera: async (data) =>
@@ -591,8 +688,8 @@ const kkAPI = {
   },
   deleteHeader: async (id) =>
     fetchWithAuth(`/kk/header/${id}`, { method: "DELETE" }),
-  getDetail: async (id) => fetchWithAuth(`/kk/${id}`),
-  getAllMembers: async () => fetchWithAuth("/kk/members"),
+  getDetail: async (id, options = {}) => fetchWithAuth(`/kk/${id}`, options),
+  getAllMembers: async (options = {}) => fetchWithAuth("/kk/members", options),
 
   addMember: async (data) =>
     fetchWithAuth("/kk/members", { method: "POST", body: data }),
@@ -615,6 +712,7 @@ const previewAPI = {
 export {
   // Core
   fetchWithAuth,
+  invalidateCache,
 
   // API Modules
   authAPI,

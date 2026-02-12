@@ -191,3 +191,26 @@
     filter: blur(0);
   }
 }
+
+.forgot-password-container {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: right;
+  display: block;
+}
+
+.forgot-password-link {
+  color: #60a5fa !important; /* Brighter blue for visibility */
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.forgot-password-link:hover {
+  color: white !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}

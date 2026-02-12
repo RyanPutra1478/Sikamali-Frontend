@@ -62,7 +62,7 @@ export default function AuthForm({ onAuth }) {
                                                 lineHeight: '1.4',
                                                 margin: 0
                                         }}>
-                                                Sistem Informasi Kependudukan<br/>Lingkar Tambang
+                                                Sistem Informasi Kependudukan<br/>Masyarakat Lingkar Tambang
                                         </h1>
                                 </div>
                                 <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>{isLogin ? 'Login' : 'Buat Akun'}</h2>
@@ -108,8 +108,8 @@ export default function AuthForm({ onAuth }) {
                                                                 {showPassword ? '👁️' : '👁️‍🗨️'}
                                                         </button>
                                                 </div>
-                                                <div style={{ marginTop: '5px', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>
-                                                        Lupa Password? <a href="#" onClick={(e) => { e.preventDefault(); window.open('https://wa.me/6282192840313', '_blank'); }} style={{ color: '#007bff', textDecoration: 'none' }}>Hubungi Super Admin</a>
+                                                <div className="forgot-password-container">
+                                                        Lupa Password? <a href="#" onClick={(e) => { e.preventDefault(); window.open('https://wa.me/6282192840313', '_blank'); }} className="forgot-password-link">Hubungi Super Admin</a>
                                                 </div>
                                         </div>
 

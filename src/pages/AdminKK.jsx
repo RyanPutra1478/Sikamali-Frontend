@@ -110,10 +110,10 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     setPage(1);
   }, [searchTerm, filterCategory, filterValue]);
 
-  const loadKKList = async () => {
+  const loadKKList = async (force = false) => {
     setLoading(true);
     try {
-      const data = await adminAPI.getKK();
+      const data = await adminAPI.getKK({ forceRefresh: force });
       setKkList(data);
     } catch (err) {
       console.error(err);
@@ -132,8 +132,8 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
     // 2. Clear any selected items (detail dialogs, etc)
     setSelectedKK(null);
     
-    // 3. Re-fetch data from API
-    await loadKKList();
+    // 3. Re-fetch data from API bypassing cache
+    await loadKKList(true);
   };
 
   const loadProvinces = async () => {

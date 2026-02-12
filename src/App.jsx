@@ -33,22 +33,50 @@ import './App.css';
 import DataZona from './pages/DataZona';
 import DataPenduduk from './pages/DataPenduduk';
 
+// Cek kelengkapan profil
+const isProfileComplete = (userData) => {
+  if (!userData) return false;
+  if (userData.role === 'admin' || userData.role === 'superadmin') return true;
+
+  const hasNama = userData.nama && userData.nama.trim() !== '';
+  const hasNIK = userData.nik && userData.nik.trim() !== '';
+  const hasAlamat = userData.alamat && userData.alamat.trim() !== '';
+  return hasNama && hasNIK && hasAlamat;
+};
+
+// Guard components outside move to avoid re-creation on every render
+const RequireAuth = ({ user, children }) => {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+const RequireProfile = ({ user, role, onComplete, onCancel, children }) => {
+  if (role !== 'user') return children;
+  if (isProfileComplete(user)) return children;
+
+  return (
+    <CompleteProfileModal
+      user={user}
+      onComplete={onComplete}
+      onClose={onCancel}
+    />
+  );
+};
+
+const RoleGuard = ({ allowedRoles, role, children }) => {
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [showTokenPopup, setShowTokenPopup] = useState(false);
-
-  // Cek kelengkapan profil
-  const isProfileComplete = (userData) => {
-    if (!userData) return false;
-    if (userData.role === 'admin' || userData.role === 'superadmin') return true;
-
-    const hasNama = userData.nama && userData.nama.trim() !== '';
-    const hasNIK = userData.nik && userData.nik.trim() !== '';
-    const hasAlamat = userData.alamat && userData.alamat.trim() !== '';
-    return hasNama && hasNIK && hasAlamat;
-  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -122,34 +150,7 @@ function App() {
     perms = getRolePermissions(role);
   }
 
-  // Guard profil lengkap (khusus role "user")
-  const RequireProfile = ({ children }) => {
-    if (role !== 'user') return children;
-    if (isProfileComplete(user)) return children;
 
-    return (
-      <CompleteProfileModal
-        user={user}
-        onComplete={refreshUser}
-        onClose={() => navigate('/dashboard')}
-      />
-    );
-  };
-
-  // Guard role: kalau tidak punya hak, lempar ke dashboard
-  const withRoleGuard = (allowedRoles, element) => {
-    if (!allowedRoles.includes(role)) {
-      return <Navigate to="/dashboard" replace />;
-    }
-    return element;
-  };
-
-  const RequireAuth = ({ children }) => {
-    if (!user) {
-      return <Navigate to="/login" replace />;
-    }
-    return children;
-  };
 
   return (
     <Routes>
@@ -173,7 +174,7 @@ function App() {
       <Route
         path="/*"
         element={
-          <RequireAuth>
+          <RequireAuth user={user}>
             <Layout user={user} onLogout={handleLogout}>
               <TokenExpirationPopup
                 isOpen={showTokenPopup}
@@ -191,178 +192,172 @@ function App() {
                   }
                 />
 
-        {/* ====== USER SELF-SERVICE (butuh profil lengkap) ====== */}
+                {/* ====== USER SELF-SERVICE (butuh profil lengkap) ====== */}
 
-        {/* KK / Documents */}
-        <Route
-          path="/documents"
-          element={withRoleGuard(
-            ['user'],
-            <RequireProfile>
-              <AdminKK user={user} readOnly={false} />
-            </RequireProfile>
-          )}
-        />
+                {/* KK / Documents */}
+                <Route
+                  path="/documents"
+                  element={
+                    <RoleGuard allowedRoles={['user']} role={role}>
+                      <RequireProfile user={user} role={role} onComplete={refreshUser} onCancel={() => navigate('/dashboard')}>
+                        <AdminKK user={user} readOnly={false} />
+                      </RequireProfile>
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Peta tanah user */}
-        <Route
-          path="/land"
-          element={withRoleGuard(
-            ['user'],
-            <RequireProfile>
-              <Land user={user} />
-            </RequireProfile>
-          )}
-        />
+                {/* Peta tanah user */}
+                <Route
+                  path="/land"
+                  element={
+                    <RoleGuard allowedRoles={['user']} role={role}>
+                      <RequireProfile user={user} role={role} onComplete={refreshUser} onCancel={() => navigate('/dashboard')}>
+                        <Land user={user} />
+                      </RequireProfile>
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Pengaduan */}
-        <Route
-          path="/complaints"
-          element={withRoleGuard(
-            ['user'],
-            <RequireProfile>
-              <Complaints />
-            </RequireProfile>
-          )}
-        />
+                {/* Pengaduan */}
+                <Route
+                  path="/complaints"
+                  element={
+                    <RoleGuard allowedRoles={['user']} role={role}>
+                      <RequireProfile user={user} role={role} onComplete={refreshUser} onCancel={() => navigate('/dashboard')}>
+                        <Complaints />
+                      </RequireProfile>
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Kesejahteraan (self-service) */}
-        <Route
-          path="/kesejahteraan"
-          element={withRoleGuard(
-            ['user'],
-            <RequireProfile>
-              <Kesejahteraan />
-            </RequireProfile>
-          )}
-        />
+                {/* Kesejahteraan (self-service) */}
+                <Route
+                  path="/kesejahteraan"
+                  element={
+                    <RoleGuard allowedRoles={['user']} role={role}>
+                      <RequireProfile user={user} role={role} onComplete={refreshUser} onCancel={() => navigate('/dashboard')}>
+                        <Kesejahteraan />
+                      </RequireProfile>
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Kesejahteraan / Angkatan Kerja (self-service) */}
-        <Route
-          path="/kesejahteraan"
-          element={withRoleGuard(
-            ['user'],
-            <RequireProfile>
-              <Kesejahteraan />
-            </RequireProfile>
-          )}
-        />
+                <Route
+                  path="/admin/preview/keluarga"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest']} role={role}>
+                      <DataPreviewKeluarga user={user} />
+                    </RoleGuard>
+                  }
+                />
 
-        <Route
-          path="/admin/preview/keluarga"
-          element={withRoleGuard(
-            ['superadmin', 'admin', 'user', 'guest'],
-            <DataPreviewKeluarga user={user} />
-          )}
-        />
+                <Route
+                  path="/admin/preview/penduduk"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest']} role={role}>
+                      <DataPreviewPenduduk user={user} />
+                    </RoleGuard>
+                  }
+                />
 
-        <Route
-          path="/admin/preview/penduduk"
-          element={withRoleGuard(
-            ['superadmin', 'admin', 'user', 'guest'],
-            <DataPreviewPenduduk user={user} />
-          )}
-        />
+                {/* ====== ADMIN AREA ====== */}
 
-        {/* ====== ADMIN AREA ====== */}
+                {/* Admin Land (Now used for 'Data Zona' feature) */}
+                <Route
+                  path="/admin/land"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
+                      <AdminLand readOnly={!perms?.lokasiZona?.land?.edit} />
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Data Zona (Updated to point to AdminLand as requested) */}
-        {/* Note: User requested 'Data Zona' to refer to AdminLand.jsx */}
-        {/* We keep /admin/land route for AdminLand component */}
+                {/* Admin KK */}
+                <Route
+                  path="/admin/kk"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                      <AdminKK mode="full" user={user} />
+                    </RoleGuard>
+                  }
+                />
 
+                {/* Admin Members */}
+                <Route
+                  path="/admin/members"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                      <AdminMembers user={user} />
+                    </RoleGuard>
+                  }
+                />
 
+                {/* Admin Employment */}
+                <Route
+                  path="/admin/employment"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                      <AdminEmployment
+                        readOnly={!perms?.database?.employment?.edit}
+                        canCreate={perms?.database?.employment?.insert}
+                      />
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Admin Land (Now used for 'Data Zona' feature) */}
-        <Route
-          path="/admin/land"
-          element={withRoleGuard(
-            ['superadmin', 'admin', 'user'],
-            <AdminLand readOnly={!perms?.lokasiZona?.land?.edit} />
-          )}
-        />
+                {/* Admin Kesejahteraan */}
+                <Route
+                  path="/admin/kesejahteraan"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                      <AdminPrasejahtera
+                        readOnly={!perms?.database?.kesejahteraan?.edit}
+                        canCreate={perms?.database?.kesejahteraan?.insert}
+                        canDelete={perms?.database?.kesejahteraan?.delete}
+                        canExport={perms?.database?.kesejahteraan?.export}
+                      />
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Admin KK */}
+                {/* Admin Users – hanya SUPERADMIN */}
+                <Route
+                  path="/admin/users"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin']} role={role}>
+                      <AdminUsers currentUser={user} />
+                    </RoleGuard>
+                  }
+                />
 
-        <Route
-          path="/admin/kk"
-          element={withRoleGuard(
-            ['superadmin', 'admin'],
-            <AdminKK mode="full" user={user} />
-          )}
-        />
+                {/* Admin Pengumuman */}
+                <Route
+                  path="/admin/announcements"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                      <AdminAnnouncements readOnly={false} />
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Admin Employment */}
-        <Route
-          path="/admin/members"
-          element={withRoleGuard(
-            ['superadmin', 'admin'],
-            <AdminMembers user={user} />
-          )}
-        />
+                {/* Admin History Log (Superadmin Only) */}
+                <Route
+                  path="/admin/history"
+                  element={
+                    <RoleGuard allowedRoles={['superadmin']} role={role}>
+                      <AdminHistory />
+                    </RoleGuard>
+                  }
+                />
 
-        {/* Admin Employment */}
-        <Route
-          path="/admin/employment"
-          element={withRoleGuard(
-            ['superadmin', 'admin'],
-            <AdminEmployment
-              readOnly={!perms?.database?.employment?.edit}
-              canCreate={perms?.database?.employment?.insert}
-            />
-          )}
-        />
-
-        {/* Admin Kesejahteraan */}
-        <Route
-          path="/admin/kesejahteraan"
-          element={withRoleGuard(
-            ['superadmin', 'admin'],
-            <AdminPrasejahtera
-              readOnly={!perms?.database?.kesejahteraan?.edit}
-              canCreate={perms?.database?.kesejahteraan?.insert}
-              canDelete={perms?.database?.kesejahteraan?.delete}
-              canExport={perms?.database?.kesejahteraan?.export}
-            />
-          )}
-        />
-
-
-
-        {/* Admin Users – hanya SUPERADMIN */}
-        <Route
-          path="/admin/users"
-          element={withRoleGuard(
-            ['superadmin'],
-            <AdminUsers currentUser={user} />
-          )}
-        />
-
-        {/* Admin Pengumuman */}
-        <Route
-          path="/admin/announcements"
-          element={withRoleGuard(
-            ['superadmin', 'admin'],
-            <AdminAnnouncements readOnly={false} />
-          )}
-        />
-
-        {/* Admin History Log (Superadmin Only) */}
-        <Route
-          path="/admin/history"
-          element={withRoleGuard(
-            ['superadmin'],
-            <AdminHistory />
-          )}
-        />
-
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </Layout>
-  </RequireAuth>
-  } />
-</Routes>
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </Layout>
+          </RequireAuth>
+        }
+      />
+    </Routes>
   );
 }
 

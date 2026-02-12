@@ -133,11 +133,11 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     loadResidents();
   }, []);
 
-  const loadResidents = async () => {
+  const loadResidents = async (force = false) => {
     try {
       const [membersData, kkData] = await Promise.all([
-        kkAPI.getAllMembers(),
-        adminAPI.getKK()
+        kkAPI.getAllMembers({ forceRefresh: force }),
+        adminAPI.getKK({ forceRefresh: force })
       ]);
 
       const merged = membersData.map(m => {
@@ -200,10 +200,10 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     setPage(1);
   }, [searchTerm, filterCategory, filterValue]);
 
-  const loadData = async () => {
+  const loadData = async (force = false) => {
     setLoading(true);
     try {
-      const result = await adminAPI.getEmployment();
+      const result = await adminAPI.getEmployment({ forceRefresh: force });
       setDataList(Array.isArray(result) ? result : []);
     } catch (err) {
       setError(err.message);
@@ -217,7 +217,8 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     setFilterCategory('');
     setFilterValue('');
     setPage(1);
-    loadData();
+    loadData(true);
+    loadResidents(true);
   };
 
   const handleExportExcel = (exportFiltered) => {

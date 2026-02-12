@@ -66,12 +66,12 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     setPage(1);
   }, [searchTerm, filterCategory, filterValue]);
 
-  const loadData = async () => {
+  const loadData = async (force = false) => {
     setLoading(true);
     try {
       const [kesejahteraanData, kkData] = await Promise.all([
-        adminAPI.getKesejahteraan(),
-        adminAPI.getKK()
+        adminAPI.getKesejahteraan({ forceRefresh: force }),
+        adminAPI.getKK({ forceRefresh: force })
       ]);
 
       const pData = Array.isArray(kesejahteraanData) ? kesejahteraanData : [];
@@ -100,7 +100,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     setFilterCategory('');
     setFilterValue('');
     setPage(1);
-    loadData();
+    loadData(true);
   };
 
   const handleExportExcel = (exportFiltered) => {
