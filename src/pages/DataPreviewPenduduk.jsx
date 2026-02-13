@@ -20,9 +20,16 @@ import {
   Menu,
   Button
 } from '@mui/material';
-import { Search as SearchIcon, People as PeopleIcon, Man as ManIcon, Woman as WomanIcon } from '@mui/icons-material';
+import { 
+  Search as SearchIcon, 
+  People as PeopleIcon, 
+  Man as ManIcon, 
+  Woman as WomanIcon,
+  Visibility as VisibilityIcon
+} from '@mui/icons-material';
 import { Users, Download as FileDownloadIcon, RefreshCw as RefreshIcon } from 'lucide-react';
-import { previewAPI } from '../services/api';
+import { previewAPI, adminAPI, kkAPI } from '../services/api';
+import MemberFormModal from '../components/MemberFormModal';
 import { getRolePermissions } from '../utils/permissions';
 import * as XLSX from 'xlsx';
 import './AdminTables.css';
@@ -127,6 +134,10 @@ const DataPreviewPenduduk = ({ user }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDesa, setSelectedDesa] = useState('');
   const [page, setPage] = useState(1);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [allKK, setAllKK] = useState([]);
   const itemsPerPage = 15;
   
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
@@ -138,12 +149,13 @@ const DataPreviewPenduduk = ({ user }) => {
 
   useEffect(() => {
     fetchData();
+    loadAllKK();
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const residents = await previewAPI.getMember();
+      const residents = await kkAPI.getAllMembers();
       setData(residents);
     } catch (error) {
       console.error("Error fetching resident data:", error);
@@ -159,21 +171,38 @@ const DataPreviewPenduduk = ({ user }) => {
     fetchData();
   };
 
+  const handleViewMember = (member) => {
+    // MemberFormModal expects fields like 'nama', 'kk_nomor', 'kk_kepala'
+    // kkAPI.getAllMembers already provides most of these
+    setEditingMember(member);
+    setIsViewMode(true);
+    setEditModalOpen(true);
+  };
+
+  const loadAllKK = async () => {
+    try {
+      const res = await adminAPI.getKK();
+      setAllKK(res);
+    } catch (error) {
+      console.error("Error loading KK data:", error);
+    }
+  };
+
   const handleExportExcel = (exportAll = false) => {
     setExportMenuAnchor(null);
     const sourceData = exportAll ? data : filteredData;
     const exportData = sourceData.map((row, index) => ({
       'No': index + 1,
-      'NO KARTU KELUARGA': row.no_kartu_keluarga,
-      'Kepala Keluarga': row.kepala_keluarga || '-',
+      'NO KARTU KELUARGA': row.kk_nomor || row.no_kartu_keluarga,
+      'Kepala Keluarga': row.kk_kepala || row.kepala_keluarga || '-',
       'Alamat': row.alamat,
-      'Desa/Kelurahan': row.desa_kelurahan || '-',
+      'Desa/Kelurahan': row.desa || row.desa_kelurahan || '-',
       'Kecamatan': row.kecamatan,
       'ZONA': row.zona || '-',
-      'Nama Lengkap': row.nama_lengkap,
+      'Nama Lengkap': row.nama || row.nama_lengkap,
       'NIK': row.nik,
       'Jenis Kelamin': (row.jenis_kelamin || '').toString().toUpperCase().startsWith('L') ? 'LAKI-LAKI' : 'PEREMPUAN',
-      'Umur': row.umur || '-',
+      'Umur': row.umur || calculateAge(row.tanggal_lahir) || '-',
       'Pendidikan': row.pendidikan || '-',
       'Pekerjaan': row.pekerjaan || '-',
       'Hubungan Keluarga': row.hubungan_keluarga || '-',
@@ -181,7 +210,7 @@ const DataPreviewPenduduk = ({ user }) => {
       'Skill': row.skill || '-',
       'Status Kerja': row.status_kerja || '-',
       'Tempat Bekerja': row.tempat_bekerja || '-',
-      'No HP/WA': row.no_hp_wa || '-',
+      'No HP/WA': row.no_hp || row.no_hp_wa || '-',
       'Email': row.email || '-'
     }));
 
@@ -210,14 +239,14 @@ const DataPreviewPenduduk = ({ user }) => {
     return age;
   };
 
-  const uniqueDesa = [...new Set(data.map(item => item.desa_kelurahan).filter(Boolean))].sort();
+  const uniqueDesa = [...new Set(data.map(item => item.desa || item.desa_kelurahan).filter(Boolean))].sort();
 
   const filteredData = data.filter(item => {
-    const matchesSearch = (item.nama_lengkap || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (item.nama || item.nama_lengkap || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.nik || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.no_kartu_keluarga || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (item.kk_nomor || item.no_kartu_keluarga || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesDesa = !selectedDesa || item.desa_kelurahan === selectedDesa;
+    const matchesDesa = !selectedDesa || (item.desa || item.desa_kelurahan) === selectedDesa;
 
     return matchesSearch && matchesDesa;
   });
@@ -339,11 +368,23 @@ const DataPreviewPenduduk = ({ user }) => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            sx={{ width: { xs: '100%', sm: 400 }, '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: 'white' } }}
-            InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon color="action" /></InputAdornment>) }}
+            sx={{
+              width: { xs: '100%', sm: 300 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2.5,
+                bgcolor: 'white',
+              }
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
           />
           
-          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 180 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
             <InputLabel>Filter Desa</InputLabel>
             <Select
               value={selectedDesa}
@@ -363,16 +404,17 @@ const DataPreviewPenduduk = ({ user }) => {
         </Box>
 
         <Box sx={{ overflowX: 'auto' }}>
-          <table className="modern-table" style={{ minWidth: 3500 }}>
+          <table className="modern-table" style={{ minWidth: 2800 }}>
             <thead>
               <tr>
                 {[
-                  'NO', 'NO KARTU KELUARGA', 'KEPALA KELUARGA', 'ALAMAT', 'DESA/KELURAHAN', 'KECAMATAN',
-                  'ZONA', 'NAMA LENGKAP', 'NIK', 'JENIS KELAMIN', 'UMUR',
-                  'PENDIDIKAN', 'PEKERJAAN', 'HUBUNGAN KELUARGA', 'PENDIDIKAN TERAKHIR', 'SKILL',
-                  'STATUS KERJA', 'TEMPAT BEKERJA', 'NO HP/WA', 'E-MAIL'
+                'NO', 'NO KARTU KELUARGA', 'KEPALA KELUARGA', 'ALAMAT', 'DESA', 'KECAMATAN',
+                'ZONA', 'NAMA LENGKAP', 'NIK', 'JENIS KELAMIN', 'UMUR',
+                'PENDIDIKAN', 'PEKERJAAN', 'HUBUNGAN KELUARGA', 'PENDIDIKAN TERAKHIR', 'SKILL',
+                'STATUS KERJA', 'TEMPAT BEKERJA', 'NO HP/WA', 'E-MAIL', 'AKSI'
                 ].map((head) => {
-                  const isCentered = head === 'NO';
+                  const centeredHeads = ['NO', 'AKSI'];
+                  const isCentered = centeredHeads.includes(head);
                   return (
                     <th key={head} style={{ 
                       fontSize: '0.75rem', 
@@ -389,16 +431,20 @@ const DataPreviewPenduduk = ({ user }) => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={24} style={{ textAlign: 'center', padding: '100px 0' }}><CircularProgress sx={{ color: '#10b981' }} /></td></tr>
+                <tr>
+                  <td colSpan={21} style={{ textAlign: 'center', padding: '100px 0' }}>
+                    <CircularProgress sx={{ color: '#10b981' }} />
+                  </td>
+                </tr>
               ) : (
                 filteredData.slice((page-1)*itemsPerPage, page*itemsPerPage).map((row, index) => (
                   <tr key={index}>
                     <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{(page - 1) * itemsPerPage + index + 1}</td>
-                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.no_kartu_keluarga}</td>
-                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.kepala_keluarga || '-'}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.kk_nomor || row.no_kartu_keluarga}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.kk_kepala || row.kepala_keluarga || '-'}</td>
                     <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.75rem', padding: '5px 12px' }}>{row.alamat}</td>
-                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.desa_kelurahan || '-'}</td>
-                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.kecamatan}</td>
+                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.desa || row.desa_kelurahan || '-'}</td>
+                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.kecamatan || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
                       <span style={{ 
                         color: (() => {
@@ -409,11 +455,11 @@ const DataPreviewPenduduk = ({ user }) => {
                           if (z.includes("RING 4")) return "#ef4444";
                           return "inherit";
                         })()
-                      }}>
-                        {row.zona || '-'}
-                      </span>
+                        }}>
+                          {row.zona || '-'}
+                        </span>
                     </td>
-                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.nama_lengkap}</td>
+                    <td style={{ color: '#1e293b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.nama || row.nama_lengkap}</td>
                     <td style={{ color: '#64748b', fontSize: '0.75rem', padding: '5px 12px' }}>{row.nik}</td>
                     <td style={{ padding: '5px 12px' }}>
                       <span style={{ 
@@ -423,7 +469,7 @@ const DataPreviewPenduduk = ({ user }) => {
                         {(row.jenis_kelamin || '').toString().toUpperCase().startsWith('L') ? 'LAKI-LAKI' : 'PEREMPUAN'}
                       </span>
                     </td>
-                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.umur || '-'}</td>
+                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.umur || calculateAge(row.tanggal_lahir) || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.pendidikan || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.pekerjaan || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.hubungan_keluarga || '-'}</td>
@@ -431,8 +477,21 @@ const DataPreviewPenduduk = ({ user }) => {
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.skill || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.status_kerja || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.tempat_bekerja || '-'}</td>
-                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.no_hp_wa || '-'}</td>
+                    <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.no_hp || row.no_hp_wa || '-'}</td>
                     <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>{row.email || '-'}</td>
+                    <td style={{ textAlign: 'center', padding: '5px 12px' }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleViewMember(row)}
+                        sx={{ 
+                          color: '#3b82f6', 
+                          bgcolor: '#eff6ff',
+                          '&:hover': { bgcolor: '#dbeafe' }
+                        }}
+                      >
+                        <VisibilityIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </td>
                   </tr>
                 ))
               )}
@@ -451,6 +510,15 @@ const DataPreviewPenduduk = ({ user }) => {
           />
         </Box>
       </Paper>
+
+      <MemberFormModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        initialData={editingMember}
+        isEdit={false}
+        viewMode={isViewMode}
+        allKK={allKK}
+      />
     </Container>
   );
 };

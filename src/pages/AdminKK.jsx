@@ -1392,12 +1392,6 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
                       Kepala Keluarga: <strong>{selectedKK.kepala_keluarga}</strong>
                     </p>
                   </div>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => setActiveTab("list")}
-                  >
-                    &larr; Kembali
-                  </button>
                 </div>
               </div>
             </div>

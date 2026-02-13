@@ -123,7 +123,7 @@ export default function Land({ user }) {
     setIsEditing(true);
     setShowForm(true);
     if (plot.nomor_kk) loadKKData(plot.nomor_kk);
-    setFotoRumahPreview(`${import.meta.env.VITE_API_URL || "http://192.168.0.251:5000/api"}/land/foto/${plot.foto_rumah}`);
+    setFotoRumahPreview(`${import.meta.env.VITE_API_URL || "http://10.12.9.188:5000/api"}/land/foto/${plot.foto_rumah}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

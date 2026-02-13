@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://192.168.0.251:5000/api";
+  import.meta.env.VITE_API_URL || "http://10.12.9.188:5000/api";
 const BASE_URL = `${API_BASE_URL.replace(/\/$/, "")}/regions`;
 
 const regionsCache = new Map();
