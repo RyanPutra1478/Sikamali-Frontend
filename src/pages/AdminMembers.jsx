@@ -17,38 +17,58 @@ import MemberFormModal from '../components/MemberFormModal';
 import * as XLSX from 'xlsx';
 
 const OCCUPATION_OPTIONS = [
+    "APARAT DESA/ KECAMATAN",
     "APOTEKER",
     "BELUM/ TIDAK BEKERJA",
     "BURUH HARIAN LEPAS",
+    "BURUH NELAYAN/ PERIKANAN",
     "BURUH TANI/ PERKEBUNAN",
-    "CERAI MATI BELUM TERCATAT",
+    "DOSEN SWASTA",
     "DOKTER",
     "GURU",
+    "GURU HONORER",
     "GURU PPPK",
+    "IMAM MESJID",
     "KARYAWAN HONORER",
     "KARYAWAN SWASTA",
     "KEPOLISIAN RI (POLRI)",
     "LANJUT USIA (LANSIA)",
     "MENGURUS RUMAH TANGGA",
     "NELAYAN/ PERIKANAN",
+    "PA CNI",
     "PARAMEDIK/ BIDAN/ PERAWAT",
     "PEDAGANG",
+    "PEGAWAI BUMN/PERSERO",
     "PEGAWAI HONORER",
     "PEGAWAI NEGERI SIPIL (PNS)",
+    "PEGAWAI PPPK",
     "PEKERJAAN LAINNYA",
     "PELAJAR/ MAHASISWA",
-    "PENSIUNAN",
+    "PELAYARAN",
+    "PENSIUNAN PNS",
+    "PERDAGANGAN",
     "PETANI/ PEKEBUN",
+    "PURNAWIRAWAN TNI/ POLRI",
+    "SECURITY",
     "SOPIR",
     "TENTARA NASIONAL INDONESIA (TNI)",
+    "TUKANG BATU",
     "TUKANG JAHIT",
+    "TUKANG KAYU",
+    "TUKANG LAS/ PANDAI BESI",
+    "VETERAN",
     "WARTAWAN/ JURNALIS",
-    "WIRASWASTA"
+    "WIRASWASTA",
+    "ARTIS",
+    "ANGGOTA DEWAN",
+    "GURU TPQ",
+    "MEKANIK"
 ];
 
 const MARITAL_STATUS_OPTIONS = [
     "BELUM KAWIN",
     "CERAI",
+    "CERAI BELUM TERCATAT",
     "CERAI HIDUP",
     "CERAI HIDUP BELUM TERCATAT",
     "CERAI HIDUP TERCATAT",
@@ -83,7 +103,7 @@ const FAMILY_RELATIONSHIP_OPTIONS = [
     "LAINNYA",
     "MERTUA",
     "ORANG TUA",
-    "SAUDARA"
+    "SAUDARA KANDUNG"
 ];
 
 export default function AdminMembers({ user }) {
@@ -112,7 +132,7 @@ export default function AdminMembers({ user }) {
     const [filterCategory, setFilterCategory] = useState('');
     const [filterValue, setFilterValue] = useState('');
     const [page, setPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 25;
 
     // Create Form State
     const [selectedKK, setSelectedKK] = useState(null);

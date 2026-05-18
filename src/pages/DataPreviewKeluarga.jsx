@@ -154,7 +154,7 @@ const DataPreviewKeluarga = ({ user }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await adminAPI.getKK();
+      const res = await previewAPI.getKK();
       setData(Array.isArray(res) ? res : res?.data || []);
     } catch (error) {
       console.error("Error fetching KK data:", error);
@@ -269,7 +269,8 @@ const DataPreviewKeluarga = ({ user }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+    <div className="scrollable-page">
+      <Container maxWidth="xl" sx={{ mt: 0, mb: 4, p: '0 !important' }}>
       <Box className="admin-header" sx={{ 
         flexDirection: { xs: 'column', md: 'row' }, 
         alignItems: { xs: 'flex-start', md: 'flex-end' },
@@ -793,6 +794,7 @@ const DataPreviewKeluarga = ({ user }) => {
         </div>
       )}
     </Container>
+    </div>
   );
 };
 

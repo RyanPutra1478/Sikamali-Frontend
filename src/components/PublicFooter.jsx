@@ -7,14 +7,14 @@ export default function PublicFooter() {
         <div>
           <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontWeight: '900', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             <img 
-              src="/logo-icon.png" 
+              src="/LOGOBARU.png" 
               alt="Sikamali Logo" 
               style={{ 
-                width: '32px', 
-                height: '32px', 
-                background: '#ffffff', 
-                borderRadius: '8px', 
-                padding: '4px'
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '50%',
+                padding: '2px',
+                background: 'white'
               }} 
             />
             SIKAMALI

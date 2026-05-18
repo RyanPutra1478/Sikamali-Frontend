@@ -294,14 +294,14 @@ export default function LandingPage() {
             boxShadow: '0 15px 35px rgba(0,0,0,0.3)'
           }}>
             <img 
-              src="/logo-icon.png" 
+              src="/LOGOBARU.png" 
               alt="Logo" 
               style={{ 
-                height: '80px', 
-                width: '80px', 
+                height: '120px', 
+                width: '120px', 
                 borderRadius: '16px', 
                 background: 'white', 
-                padding: '6px' 
+                padding: '4px' 
               }} 
             />
           </div>
@@ -325,7 +325,9 @@ export default function LandingPage() {
             margin: '0 auto 30px',
             lineHeight: '1.6'
           }}>
-            Sistem Informasi Kependudukan Masyarakat Lingkar Tambang.
+            Sistem Informasi Kependudukan Masyarakat Lingkar Tambang 
+            <br />
+            PT. Ceria Nugraha Indotama
           </p>
 
           <button 

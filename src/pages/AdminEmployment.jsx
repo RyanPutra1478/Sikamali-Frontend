@@ -88,7 +88,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
   // Kalau tidak punya izin view sama sekali
   if (!employmentPerm.view) {
     return (
-      <div className="admin-page-container">
+      <div className="admin-page">
         <div className="admin-header">
           <div>
             <p className="section-label">Profil Ketenagakerjaan</p>
@@ -114,7 +114,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [submitStatus, setSubmitStatus] = useState('idle');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -518,90 +518,90 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
         {activeTab === 'list' && (
           <>
-        <div className="table-wrapper">
-        {/* TOOLBAR */}
-        <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: '#fcfcfc', flexWrap: 'wrap', gap: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Cari Nama, NIK, No KK, Skill..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{
-                width: { xs: '100%', md: 300 },
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  bgcolor: 'white',
-                  '& fieldset': { borderColor: '#e0e0e0' },
-                  '&:hover fieldset': { borderColor: '#00AEEF' },
-                }
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
+            {/* TOOLBAR */}
+            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: '#fcfcfc', flexWrap: 'wrap', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                <TextField
+                  size="small"
+                  placeholder="Cari Nama, NIK, No KK, Skill..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  sx={{
+                    width: { xs: '100%', md: 300 },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      bgcolor: 'white',
+                      '& fieldset': { borderColor: '#e0e0e0' },
+                      '&:hover fieldset': { borderColor: '#00AEEF' },
+                    }
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-            {/* FILTER CATEGORY */}
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Filter By</InputLabel>
-              <Select
-                value={filterCategory}
-                label="Filter By"
-                onChange={(e) => {
-                  setFilterCategory(e.target.value);
-                  setFilterValue('');
-                }}
-                sx={{ borderRadius: 3, bgcolor: 'white' }}
-              >
-                <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value="Rentang Umur">Rentang Umur</MenuItem>
-                <MenuItem value="Pendidikan Terakhir">Pendidikan Terakhir</MenuItem>
-                <MenuItem value="Desa">Desa</MenuItem>
-                <MenuItem value="Kecamatan">Kecamatan</MenuItem>
-              </Select>
-            </FormControl>
+                {/* FILTER CATEGORY */}
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Filter By</InputLabel>
+                  <Select
+                    value={filterCategory}
+                    label="Filter By"
+                    onChange={(e) => {
+                      setFilterCategory(e.target.value);
+                      setFilterValue('');
+                    }}
+                    sx={{ borderRadius: 3, bgcolor: 'white' }}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    <MenuItem value="Rentang Umur">Rentang Umur</MenuItem>
+                    <MenuItem value="Pendidikan Terakhir">Pendidikan Terakhir</MenuItem>
+                    <MenuItem value="Desa">Desa</MenuItem>
+                    <MenuItem value="Kecamatan">Kecamatan</MenuItem>
+                  </Select>
+                </FormControl>
 
-            {/* FILTER VALUE */}
-            {filterCategory && (
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel>Select Value</InputLabel>
-                <Select
-                  value={filterValue}
-                  label="Select Value"
-                  onChange={(e) => setFilterValue(e.target.value)}
-                  sx={{ borderRadius: 3, bgcolor: 'white' }}
-                >
-                  <MenuItem value=""><em>All</em></MenuItem>
-                  {filterCategory === 'Rentang Umur' && Object.keys(ageRanges).map(opt => (
-                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                  ))}
-                  {filterCategory === 'Pendidikan Terakhir' && uniquePendidikan.map(opt => (
-                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                  ))}
-                  {filterCategory === 'Desa' && uniqueDesa.map(opt => (
-                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                  ))}
-                  {filterCategory === 'Kecamatan' && uniqueKecamatan.map(opt => (
-                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          </Box>
+                {/* FILTER VALUE */}
+                {filterCategory && (
+                  <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <InputLabel>Select Value</InputLabel>
+                    <Select
+                      value={filterValue}
+                      label="Select Value"
+                      onChange={(e) => setFilterValue(e.target.value)}
+                      sx={{ borderRadius: 3, bgcolor: 'white' }}
+                    >
+                      <MenuItem value=""><em>All</em></MenuItem>
+                      {filterCategory === 'Rentang Umur' && Object.keys(ageRanges).map(opt => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                      ))}
+                      {filterCategory === 'Pendidikan Terakhir' && uniquePendidikan.map(opt => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                      ))}
+                      {filterCategory === 'Desa' && uniqueDesa.map(opt => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                      ))}
+                      {filterCategory === 'Kecamatan' && uniqueKecamatan.map(opt => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              </Box>
+            </Box>
 
-        </Box>
+            <div className="table-wrapper">
+
 
             {loading ? (
               <p className="loading-text">Memuat data...</p>
             ) : error ? (
               <p className="error-text">Error: {error}</p>
             ) : (
-              <div className="table-container">
-                <table className="modern-table">
+              <table className="modern-table">
                   <thead>
                       <tr>
                       <th style={{ minWidth: '40px', fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
@@ -683,43 +683,41 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                                     </>
                                   )}
                                 </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                      )}
+                    </tbody>
+                  </table>
+              )}
+            </div>
+
+            {Math.ceil(filteredList.length / itemsPerPage) > 1 && (
+              <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
+                <Pagination
+                  count={Math.ceil(filteredList.length / itemsPerPage)}
+                  page={page}
+                  onChange={(e, v) => setPage(v)}
+                  color="primary"
+                  size="large"
+                  showFirstButton
+                  showLastButton
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                    },
+                    '& .Mui-selected': {
+                      bgcolor: '#10b981 !important',
+                      color: 'white',
+                    }
+                  }}
+                />
+              </Box>
             )}
-
-                {Math.ceil(filteredList.length / itemsPerPage) > 1 && (
-                  <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
-                    <Pagination
-                      count={Math.ceil(filteredList.length / itemsPerPage)}
-                      page={page}
-                      onChange={(e, v) => setPage(v)}
-                      color="primary"
-                      size="large"
-                      showFirstButton
-                      showLastButton
-                      sx={{
-                        '& .MuiPaginationItem-root': {
-                          fontWeight: 600,
-                          borderRadius: '8px',
-                        },
-                        '& .Mui-selected': {
-                          bgcolor: '#10b981 !important',
-                          color: 'white',
-                        }
-                      }}
-                    />
-                  </Box>
-                )}
-          </div>
-
-        </>
-      )}
+          </>
+        )}
 
       {/* MODAL VIEW */}
       {selectedItem && (
@@ -772,9 +770,8 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
       {/* FORM CREATE / EDIT (INLINE PAGE) */}
       {activeTab === 'create' && editItem && (
-        <div className="form-page-wrapper" style={{ animation: 'fadeIn 0.3s ease' }}>
              <form onSubmit={handleUpdate}>
-                <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: 'var(--shadow-md)' }}>
+                <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: 'var(--shadow-md)', animation: 'fadeIn 0.3s ease' }}>
                 <h3>Input Data Angkatan Kerja Baru</h3>
                 <div className="search-section" style={{ 
                   background: '#f8fafc', 
@@ -982,7 +979,6 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
               </div>
             </form>
-        </div>
       )}
 
       {/* MODAL DELETE */}

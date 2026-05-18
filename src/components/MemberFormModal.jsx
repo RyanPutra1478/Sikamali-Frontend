@@ -7,38 +7,58 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography }
 const formatDateInput = (dateString) => dateString ? new Date(dateString).toISOString().split('T')[0] : '';
 
 const OCCUPATION_OPTIONS = [
+    "APARAT DESA/ KECAMATAN",
     "APOTEKER",
     "BELUM/ TIDAK BEKERJA",
     "BURUH HARIAN LEPAS",
+    "BURUH NELAYAN/ PERIKANAN",
     "BURUH TANI/ PERKEBUNAN",
-    "CERAI MATI BELUM TERCATAT",
+    "DOSEN SWASTA",
     "DOKTER",
     "GURU",
+    "GURU HONORER",
     "GURU PPPK",
+    "IMAM MESJID",
     "KARYAWAN HONORER",
     "KARYAWAN SWASTA",
     "KEPOLISIAN RI (POLRI)",
     "LANJUT USIA (LANSIA)",
     "MENGURUS RUMAH TANGGA",
     "NELAYAN/ PERIKANAN",
+    "PA CNI",
     "PARAMEDIK/ BIDAN/ PERAWAT",
     "PEDAGANG",
+    "PEGAWAI BUMN/PERSERO",
     "PEGAWAI HONORER",
     "PEGAWAI NEGERI SIPIL (PNS)",
+    "PEGAWAI PPPK",
     "PEKERJAAN LAINNYA",
     "PELAJAR/ MAHASISWA",
-    "PENSIUNAN",
+    "PELAYARAN",
+    "PENSIUNAN PNS",
+    "PERDAGANGAN",
     "PETANI/ PEKEBUN",
+    "PURNAWIRAWAN TNI/ POLRI",
+    "SECURITY",
     "SOPIR",
     "TENTARA NASIONAL INDONESIA (TNI)",
+    "TUKANG BATU",
     "TUKANG JAHIT",
+    "TUKANG KAYU",
+    "TUKANG LAS/ PANDAI BESI",
+    "VETERAN",
     "WARTAWAN/ JURNALIS",
-    "WIRASWASTA"
+    "WIRASWASTA",
+    "ARTIS",
+    "ANGGOTA DEWAN",
+    "GURU TPQ",
+    "MEKANIK"
 ];
 
 const MARITAL_STATUS_OPTIONS = [
     "BELUM KAWIN",
     "CERAI",
+    "CERAI BELUM TERCATAT",
     "CERAI HIDUP",
     "CERAI HIDUP BELUM TERCATAT",
     "CERAI HIDUP TERCATAT",
@@ -73,7 +93,7 @@ const FAMILY_RELATIONSHIP_OPTIONS = [
     "LAINNYA",
     "MERTUA",
     "ORANG TUA",
-    "SAUDARA"
+    "SAUDARA KANDUNG"
 ];
 
 const MemberFormModal = ({ isOpen, onClose, onSubmit, initialData, kkId, isEdit, viewMode, allKK, members = [] }) => {

@@ -238,7 +238,7 @@ export default function Sidebar({ user, isOpen, onClose }) {
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="logo-icon">
-          <img src="/logo-icon.png" alt="Sikamali" style={{ width: '40px' }} />
+          <img src="/LOGOBARU.png" alt="Sikamali" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
         </div>
         <div className="logo-text">
           <h2>SIKAMALI</h2>

@@ -33,7 +33,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
   const [selectedKK, setSelectedKK] = useState(null); // For detail view
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   const [fotoRumahFile, setFotoRumahFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -1346,7 +1346,7 @@ export default function AdminKK({ user, readOnly, canCreate, mode = "full" }) {
       {activeTab === "detail" && selectedKK && (
         <div
           className="detail-view-container"
-          style={{ animation: "fadeIn 0.5s ease" }}
+          style={{ animation: "fadeIn 0.5s ease", flex: 1, overflowY: 'auto', padding: '1rem 2rem' }}
         >
           <div
             className="detail-header-card"

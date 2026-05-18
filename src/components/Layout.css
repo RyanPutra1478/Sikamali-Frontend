@@ -1,7 +1,8 @@
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background: #f9fafb;
+  overflow: hidden;
 }
 
 .main-wrapper {
@@ -9,8 +10,9 @@
   margin-left: 280px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   min-width: 0;
+  overflow: hidden;
 }
 
 .main-header {
@@ -41,7 +43,7 @@
 .logo-image {
   border-radius: 50%;
   background: #ffffff;
-  padding: 4px;
+  padding: 0;
   border: 2px solid #10b981;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
   object-fit: contain;
@@ -79,10 +81,11 @@
 
 .main-content {
   flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding: 1rem 1.5rem;
+  overflow: hidden;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Hamburger Button */

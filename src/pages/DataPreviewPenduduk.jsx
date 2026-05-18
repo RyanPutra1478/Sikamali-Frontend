@@ -155,7 +155,7 @@ const DataPreviewPenduduk = ({ user }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const residents = await kkAPI.getAllMembers();
+      const residents = await previewAPI.getMember();
       setData(residents);
     } catch (error) {
       console.error("Error fetching resident data:", error);
@@ -258,7 +258,8 @@ const DataPreviewPenduduk = ({ user }) => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+    <div className="scrollable-page">
+      <Container maxWidth="xl" sx={{ mt: 0, mb: 4, p: '0 !important' }}>
       <Box className="admin-header" sx={{ 
         flexDirection: { xs: 'column', md: 'row' }, 
         alignItems: { xs: 'flex-start', md: 'flex-end' },
@@ -520,6 +521,7 @@ const DataPreviewPenduduk = ({ user }) => {
         allKK={allKK}
       />
     </Container>
+    </div>
   );
 };
 

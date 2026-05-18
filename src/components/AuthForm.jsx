@@ -42,14 +42,14 @@ export default function AuthForm({ onAuth }) {
                         <div className="auth-form">
                                 <div className="auth-header" style={{ textAlign: 'center', marginBottom: '2rem' }}>
                                         <img 
-                                                src="/logo-icon.png" 
+                                                src="/LOGOBARU.png" 
                                                 alt="Sikamali Logo" 
                                                 style={{ 
-                                                        width: '80px', 
+                                                        width: '120px', 
                                                         height: 'auto', 
                                                         background: 'rgba(255, 255, 255, 0.9)', 
                                                         borderRadius: '16px', 
-                                                        padding: '8px',
+                                                        padding: '4px',
                                                         boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                                                         marginBottom: '1rem'
                                                 }} 

@@ -28,16 +28,16 @@ export default function PublicNavbar() {
         cursor: 'pointer'
       }} onClick={() => navigate('/')}>
         <img 
-          src="/logo-icon.png" 
+          src="/LOGOBARU.png" 
           alt="Sikamali Logo" 
           style={{ 
-            width: '42px', 
-            height: '42px', 
-            background: '#ffffff', 
-            borderRadius: '50%', 
-            padding: '4px',
-            border: '2px solid #ffffff',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.25)',
+            width: '56px', 
+            height: '56px', 
+            borderRadius: '50%',
+            background: 'white',
+            padding: '2px',
+            border: '2px solid #bef264',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
             objectFit: 'contain'
           }} 
         />

@@ -6,7 +6,7 @@
   font-family: 'Inter', sans-serif;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;
   animation: fadeIn 0.5s ease;
   color: #1f2937;
 }
@@ -17,14 +17,14 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 2px solid #f3f4f6;
 }
 
 .admin-header h2 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   color: #111827;
   font-weight: 800;
 }
@@ -66,9 +66,9 @@
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  max-height: calc(100vh - 320px);
+  overflow: auto;
   border: 1px solid #e5e7eb;
-  overflow-x: auto;
 }
 
 .modern-table {
@@ -89,6 +89,10 @@
   color: #4b5563;
   border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f9fafb;
 }
 
 .modern-table td {

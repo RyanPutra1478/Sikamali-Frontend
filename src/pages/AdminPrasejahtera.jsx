@@ -49,7 +49,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
 
   // Pagination
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -389,8 +389,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
       ) : (
         /* CONDITIONAL RENDER: FORM OR TABLE */
         showForm ? (
-          <div className="form-page-wrapper" style={{ animation: 'fadeIn 0.3s ease' }}>
-            <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+            <div className="form-container" style={{ background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', animation: 'fadeIn 0.3s ease' }}>
               <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>
                 {editingRecord ? 'Edit Penilaian Sosial' : 'Input Penilaian Sosial Baru'}
               </h3>
@@ -608,10 +607,9 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                 </div>
               </form>
             </div>
-          </div>
         ) : (
         /* TABLE SECTION */
-        <div className="table-wrapper">
+        <>
           {/* TOOLBAR */}
           <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: '#fcfcfc', flexWrap: 'wrap', gap: 2, mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
@@ -681,10 +679,11 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                 </FormControl>
               )}
             </Box>
-
           </Box>
 
-          <div className="table-container">
+          <div className="table-wrapper">
+
+
           <table className="modern-table">
             <thead>
               <tr>
@@ -882,23 +881,23 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
               )}
             </tbody>
           </table>
-        </div>
+              </div>
 
-        {Math.ceil(filteredData.length / itemsPerPage) > 1 && (
-          <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
-            <Pagination
-              count={Math.ceil(filteredData.length / itemsPerPage)}
-              page={page}
-              onChange={(e, v) => setPage(v)}
-              color="primary"
-              size="large"
-              sx={{ '& .MuiPaginationItem-root': { fontWeight: 600, borderRadius: '8px' }, '& .Mui-selected': { bgcolor: '#10b981 !important', color: 'white' } }}
-            />
-          </Box>
+              {Math.ceil(filteredData.length / itemsPerPage) > 1 && (
+                <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fcfcfc', borderTop: '1px solid rgba(0,0,0,0.05)', mt: 1 }}>
+                  <Pagination
+                    count={Math.ceil(filteredData.length / itemsPerPage)}
+                    page={page}
+                    onChange={(e, v) => setPage(v)}
+                    color="primary"
+                    size="large"
+                    sx={{ '& .MuiPaginationItem-root': { fontWeight: 600, borderRadius: '8px' }, '& .Mui-selected': { bgcolor: '#10b981 !important', color: 'white' } }}
+                  />
+                </Box>
+              )}
+            </>
+          )
         )}
-        </div>
-        )
-      )}
 
       {/* --- MODAL DELETE & DETAIL (HIDDEN FOR NOW AS NOT REQUESTED) --- */}
       {deleteTarget && (
