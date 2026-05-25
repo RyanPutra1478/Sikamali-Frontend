@@ -134,7 +134,7 @@ const AdminLand = () => {
   }, [filteredData, selectedItem]);
 
   return (
-    <div className="admin-page">
+    <div className="admin-page scrollable-page" style={{ overflowY: 'auto' }}>
       <div className="admin-header">
         <div className="header-title-section">
           <h2><MapPin size={32} /> Lokasi & Domisili</h2>

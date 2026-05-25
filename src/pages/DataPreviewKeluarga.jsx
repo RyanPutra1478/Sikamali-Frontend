@@ -30,7 +30,7 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import { Home, Download as FileDownloadIcon, RefreshCw as RefreshIcon } from 'lucide-react';
-import { previewAPI, kkAPI, adminAPI, API_URL } from '../services/api';
+import { previewAPI, kkAPI, adminAPI, API_URL, landAPI } from '../services/api';
 import { getRolePermissions } from '../utils/permissions';
 import * as XLSX from 'xlsx';
 import './AdminTables.css';
@@ -129,6 +129,16 @@ const StatCard = ({ title, value, icon, color }) => (
   </Card>
 );
 
+const isPra = (item) => {
+  const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
+  return status.includes('prasejahtera') || item.is_prasejahtera === 1 || item.is_prasejahtera === true || item.is_prasejahtera === '1' || item.is_prasejahtera === 'true';
+};
+
+const isMandiri = (item) => {
+  const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
+  return status === 'sejahteramandiri';
+};
+
 const DataPreviewKeluarga = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -138,7 +148,7 @@ const DataPreviewKeluarga = ({ user }) => {
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState('list');
   const [selectedKK, setSelectedKK] = useState(null);
-  const itemsPerPage = 15;
+  const itemsPerPage = 25;
 
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -173,14 +183,28 @@ const DataPreviewKeluarga = ({ user }) => {
     fetchData();
   };
 
-  const handleViewDetail = async (kkId) => {
+  const handleViewDetail = async (rowData) => {
+    if (!rowData) return;
+    
     setLoading(true);
     try {
-      const detail = await kkAPI.getDetail(kkId);
+      let detail;
+      const validId = rowData.id || rowData.kk_id || rowData.id_kk;
+      
+      if (validId && validId !== 'undefined') {
+        detail = await kkAPI.getDetail(validId);
+      } else if (rowData.nomor_kk) {
+        detail = await landAPI.getKKByNomor(rowData.nomor_kk);
+      } else {
+        alert("Gagal memuat detail: Tidak ada ID atau Nomor KK pada data ini.");
+        setLoading(false);
+        return;
+      }
+      
       setSelectedKK(detail);
       setActiveTab("detail");
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Gagal memuat detail keluarga.");
     } finally {
       setLoading(false);
     }
@@ -201,7 +225,7 @@ const DataPreviewKeluarga = ({ user }) => {
     setExportMenuAnchor(null);
     const sourceData = exportAll ? data : filteredData;
     const exportData = sourceData.map((row, index) => {
-      const isPrasejahtera = (row.status_kesejahteraan || row.kategori_sosial)?.toLowerCase() === 'prasejahtera';
+      const isPrasejahtera = isPra(row);
       return {
         'No': index + 1,
         'NO KARTU KELUARGA': row.nomor_kk,
@@ -234,14 +258,6 @@ const DataPreviewKeluarga = ({ user }) => {
     XLSX.writeFile(workbook, `Data_Keluarga_Sikamali_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  const isPra = (item) => {
-    return (item.status_kesejahteraan || item.kategori_sosial)?.toLowerCase() === 'prasejahtera';
-  };
-
-  const isMandiri = (item) => {
-    return (item.status_kesejahteraan || item.kategori_sosial)?.toLowerCase() === 'sejahtera mandiri';
-  };
-
   const uniqueDesa = [...new Set(data.map(item => item.desa || item.desa_kelurahan).filter(Boolean))].sort();
 
   const filteredData = data.filter(item => {
@@ -262,15 +278,15 @@ const DataPreviewKeluarga = ({ user }) => {
   });
 
   const stats = {
-    total: data.length,
-    praSejahtera: data.filter(d => isPra(d)).length,
-    sejahtera: data.filter(d => !isPra(d) && !isMandiri(d)).length,
-    sejahteraMandiri: data.filter(d => isMandiri(d)).length
+    total: filteredData.length,
+    praSejahtera: filteredData.filter(d => isPra(d)).length,
+    sejahtera: filteredData.filter(d => !isPra(d) && !isMandiri(d)).length,
+    sejahteraMandiri: filteredData.filter(d => isMandiri(d)).length
   };
 
   return (
-    <div className="scrollable-page">
-      <Container maxWidth="xl" sx={{ mt: 0, mb: 4, p: '0 !important' }}>
+    <div className="admin-page">
+      <Container maxWidth="xl" sx={{ mt: 0, mb: 0, p: '0 !important', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, height: '100%' }}>
       <Box className="admin-header" sx={{ 
         flexDirection: { xs: 'column', md: 'row' }, 
         alignItems: { xs: 'flex-start', md: 'flex-end' },
@@ -389,7 +405,7 @@ const DataPreviewKeluarga = ({ user }) => {
       </Box>
 
       {/* MAIN TABLE PAPER */}
-      <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)' }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
         <Box sx={{ 
           p: 2, 
           display: 'flex', 
@@ -419,27 +435,6 @@ const DataPreviewKeluarga = ({ user }) => {
               ),
             }}
           />
-          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
-            <InputLabel>Filter Status</InputLabel>
-            <Select
-              value={filterValue}
-              label="Filter Status"
-              onChange={(e) => {
-                setFilterValue(e.target.value);
-                setPage(1);
-              }}
-              sx={{ 
-                borderRadius: 2.5, 
-                bgcolor: 'white',
-              }}
-            >
-              <MenuItem value=""><em>Semua Status</em></MenuItem>
-              <MenuItem value="prasejahtera">Prasejahtera</MenuItem>
-              <MenuItem value="sejahtera">Sejahtera</MenuItem>
-              <MenuItem value="sejahtera_mandiri">Sejahtera Mandiri</MenuItem>
-            </Select>
-          </FormControl>
-
           <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 180 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
             <InputLabel>Filter Desa</InputLabel>
             <Select
@@ -460,10 +455,31 @@ const DataPreviewKeluarga = ({ user }) => {
               ))}
             </Select>
           </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
+            <InputLabel>Filter Status</InputLabel>
+            <Select
+              value={filterValue}
+              label="Filter Status"
+              onChange={(e) => {
+                setFilterValue(e.target.value);
+                setPage(1);
+              }}
+              sx={{ 
+                borderRadius: 2.5, 
+                bgcolor: 'white',
+              }}
+            >
+              <MenuItem value=""><em>Semua Status</em></MenuItem>
+              <MenuItem value="prasejahtera">Prasejahtera</MenuItem>
+              <MenuItem value="sejahtera">Sejahtera</MenuItem>
+              <MenuItem value="sejahtera_mandiri">Sejahtera Mandiri</MenuItem>
+            </Select>
+          </FormControl>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }} />
         </Box>
 
-        <Box sx={{ overflowX: 'auto' }}>
+        <div className="table-wrapper">
           <table className="modern-table" style={{ minWidth: 1800 }}>
             <thead>
               <tr>
@@ -496,7 +512,7 @@ const DataPreviewKeluarga = ({ user }) => {
                 </tr>
               ) : (
                 filteredData.slice((page-1)*itemsPerPage, page*itemsPerPage).map((row, index) => {
-                  const isPrasejahtera = row.kategori_sosial?.toLowerCase() === 'prasejahtera';
+                  const isPrasejahtera = isPra(row);
                   return (
                     <tr key={index}>
                       <td style={{ textAlign: 'center', fontSize: '0.75rem', padding: '5px 12px' }}>{(page - 1) * itemsPerPage + index + 1}</td>
@@ -532,10 +548,10 @@ const DataPreviewKeluarga = ({ user }) => {
                         <span style={{ 
                           fontSize: '0.75rem', 
                           textTransform: 'uppercase',
-                          color: ((row.status_kesejahteraan || row.kategori_sosial || '').toLowerCase() === 'sejahtera mandiri' ? '#3b82f6' : 
-                                 ((row.status_kesejahteraan || row.kategori_sosial || '').toLowerCase() === 'prasejahtera' || isPrasejahtera) ? '#ef4444' : '#10b981')
+                          color: (isPrasejahtera ? '#ef4444' : 
+                                 (isMandiri(row) ? '#3b82f6' : '#10b981'))
                         }}>
-                          {row.status_kesejahteraan || row.kategori_sosial || (isPrasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA')}
+                          {isPrasejahtera ? 'PRASEJAHTERA' : (row.status_kesejahteraan || row.kategori_sosial || 'SEJAHTERA')}
                         </span>
                       </td>
                       <td style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
@@ -553,7 +569,7 @@ const DataPreviewKeluarga = ({ user }) => {
                       <td style={{ textAlign: 'center', padding: '5px 12px' }}>
                         <IconButton
                           size="small"
-                          onClick={() => handleViewDetail(row.id)}
+                          onClick={() => handleViewDetail(row)}
                           sx={{ 
                             color: '#3b82f6', 
                             bgcolor: '#eff6ff',
@@ -569,7 +585,7 @@ const DataPreviewKeluarga = ({ user }) => {
               )}
             </tbody>
           </table>
-        </Box>
+        </div>
         <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
           <Pagination 
             count={Math.ceil(filteredData.length / itemsPerPage)} 
@@ -586,7 +602,7 @@ const DataPreviewKeluarga = ({ user }) => {
       ) : (
         <div
           className="detail-view-container"
-          style={{ animation: "fadeIn 0.5s ease", width: '100%' }}
+          style={{ animation: "fadeIn 0.5s ease", width: '100%', overflowY: 'auto', flex: 1, minHeight: 0 }}
         >
           <div
             className="detail-header-card"

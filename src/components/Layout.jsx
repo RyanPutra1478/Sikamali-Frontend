@@ -50,7 +50,9 @@ export default function Layout({ children, user, onLogout }) {
 
             <div className="logo-container">
               <img src="/LOGOBARU.png" alt="Sikamali Logo" className="logo-image" style={{ height: '56px', width: '56px' }} />
-              <h1 className="app-title">Sistem Informasi Kependudukan Masyarakat Lingkar Tambang</h1>
+              <h1 className="app-title">Sistem Informasi Kependudukan Masyarakat Lingkar Tambang
+                <br />PT. Ceria Nugraha Indotama 
+              </h1>
             </div>
           </div>
           <div className="header-right">

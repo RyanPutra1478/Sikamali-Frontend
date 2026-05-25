@@ -25,7 +25,10 @@ import {
   People as PeopleIcon, 
   Man as ManIcon, 
   Woman as WomanIcon,
-  Visibility as VisibilityIcon
+  Visibility as VisibilityIcon,
+  Work as WorkIcon,
+  WorkOutline as WorkOutlineIcon,
+  WorkOff as WorkOffIcon
 } from '@mui/icons-material';
 import { Users, Download as FileDownloadIcon, RefreshCw as RefreshIcon } from 'lucide-react';
 import { previewAPI, adminAPI, kkAPI } from '../services/api';
@@ -133,12 +136,13 @@ const DataPreviewPenduduk = ({ user }) => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDesa, setSelectedDesa] = useState('');
+  const [workFilter, setWorkFilter] = useState('');
   const [page, setPage] = useState(1);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
   const [allKK, setAllKK] = useState([]);
-  const itemsPerPage = 15;
+  const itemsPerPage = 25;
   
   const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
   const openExportMenu = Boolean(exportMenuAnchor);
@@ -156,7 +160,7 @@ const DataPreviewPenduduk = ({ user }) => {
     setLoading(true);
     try {
       const residents = await previewAPI.getMember();
-      setData(residents);
+      setData(Array.isArray(residents) ? residents : residents?.data || []);
     } catch (error) {
       console.error("Error fetching resident data:", error);
     } finally {
@@ -167,6 +171,7 @@ const DataPreviewPenduduk = ({ user }) => {
   const handleRefresh = () => {
     setSearchTerm('');
     setSelectedDesa('');
+    setWorkFilter('');
     setPage(1);
     fetchData();
   };
@@ -182,7 +187,7 @@ const DataPreviewPenduduk = ({ user }) => {
   const loadAllKK = async () => {
     try {
       const res = await adminAPI.getKK();
-      setAllKK(res);
+      setAllKK(Array.isArray(res) ? res : res?.data || []);
     } catch (error) {
       console.error("Error loading KK data:", error);
     }
@@ -248,18 +253,43 @@ const DataPreviewPenduduk = ({ user }) => {
     
     const matchesDesa = !selectedDesa || (item.desa || item.desa_kelurahan) === selectedDesa;
 
-    return matchesSearch && matchesDesa;
+    let matchesWork = true;
+    if (workFilter) {
+      const sk = String(item.status_kerja || '').toLowerCase().trim();
+      if (workFilter === 'angkatan_kerja') {
+        matchesWork = sk === 'belum bekerja' || sk === 'sudah bekerja';
+      } else if (workFilter === 'sudah_bekerja') {
+        matchesWork = sk === 'sudah bekerja';
+      } else if (workFilter === 'belum_bekerja') {
+        matchesWork = sk === 'belum bekerja';
+      }
+    }
+
+    return matchesSearch && matchesDesa && matchesWork;
   });
 
   const stats = {
-    total: data.length,
-    laki: data.filter(d => (d.jenis_kelamin || '').toLowerCase().startsWith('l')).length,
-    perempuan: data.filter(d => (d.jenis_kelamin || '').toLowerCase().startsWith('p')).length
+    total: filteredData.length,
+    angkatanKerja: filteredData.filter(d => {
+      if (!d.status_kerja) return false;
+      const sk = String(d.status_kerja).toLowerCase().trim();
+      return sk === 'belum bekerja' || sk === 'sudah bekerja';
+    }).length,
+    sudahBekerja: filteredData.filter(d => {
+      if (!d.status_kerja) return false;
+      const sk = String(d.status_kerja).toLowerCase().trim();
+      return sk === 'sudah bekerja';
+    }).length,
+    belumBekerja: filteredData.filter(d => {
+      if (!d.status_kerja) return false;
+      const sk = String(d.status_kerja).toLowerCase().trim();
+      return sk === 'belum bekerja';
+    }).length
   };
 
   return (
-    <div className="scrollable-page">
-      <Container maxWidth="xl" sx={{ mt: 0, mb: 4, p: '0 !important' }}>
+    <div className="admin-page">
+      <Container maxWidth="xl" sx={{ mt: 0, mb: 0, p: '0 !important', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, height: '100%' }}>
       <Box className="admin-header" sx={{ 
         flexDirection: { xs: 'column', md: 'row' }, 
         alignItems: { xs: 'flex-start', md: 'flex-end' },
@@ -343,15 +373,18 @@ const DataPreviewPenduduk = ({ user }) => {
           <StatCard title="Total Penduduk" value={stats.total} icon={<PeopleIcon />} color="#6366f1" />
         </Box>
         <Box sx={{ flex: 1, minWidth: '200px' }}>
-          <StatCard title="Laki-laki" value={stats.laki} icon={<ManIcon />} color="#0ea5e9" />
+          <StatCard title="Angkatan Kerja" value={stats.angkatanKerja} icon={<WorkOutlineIcon />} color="#8b5cf6" />
         </Box>
         <Box sx={{ flex: 1, minWidth: '200px' }}>
-          <StatCard title="Perempuan" value={stats.perempuan} icon={<WomanIcon />} color="#f43f5e" />
+          <StatCard title="Sudah Bekerja" value={stats.sudahBekerja} icon={<WorkIcon />} color="#10b981" />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
+          <StatCard title="Belum Bekerja" value={stats.belumBekerja} icon={<WorkOffIcon />} color="#f43f5e" />
         </Box>
       </Box>
 
       {/* TABLE PAPER */}
-      <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)' }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 8px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
         <Box sx={{ 
           p: 2, 
           bgcolor: '#fcfcfc', 
@@ -402,9 +435,27 @@ const DataPreviewPenduduk = ({ user }) => {
               ))}
             </Select>
           </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 auto', sm: '0 0 auto' } }}>
+            <InputLabel>Filter Status Kerja</InputLabel>
+            <Select
+              value={workFilter}
+              label="Filter Status Kerja"
+              onChange={(e) => {
+                setWorkFilter(e.target.value);
+                setPage(1);
+              }}
+              sx={{ borderRadius: 2.5, bgcolor: 'white' }}
+            >
+              <MenuItem value=""><em>Semua Status Kerja</em></MenuItem>
+              <MenuItem value="angkatan_kerja">Angkatan Kerja</MenuItem>
+              <MenuItem value="sudah_bekerja">Sudah Bekerja</MenuItem>
+              <MenuItem value="belum_bekerja">Belum Bekerja</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
-        <Box sx={{ overflowX: 'auto' }}>
+        <div className="table-wrapper">
           <table className="modern-table" style={{ minWidth: 2800 }}>
             <thead>
               <tr>
@@ -498,7 +549,7 @@ const DataPreviewPenduduk = ({ user }) => {
               )}
             </tbody>
           </table>
-        </Box>
+        </div>
         <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
           <Pagination 
             count={Math.ceil(filteredData.length / itemsPerPage)} 

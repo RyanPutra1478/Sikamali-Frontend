@@ -36,14 +36,14 @@ export const ROLE_PERMISSIONS = {
       announcements: { view: false, create: false, edit: false, delete: false },
     },
     database: {
-      kk: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
-      employment: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
-      kesejahteraan: { view: true, insert: true, edit: true, delete: false, copy: true, export: false },
+      kk: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
+      employment: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
+      kesejahteraan: { view: true, insert: true, edit: true, delete: true, copy: true, export: true },
     },
     dataPreview: {
-      penduduk: { view: true, edit: true, delete: true, copy: true, export: false },
-      employment: { view: true, edit: true, delete: true, copy: true, export: false },
-      kesejahteraan: { view: true, edit: true, delete: true, copy: true, export: false },
+      penduduk: { view: true, edit: true, delete: true, copy: true, export: true },
+      employment: { view: true, edit: true, delete: true, copy: true, export: true },
+      kesejahteraan: { view: true, edit: true, delete: true, copy: true, export: true },
     },
     lokasiZona: {
       // Full Access restored as per request
@@ -62,10 +62,10 @@ export const ROLE_PERMISSIONS = {
       announcements: { view: false, create: false, edit: false, delete: false },
     },
     database: {
-      // Create Only. View needed to access form. Edit/Delete/Copy = FALSE.
-      kk: { view: true, insert: true, edit: false, delete: false, copy: false },
-      employment: { view: true, insert: true, edit: false, delete: false, copy: false },
-      kesejahteraan: { view: true, insert: true, edit: false, delete: false, copy: false },
+      // View, Insert, Edit = TRUE. Delete/Copy/Export = FALSE.
+      kk: { view: true, insert: true, edit: true, delete: false, copy: false, export: false },
+      employment: { view: true, insert: true, edit: true, delete: false, copy: false, export: false },
+      kesejahteraan: { view: true, insert: true, edit: true, delete: false, copy: false, export: false },
     },
     dataPreview: {
       // View Only
@@ -74,8 +74,7 @@ export const ROLE_PERMISSIONS = {
       kesejahteraan: { view: true, edit: false, delete: false, copy: false, export: false },
     },
     lokasiZona: {
-      // Access terbatas ke Lokasi dan Domisili (Insert Record saja)
-      // View true otherwise they can't see the map to insert? Use view: true
+      // Access ke Lokasi dan Domisili (View only for general user/resident)
       land: { view: true, insert: true, edit: false, delete: false, copy: false },
     },
   },
@@ -102,6 +101,30 @@ export const ROLE_PERMISSIONS = {
     },
     lokasiZona: {
       // Read only ke Lokasi dan Domisili
+      land: { view: true, insert: false, edit: false, delete: false, copy: false },
+    },
+  },
+
+  // ===========================================================================
+  // 5) VIEWER
+  // - HANYA BISA MENGAKSES DATA PREVIEW KELUARGA DAN DATA PREVIEW PENDUDUK
+  // ===========================================================================
+  viewer: {
+    management: {
+      users: { view: false, create: false, edit: false, delete: false },
+      announcements: { view: false, create: false, edit: false, delete: false },
+    },
+    database: {
+      kk: { view: false, insert: false, edit: false, delete: false, copy: false },
+      employment: { view: false, insert: false, edit: false, delete: false, copy: false },
+      kesejahteraan: { view: false, insert: false, edit: false, delete: false, copy: false },
+    },
+    dataPreview: {
+      penduduk: { view: true, edit: false, delete: false, copy: false, export: false },
+      employment: { view: true, edit: false, delete: false, copy: false, export: false },
+      kesejahteraan: { view: true, edit: false, delete: false, copy: false, export: false },
+    },
+    lokasiZona: {
       land: { view: true, insert: false, edit: false, delete: false, copy: false },
     },
   },

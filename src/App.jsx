@@ -245,7 +245,7 @@ function App() {
                 <Route
                   path="/admin/preview/keluarga"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest', 'viewer']} role={role}>
                       <DataPreviewKeluarga user={user} />
                     </RoleGuard>
                   }
@@ -254,7 +254,7 @@ function App() {
                 <Route
                   path="/admin/preview/penduduk"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest', 'viewer']} role={role}>
                       <DataPreviewPenduduk user={user} />
                     </RoleGuard>
                   }
@@ -266,7 +266,7 @@ function App() {
                 <Route
                   path="/admin/land"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user', 'guest', 'viewer']} role={role}>
                       <AdminLand readOnly={!perms?.lokasiZona?.land?.edit} />
                     </RoleGuard>
                   }
@@ -276,8 +276,8 @@ function App() {
                 <Route
                   path="/admin/kk"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
-                      <AdminKK mode="full" user={user} />
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
+                      <AdminKK mode="full" user={user} readOnly={!perms?.database?.kk?.edit} />
                     </RoleGuard>
                   }
                 />
@@ -286,7 +286,7 @@ function App() {
                 <Route
                   path="/admin/members"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
                       <AdminMembers user={user} />
                     </RoleGuard>
                   }
@@ -296,7 +296,7 @@ function App() {
                 <Route
                   path="/admin/employment"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
                       <AdminEmployment
                         readOnly={!perms?.database?.employment?.edit}
                         canCreate={perms?.database?.employment?.insert}
@@ -309,7 +309,7 @@ function App() {
                 <Route
                   path="/admin/kesejahteraan"
                   element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
+                    <RoleGuard allowedRoles={['superadmin', 'admin', 'user']} role={role}>
                       <AdminPrasejahtera
                         readOnly={!perms?.database?.kesejahteraan?.edit}
                         canCreate={perms?.database?.kesejahteraan?.insert}

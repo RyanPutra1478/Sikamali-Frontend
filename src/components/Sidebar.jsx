@@ -100,6 +100,7 @@ const ROLE_LABEL = {
   admin: 'Admin',
   user: 'User',
   guest: 'Guest',
+  viewer: 'Viewer',
 };
 
 export default function Sidebar({ user, isOpen, onClose }) {
@@ -108,14 +109,26 @@ export default function Sidebar({ user, isOpen, onClose }) {
   const [openGroup, setOpenGroup] = useState(null);
   const [showDeniedPopup, setShowDeniedPopup] = useState(false);
 
+  const handleProtectedClick = (e, item) => {
+    let isAllowed = true;
+    if (item.permission) {
+      isAllowed = can(role, item.permission.section, item.permission.module, item.permission.action);
+    }
+    if (!isAllowed) {
+      e.preventDefault();
+      setShowDeniedPopup(true);
+    }
+  };
+
   const menuConfig = useMemo(() => {
     const filterItems = (items) => {
       return items.reduce((acc, item) => {
-        if (role === 'guest') {
+        if (role === 'guest' || role === 'viewer') {
           const isDashboard = item.label === 'Dashboard';
           const isPreviewGroup = item.key === 'preview';
           const isPreviewChild = item.permission && item.permission.section === 'dataPreview';
-          if (!isDashboard && !isPreviewGroup && !isPreviewChild) return acc;
+          const isLand = item.to === '/admin/land' || (item.permission && item.permission.section === 'lokasiZona');
+          if (!isDashboard && !isPreviewGroup && !isPreviewChild && !isLand) return acc;
         }
 
         let isAllowed = true;
@@ -160,26 +173,11 @@ export default function Sidebar({ user, isOpen, onClose }) {
   }, [location.pathname]);
 
   const renderItem = (item) => {
-    const isDatabaseItem = (item) => {
-      // Check if item or its parent is part of database
-      if (item.key === 'database') return true;
-      if (item.permission?.section === 'database') return true;
-      return false;
-    };
-
-    const handleProtectedClick = (e, targetItem) => {
-      if (role === 'user' && isDatabaseItem(targetItem)) {
-        e.preventDefault();
-        setShowDeniedPopup(true);
-      }
-    };
-
     if (item.type === 'single' || !item.children) {
       return (
         <Link
           key={item.to}
           to={item.to}
-          onClick={(e) => handleProtectedClick(e, item)}
           className={`sidebar-item ${isActive(item.to) ? 'active' : ''}`}
         >
           <span className="sidebar-icon">{item.icon}</span>
@@ -194,11 +192,7 @@ export default function Sidebar({ user, isOpen, onClose }) {
         <div
           className="sidebar-item group-header"
           onClick={() => {
-            if (role === 'user' && item.key === 'database') {
-              setShowDeniedPopup(true);
-            } else {
-              setOpenGroup(isOpenGroup ? null : item.key);
-            }
+            setOpenGroup(isOpenGroup ? null : item.key);
           }}
         >
           <span className="sidebar-icon">{item.icon}</span>

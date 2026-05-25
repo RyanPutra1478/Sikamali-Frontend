@@ -218,7 +218,7 @@ export default function Land({ user }) {
   };
 
   return (
-    <div className="admin-page">
+    <div className="admin-page scrollable-page" style={{ overflowY: 'auto' }}>
       <div className="admin-header">
         <div className="header-title-section">
           <div className="section-badge">Pemetaan Wilayah</div>

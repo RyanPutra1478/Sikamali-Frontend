@@ -71,6 +71,7 @@ const ROLE_OPTIONS = [
   { value: 'superadmin', label: 'Super Admin', icon: <AdminPanelSettingsIcon fontSize="small" /> },
   { value: 'admin', label: 'Admin', icon: <SupervisedUserCircleIcon fontSize="small" /> },
   { value: 'user', label: 'User', icon: <PersonIcon fontSize="small" /> },
+  { value: 'viewer', label: 'Viewer', icon: <SupportAgentIcon fontSize="small" /> },
 ];
 
 export default function AdminUsers({ currentUser }) {
@@ -231,6 +232,7 @@ export default function AdminUsers({ currentUser }) {
       case 'superadmin': return 'primary';
       case 'admin': return 'success';
       case 'user': return 'info';
+      case 'viewer': return 'secondary';
       default: return 'default';
     }
   };

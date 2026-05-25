@@ -11,6 +11,14 @@ import Pagination from '@mui/material/Pagination';
 import * as XLSX from 'xlsx';
 import { adminAPI, kkAPI } from '../services/api';
 
+const normalizeWelfareStatus = (val) => {
+  if (!val) return 'sejahtera';
+  const clean = val.toLowerCase().replace(/\s+/g, '');
+  if (clean.includes('prasejahtera')) return 'prasejahtera';
+  if (clean === 'sejahteramandiri') return 'sejahtera mandiri';
+  return 'sejahtera';
+};
+
 export default function AdminPrasejahtera({ readOnly = false, canCreate = false, canDelete = false, canExport = false }) {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
@@ -242,7 +250,8 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
   const uniqueKecamatan = [...new Set(data.map(item => item.kecamatan).filter(Boolean))].sort();
 
   const isWargaPrasejahtera = (item) => {
-    return item.status_kesejahteraan === 'prasejahtera' || item.is_prasejahtera === true || item.is_prasejahtera === 1;
+    const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
+    return status.includes('prasejahtera') || item.is_prasejahtera === true || item.is_prasejahtera === 1 || item.is_prasejahtera === 'true' || item.is_prasejahtera === '1';
   };
 
   const filteredData = data.filter(item => {
@@ -260,11 +269,11 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
     if (filterCategory === 'Kecamatan') return item.kecamatan === filterValue;
     if (filterCategory === 'Status') {
       const isPra = isWargaPrasejahtera(item);
-      const status = (item.status_kesejahteraan || '').toLowerCase();
+      const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
       
       if (filterValue === 'Prasejahtera') return isPra;
       if (filterValue === 'Sejahtera') return status === 'sejahtera';
-      if (filterValue === 'Sejahtera Mandiri') return status === 'sejahtera mandiri';
+      if (filterValue === 'Sejahtera Mandiri') return status === 'sejahteramandiri';
     }
 
     return true;
@@ -786,11 +795,12 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                     </td>
                     <td>
                       {(() => {
-                        const status = row.status_kesejahteraan || (row.is_prasejahtera ? 'PRASEJAHTERA' : 'SEJAHTERA');
-                        const s = status.toLowerCase();
+                        const isPra = isWargaPrasejahtera(row);
+                        const status = isPra ? 'PRASEJAHTERA' : (row.status_kesejahteraan || row.kategori_sosial || 'SEJAHTERA');
+                        const s = status.toLowerCase().replace(/\s+/g, '');
                         let textColor = '#475569';
                         if (s.includes('prasejahtera')) textColor = '#dc2626';
-                        else if (s === 'sejahtera mandiri') textColor = '#2563eb';
+                        else if (s === 'sejahteramandiri') textColor = '#2563eb';
                         else if (s.includes('sejahtera')) textColor = '#16a34a';
                         
                         return (
@@ -848,7 +858,7 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                                   income_per_month: row.income_per_month || '',
                                   house_condition: row.house_condition || '',
                                   access_listrik_air: row.access_listrik_air ? 'true' : 'false',
-                                  status_kesejahteraan: row.status_kesejahteraan || (row.is_prasejahtera ? 'prasejahtera' : 'sejahtera'),
+                                  status_kesejahteraan: normalizeWelfareStatus(row.status_kesejahteraan || row.kategori_sosial),
                                   tingkat_sosial: row.tingkat_sosial || '',
                                   assessment_notes: row.assessment_notes || '',
                                 });
