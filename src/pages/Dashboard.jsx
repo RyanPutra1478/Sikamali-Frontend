@@ -115,9 +115,29 @@ export default function Dashboard({ user }) {
   // Dynamic Chart Filters
   const [kkFilter, setKkFilter] = useState('jumlahKK');
   const [pendudukFilter, setPendudukFilter] = useState('jumlahPenduduk');
+  const [chartHeight, setChartHeight] = useState(280);
 
   useEffect(() => {
     loadDashboardData();
+  }, []);
+
+  useEffect(() => {
+    const updateChartHeight = () => {
+      const width = window.innerWidth;
+      if (width >= 1600) {
+        setChartHeight(210);
+      } else if (width >= 1280) {
+        setChartHeight(220);
+      } else if (width >= 1024) {
+        setChartHeight(240);
+      } else {
+        setChartHeight(280);
+      }
+    };
+
+    updateChartHeight();
+    window.addEventListener('resize', updateChartHeight);
+    return () => window.removeEventListener('resize', updateChartHeight);
   }, []);
 
   const loadDashboardData = async () => {
@@ -357,14 +377,16 @@ export default function Dashboard({ user }) {
                 </select>
               </div>
               <div className="recharts-container-premium">
-                <ResponsiveContainer width="100%" height={310}>
-                  <ReBarChart data={kkStats} margin={{ top: 25, right: 20, left: 10, bottom: 20 }}>
+                <ResponsiveContainer width="100%" height={chartHeight}>
+                  <ReBarChart data={kkStats} margin={{ top: 16, right: 16, left: 6, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.05)" vertical={false} />
                     <XAxis
                       dataKey="desa"
                       axisLine={false}
                       tickLine={false}
                       tick={{ fill: '#64748b', fontSize: 9, fontWeight: 700 }}
+                      height={44}
+                      tickMargin={8}
                       interval={0}
                       tickFormatter={formatDesaLabel}
                     />
@@ -427,14 +449,16 @@ export default function Dashboard({ user }) {
                 </select>
               </div>
               <div className="recharts-container-premium">
-                <ResponsiveContainer width="100%" height={310}>
-                  <ReBarChart data={pendudukStats} margin={{ top: 25, right: 20, left: 10, bottom: 20 }}>
+                <ResponsiveContainer width="100%" height={chartHeight}>
+                  <ReBarChart data={pendudukStats} margin={{ top: 16, right: 16, left: 6, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.05)" vertical={false} />
                     <XAxis
                       dataKey="desa"
                       axisLine={false}
                       tickLine={false}
                       tick={{ fill: '#64748b', fontSize: 9, fontWeight: 700 }}
+                      height={44}
+                      tickMargin={8}
                       interval={0}
                       tickFormatter={formatDesaLabel}
                     />
