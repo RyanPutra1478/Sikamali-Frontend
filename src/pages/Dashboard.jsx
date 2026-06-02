@@ -1,56 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { previewAPI, announcementAPI } from '../services/api';
+import { statisticsAPI } from '../services/api';
 import {
   BarChart as ReBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, Legend, ResponsiveContainer, Cell, LabelList
 } from 'recharts';
 import {
-  LayoutDashboard, Megaphone, Users, Home, Briefcase,
+  LayoutDashboard, Users, Home, Briefcase,
   AlertCircle, User, TrendingUp, CheckCircle, XCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 import './Dashboard.css';
-
-// --- STYLING CONSTANTS ---
-const VILLAGES = [
-  'LAPAO-PAO',
-  'MUARA LAPAO-PAO',
-  'SAMAENRE',
-  'TOLOWE PONRE WARU',
-  'ULU WOLO',
-  'WOLO'
-];
-
-const normalizeDesa = (desaStr) => {
-  if (!desaStr) return '';
-  const clean = desaStr.trim().toUpperCase().replace(/\s+/g, ' ');
-  if (clean.includes('LAPAO-PAO') && !clean.includes('MUARA')) return 'LAPAO-PAO';
-  if (clean.includes('MUARA LAPAO-PAO') || (clean.includes('MUARA') && clean.includes('LAPAO'))) return 'MUARA LAPAO-PAO';
-  if (clean.includes('SAMAENRE')) return 'SAMAENRE';
-  if (clean.includes('TOLOWE') || clean.includes('PONRE') || clean.includes('WARU')) return 'TOLOWE PONRE WARU';
-  if (clean.includes('ULU WOLO') || (clean.includes('ULU') && clean.includes('WOLO'))) return 'ULU WOLO';
-  if (clean.includes('WOLO') && !clean.includes('ULU')) return 'WOLO';
-  return clean;
-};
-
-const isPra = (item) => {
-  const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
-  return status.includes('prasejahtera') || item.is_prasejahtera === 1 || item.is_prasejahtera === true || item.is_prasejahtera === '1' || item.is_prasejahtera === 'true';
-};
-
-const isMandiri = (item) => {
-  const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
-  return status === 'sejahteramandiri';
-};
-
-const getMemberDesa = (member, kkMap) => {
-  const directDesa = member.desa || member.desa_kelurahan;
-  if (directDesa) return directDesa;
-
-  const kkNo = member.kk_nomor || member.no_kartu_keluarga || member.nomor_kk;
-  if (kkNo && kkMap[kkNo]) {
-    return kkMap[kkNo].desa || kkMap[kkNo].desa_kelurahan;
-  }
-  return '';
-};
 
 // --- CHART FILTER HELPERS ---
 const getKkFilterName = (filter) => {
@@ -106,11 +63,20 @@ const formatDesaLabel = (desaName) => {
 };
 
 export default function Dashboard({ user }) {
-  const [announcements, setAnnouncements] = useState([]);
-  const [kkData, setKkData] = useState([]);
-  const [memberData, setMemberData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAnnouncements, setShowAnnouncements] = useState(true);
+  const [kkStats, setKkStats] = useState([]);
+  const [pendudukStats, setPendudukStats] = useState([]);
+  
+  // Totals for table footer
+  const [kkTotal, setKkTotal] = useState({
+    desa: 'TOTAL', jumlahKK: 0, praSejahtera: 0, sejahtera: 0, sejahteraMandiri: 0
+  });
+  const [pendudukTotal, setPendudukTotal] = useState({
+    desa: 'TOTAL', jumlahPenduduk: 0, angkatanKerja: 0, sudahBekerja: 0, belumBekerja: 0
+  });
+
+  // Dashboard Summary stats (if needed)
+  const [dashboardSummary, setDashboardSummary] = useState(null);
 
   // Dynamic Chart Filters
   const [kkFilter, setKkFilter] = useState('jumlahKK');
@@ -143,105 +109,55 @@ export default function Dashboard({ user }) {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [annRes, kkRes, memberRes] = await Promise.all([
-        announcementAPI.get().catch(() => []),
-        previewAPI.getKK().catch(() => []),
-        previewAPI.getMember().catch(() => [])
+      const [detailedStatsRes, dashboardStatsRes] = await Promise.all([
+        statisticsAPI.getDetailed().catch(() => []),
+        statisticsAPI.getDashboard().catch(() => ({}))
       ]);
 
-      const activeNews = annRes.filter(item => item.is_active);
-      setAnnouncements(activeNews);
-      setKkData(Array.isArray(kkRes) ? kkRes : kkRes?.data || []);
-      setMemberData(Array.isArray(memberRes) ? memberRes : memberRes?.data || []);
+      const detailedStats = Array.isArray(detailedStatsRes) ? detailedStatsRes : detailedStatsRes?.data || [];
+      
+      const mappedKkStats = detailedStats.map(item => ({
+        desa: item.desa || '',
+        jumlahKK: Number(item.totalKK) || 0,
+        praSejahtera: Number(item.keluargaPrasejahtera) || 0,
+        sejahtera: Number(item.keluargaSejahtera) || 0,
+        sejahteraMandiri: Number(item.keluargaSejahteraMandiri) || 0
+      }));
+
+      const mappedPendudukStats = detailedStats.map(item => ({
+        desa: item.desa || '',
+        jumlahPenduduk: Number(item.totalPenduduk) || 0,
+        angkatanKerja: Number(item.angkatanKerja) || 0,
+        sudahBekerja: Number(item.sudahBekerja) || 0,
+        belumBekerja: Number(item.belumBekerja) || 0
+      }));
+
+      setKkStats(mappedKkStats);
+      setPendudukStats(mappedPendudukStats);
+
+      setKkTotal({
+        desa: 'TOTAL',
+        jumlahKK: mappedKkStats.reduce((acc, curr) => acc + curr.jumlahKK, 0),
+        praSejahtera: mappedKkStats.reduce((acc, curr) => acc + curr.praSejahtera, 0),
+        sejahtera: mappedKkStats.reduce((acc, curr) => acc + curr.sejahtera, 0),
+        sejahteraMandiri: mappedKkStats.reduce((acc, curr) => acc + curr.sejahteraMandiri, 0)
+      });
+
+      setPendudukTotal({
+        desa: 'TOTAL',
+        jumlahPenduduk: mappedPendudukStats.reduce((acc, curr) => acc + curr.jumlahPenduduk, 0),
+        angkatanKerja: mappedPendudukStats.reduce((acc, curr) => acc + curr.angkatanKerja, 0),
+        sudahBekerja: mappedPendudukStats.reduce((acc, curr) => acc + curr.sudahBekerja, 0),
+        belumBekerja: mappedPendudukStats.reduce((acc, curr) => acc + curr.belumBekerja, 0)
+      });
+
+      setDashboardSummary(dashboardStatsRes);
     } catch (err) {
       console.error("Gagal memuat data dashboard:", err);
     } finally {
       setLoading(false);
     }
   };
-
-  // --- O(1) LOOKUP MAP ---
-  const kkMap = {};
-  kkData.forEach(kk => {
-    if (kk.nomor_kk) {
-      kkMap[kk.nomor_kk] = kk;
-    }
-  });
-
-  // --- STATS CALCULATIONS ---
-  const kkStats = VILLAGES.map(village => {
-    const villageKks = kkData.filter(kk => normalizeDesa(kk.desa || kk.desa_kelurahan) === village);
-
-    const total = villageKks.length;
-    const pra = villageKks.filter(isPra).length;
-    const mandiri = villageKks.filter(isMandiri).length;
-    const sejahtera = villageKks.filter(k => !isPra(k) && !isMandiri(k)).length;
-
-    return {
-      desa: village,
-      jumlahKK: total,
-      praSejahtera: pra,
-      sejahtera: sejahtera,
-      sejahteraMandiri: mandiri
-    };
-  });
-
-  const kkTotal = {
-    desa: 'TOTAL',
-    jumlahKK: kkStats.reduce((acc, curr) => acc + curr.jumlahKK, 0),
-    praSejahtera: kkStats.reduce((acc, curr) => acc + curr.praSejahtera, 0),
-    sejahtera: kkStats.reduce((acc, curr) => acc + curr.sejahtera, 0),
-    sejahteraMandiri: kkStats.reduce((acc, curr) => acc + curr.sejahteraMandiri, 0)
-  };
-
-  const pendudukStats = VILLAGES.map(village => {
-    const villageMembers = memberData.filter(m => {
-      const mDesa = getMemberDesa(m, kkMap);
-      return normalizeDesa(mDesa) === village;
-    });
-
-    const total = villageMembers.length;
-    const angkatan = villageMembers.filter(d => {
-      if (!d.status_kerja) return false;
-      const sk = String(d.status_kerja).toLowerCase().trim();
-      return sk === 'belum bekerja' || sk === 'sudah bekerja';
-    }).length;
-
-    const sudah = villageMembers.filter(d => {
-      if (!d.status_kerja) return false;
-      const sk = String(d.status_kerja).toLowerCase().trim();
-      return sk === 'sudah bekerja';
-    }).length;
-
-    const belum = villageMembers.filter(d => {
-      if (!d.status_kerja) return false;
-      const sk = String(d.status_kerja).toLowerCase().trim();
-      return sk === 'belum bekerja';
-    }).length;
-
-    return {
-      desa: village,
-      jumlahPenduduk: total,
-      angkatanKerja: angkatan,
-      sudahBekerja: sudah,
-      belumBekerja: belum
-    };
-  });
-
-  const pendudukTotal = {
-    desa: 'TOTAL',
-    jumlahPenduduk: pendudukStats.reduce((acc, curr) => acc + curr.jumlahPenduduk, 0),
-    angkatanKerja: pendudukStats.reduce((acc, curr) => acc + curr.angkatanKerja, 0),
-    sudahBekerja: pendudukStats.reduce((acc, curr) => acc + curr.sudahBekerja, 0),
-    belumBekerja: pendudukStats.reduce((acc, curr) => acc + curr.belumBekerja, 0)
-  };
-
-  // Global counts for stat cards
-  const globalTotalKK = kkTotal.jumlahKK;
-  const globalTotalPenduduk = pendudukTotal.jumlahPenduduk;
-  const globalAngkatanKerja = pendudukTotal.angkatanKerja;
-  const globalSudahBekerja = pendudukTotal.sudahBekerja;
-  const globalBelumBekerja = pendudukTotal.belumBekerja;
 
   if (loading) {
     return (

@@ -122,14 +122,18 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
       'No': index + 1,
       'No KK': item.nomor_kk || '-',
       'Kepala Keluarga': item.kepala_keluarga || '-',
-      'Nama Anggota': item.nama_warga || '-',
-      'NIK': item.nik_warga || '-',
+      'Alamat': item.alamat || item.user_alamat || item.alamat_kk || '-',
+      'Desa': item.desa || '-',
+      'Kecamatan': item.kecamatan || '-',
+      'Nama Anggota': item.nama_penerima || item.nama_warga || '-',
+      'NIK': item.nik_penerima || item.user_nik || item.nik_warga || '-',
+      'Jenis Kelamin': item.jenis_kelamin || '-',
+      'Umur': item.umur || '-',
+      'Kriteria': item.kriteria || '-',
       'Kesejahteraan': item.status_kesejahteraan || '-',
       'Pendapatan/Bulan': item.income_per_month || '-',
       'Kondisi Rumah': item.house_condition || '-',
       'Akses Air/Listrik': item.access_listrik_air === 'true' ? 'Ada' : 'Tidak Ada',
-      'Desa': item.desa || '-',
-      'Kecamatan': item.kecamatan || '-',
       'Catatan': item.assessment_notes || '-'
     }));
 
@@ -696,16 +700,21 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
           <table className="modern-table">
             <thead>
               <tr>
-                <th width="4%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
-                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
-                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
-                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NAMA TERDAFTAR</th>
-                <th width="14%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
-                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>PENDAPATAN PERBULAN</th>
-                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>FASILITAS HUNIAN</th>
-                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>KATEGORI SOSIAL</th>
-                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>TINGKAT SOSIAL</th>
-                <th width="10%" style={{ fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
+                <th style={{ minWidth: '40px', fontSize: '0.8rem', fontWeight: '800' }}>NO</th>
+                <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
+                <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
+                <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>ALAMAT</th>
+                <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>DESA</th>
+                <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA TERDAFTAR</th>
+                <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
+                <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>JENIS KELAMIN</th>
+                <th style={{ minWidth: '80px', fontSize: '0.8rem', fontWeight: '800' }}>UMUR</th>
+                <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>KRITERIA</th>
+                <th style={{ minWidth: '150px', fontSize: '0.8rem', fontWeight: '800' }}>PENDAPATAN PERBULAN</th>
+                <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>FASILITAS HUNIAN</th>
+                <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>KATEGORI SOSIAL</th>
+                <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>TINGKAT SOSIAL</th>
+                <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>AKSI</th>
               </tr>
             </thead>
             <tbody>
@@ -729,36 +738,16 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                       >
                       <td style={{ fontSize: '0.75rem' }}>{(page - 1) * itemsPerPage + index + 1}</td>
                     <td style={{ fontSize: '0.75rem' }}>{row.nomor_kk}</td>
-                    <td>
-                      <div>
-                        <span style={{ fontSize: '0.75rem' }}>
-                          {row.kepala_keluarga || '-'}
-                        </span>
-                        <div
-                          style={{
-                            fontSize: '0.75rem',
-                            color: '#6b7280',
-                            marginTop: '2px',
-                          }}
-                        >
-                          {row.user_alamat || row.alamat_kk}
-                        </div>
-                      </div>
+                    <td style={{ fontSize: '0.75rem' }}>{row.kepala_keluarga || '-'}</td>
+                    <td style={{ fontSize: '0.75rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.alamat || row.user_alamat || row.alamat_kk}>
+                      {row.alamat || row.user_alamat || row.alamat_kk || '-'}
                     </td>
-                    <td>
-                      {row.nama_penerima ? (
-                        <div>
-                          <span style={{ fontSize: '0.75rem' }}>
-                            {row.nama_penerima}
-                          </span>
-                        </div>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                    <td className="nowrap-cell" style={{ fontSize: '0.75rem' }}>
-                      {row.nik_penerima || row.user_nik || '-'}
-                    </td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.desa || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.nama_penerima || row.nama_warga || '-'}</td>
+                    <td className="nowrap-cell" style={{ fontSize: '0.75rem' }}>{row.nik_penerima || row.user_nik || row.nik_warga || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.jenis_kelamin || '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.umur !== undefined && row.umur !== null ? `${row.umur} TAHUN` : '-'}</td>
+                    <td style={{ fontSize: '0.75rem' }}>{row.kriteria || '-'}</td>
                     <td
                       style={{
                         color: '#4b5563',

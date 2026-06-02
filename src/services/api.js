@@ -705,6 +705,15 @@ const previewAPI = {
 };
 
 // ====================================================================
+// 8. STATISTICS API (NEW)
+// ====================================================================
+
+const statisticsAPI = {
+  getDetailed: async () => fetchWithAuth("/statistics/detailed"),
+  getDashboard: async () => fetchWithAuth("/statistics/dashboard"),
+};
+
+// ====================================================================
 // EXPORT ALL APIS
 // ====================================================================
 
@@ -726,6 +735,7 @@ export {
   userServiceAPI,
   kkAPI,
   previewAPI,
+  statisticsAPI,
 
   // Constants
   API_BASE_URL as API_URL,
@@ -745,6 +755,7 @@ const api = {
   userServiceAPI,
   kkAPI,
   previewAPI,
+  statisticsAPI,
   API_URL: API_BASE_URL,
 };
 

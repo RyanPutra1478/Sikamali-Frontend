@@ -234,6 +234,8 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
       'Kepala Keluarga': item.kepala_keluarga || '-',
       'Nama': item.nama,
       'NIK': item.nik,
+      'Jenis Kelamin': item.jenis_kelamin || '-',
+      'Umur': item.umur || (item.tanggal_lahir ? calculateAge(item.tanggal_lahir) : '-'),
       'Status Kerja': getComputedStatus(item),
       'Tempat Bekerja': item.tempat_bekerja || '-',
       'Skill': item.skill_tags || item.skill || '-',
@@ -608,8 +610,11 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                       <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NO KARTU KELUARGA</th>
                       <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>KEPALA KELUARGA</th>
                       <th style={{ minWidth: '180px', fontSize: '0.8rem', fontWeight: '800' }}>ALAMAT</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>DESA</th>
                       <th style={{ minWidth: '160px', fontSize: '0.8rem', fontWeight: '800' }}>NAMA ANGGOTA</th>
                       <th style={{ minWidth: '140px', fontSize: '0.8rem', fontWeight: '800' }}>NIK</th>
+                      <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>JENIS KELAMIN</th>
+                      <th style={{ minWidth: '100px', fontSize: '0.8rem', fontWeight: '800' }}>UMUR</th>
                       <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>PENDIDIKAN</th>
                       <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>SKILL</th>
                       <th style={{ minWidth: '130px', fontSize: '0.8rem', fontWeight: '800' }}>STATUS KERJA</th>
@@ -643,8 +648,11 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                               <td style={{ fontSize: '0.75rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.alamat || item.alamat_kk}>
                                 {item.alamat || item.alamat_kk || '-'}
                               </td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.desa || '-'}</td>
                               <td>{item.nama}</td>
                               <td style={{ fontSize: '0.75rem' }}>{item.nik}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.jenis_kelamin || '-'}</td>
+                              <td style={{ fontSize: '0.75rem' }}>{item.umur !== undefined && item.umur !== null ? `${item.umur} TAHUN` : (item.tanggal_lahir ? `${calculateAge(item.tanggal_lahir)} TAHUN` : '-')}</td>
                               <td style={{ fontSize: '0.75rem' }}>{item.pendidikan_terakhir || item.pendidikan || '-'}</td>
                               <td style={{ fontSize: '0.75rem' }}>{item.skill_tags || item.skill || '-'}</td>
                               <td>
@@ -731,7 +739,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
               <div className="detail-item"><label>NIK</label><div className="detail-value highlight">{selectedItem.nik}</div></div>
               <div className="detail-item"><label>Nama</label><div className="detail-value highlight">{selectedItem.nama}</div></div>
               <div className="detail-item"><label>Jenis Kelamin</label><div className="detail-value">{selectedItem.jenis_kelamin}</div></div>
-              <div className="detail-item"><label>Umur</label><div className="detail-value">{selectedItem.tanggal_lahir ? calculateAge(selectedItem.tanggal_lahir) + ' Tahun' : '-'}</div></div>
+              <div className="detail-item"><label>Umur</label><div className="detail-value">{selectedItem.umur !== undefined && selectedItem.umur !== null ? selectedItem.umur + ' TAHUN' : (selectedItem.tanggal_lahir ? calculateAge(selectedItem.tanggal_lahir) + ' TAHUN' : '-')}</div></div>
               <div className="detail-item"><label>No Kartu Keluarga</label><div className="detail-value">{selectedItem.nomor_kk}</div></div>
               <div className="detail-item"><label>Kepala Keluarga</label><div className="detail-value">{selectedItem.kepala_keluarga}</div></div>
               <div className="detail-item" style={{ gridColumn: 'span 2' }}><label>Alamat</label><div className="detail-value">{selectedItem.alamat || selectedItem.alamat_kk || '-'}</div></div>

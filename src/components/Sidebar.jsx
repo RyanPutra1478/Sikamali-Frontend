@@ -72,13 +72,7 @@ const BASE_MENU = [
     type: 'single',
     permission: { section: 'lokasiZona', module: 'land', action: 'view' }
   },
-  {
-    to: '/admin/announcements',
-    icon: <Megaphone size={20} />,
-    label: 'Pengumuman',
-    type: 'single',
-    permission: { section: 'management', module: 'announcements', action: 'view' }
-  },
+
   {
     to: '/admin/users',
     icon: <Users size={20} />,

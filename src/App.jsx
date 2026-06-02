@@ -20,7 +20,7 @@ import AdminMembers from './pages/AdminMembers';
 import AdminEmployment from './pages/AdminEmployment';
 import AdminPrasejahtera from './pages/AdminPrasejahtera';
 import AdminUsers from './pages/AdminUsers';
-import AdminAnnouncements from './pages/AdminAnnouncements';
+
 import AdminHistory from './pages/AdminHistory';
 import DataPreviewKeluarga from './pages/DataPreviewKeluarga';
 import DataPreviewPenduduk from './pages/DataPreviewPenduduk';
@@ -330,15 +330,7 @@ function App() {
                   }
                 />
 
-                {/* Admin Pengumuman */}
-                <Route
-                  path="/admin/announcements"
-                  element={
-                    <RoleGuard allowedRoles={['superadmin', 'admin']} role={role}>
-                      <AdminAnnouncements readOnly={false} />
-                    </RoleGuard>
-                  }
-                />
+
 
                 {/* Admin History Log (Superadmin Only) */}
                 <Route
