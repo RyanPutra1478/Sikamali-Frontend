@@ -393,17 +393,11 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
 
   // --- FILTER ---
   // --- FILTER ---
+  // --- FILTER ---
   const uniqueDesa = [...new Set(dataList.map(item => item.desa).filter(Boolean))].sort();
   const uniqueKecamatan = [...new Set(dataList.map(item => item.kecamatan).filter(Boolean))].sort();
   const uniquePendidikan = [...new Set(dataList.map(item => item.pendidikan_terakhir).filter(Boolean))].sort();
-
-  const ageRanges = {
-    'Balita (0-5)': { min: 0, max: 5 },
-    'Kanak-kanak (6-11)': { min: 6, max: 11 },
-    'Remaja (12-25)': { min: 12, max: 25 },
-    'Dewasa (26-45)': { min: 26, max: 45 },
-    'Lansia (46+)': { min: 46, max: 150 }
-  };
+  const uniqueStatusKerja = [...new Set(dataList.map(item => getComputedStatus(item)).filter(Boolean))].sort();
 
   const filteredList = dataList.filter((item) => {
     const searchLower = searchTerm.toLowerCase();
@@ -423,12 +417,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
     if (filterCategory === 'Desa') return item.desa === filterValue;
     if (filterCategory === 'Kecamatan') return item.kecamatan === filterValue;
     if (filterCategory === 'Pendidikan Terakhir') return item.pendidikan_terakhir === filterValue;
-    if (filterCategory === 'Rentang Umur') {
-      const range = ageRanges[filterValue];
-      if (!range) return true;
-      const age = item.tanggal_lahir ? calculateAge(item.tanggal_lahir) : 0;
-      return age >= range.min && age <= range.max;
-    }
+    if (filterCategory === 'Status Kerja') return computedStatus === filterValue;
 
     return true;
   });
@@ -559,7 +548,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                     sx={{ borderRadius: 3, bgcolor: 'white' }}
                   >
                     <MenuItem value=""><em>None</em></MenuItem>
-                    <MenuItem value="Rentang Umur">Rentang Umur</MenuItem>
+                    <MenuItem value="Status Kerja">Status Kerja</MenuItem>
                     <MenuItem value="Pendidikan Terakhir">Pendidikan Terakhir</MenuItem>
                     <MenuItem value="Desa">Desa</MenuItem>
                     <MenuItem value="Kecamatan">Kecamatan</MenuItem>
@@ -577,7 +566,7 @@ export default function AdminEmployment({ user, readOnly, canCreate }) {
                       sx={{ borderRadius: 3, bgcolor: 'white' }}
                     >
                       <MenuItem value=""><em>All</em></MenuItem>
-                      {filterCategory === 'Rentang Umur' && Object.keys(ageRanges).map(opt => (
+                      {filterCategory === 'Status Kerja' && uniqueStatusKerja.map(opt => (
                         <MenuItem key={opt} value={opt}>{opt}</MenuItem>
                       ))}
                       {filterCategory === 'Pendidikan Terakhir' && uniquePendidikan.map(opt => (

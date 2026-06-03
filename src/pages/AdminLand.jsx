@@ -215,7 +215,7 @@ const AdminLand = () => {
                   setSearchTerm(e.target.value);
                   setSelectedItem(null);
                 }}
-                placeholder="Cari No KK, Nama, Alamat, atau Desa..."
+                placeholder="Cari No KK atau Nama..."
                 style={{ paddingLeft: "40px", width: "100%" }}
               />
             </div>

@@ -252,6 +252,8 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
   // Filter Logic
   const uniqueDesa = [...new Set(data.map(item => item.desa).filter(Boolean))].sort();
   const uniqueKecamatan = [...new Set(data.map(item => item.kecamatan).filter(Boolean))].sort();
+  const uniqueKriteria = [...new Set(data.map(item => item.kriteria).filter(Boolean))].sort();
+  const uniqueTingkatSosial = [...new Set(data.map(item => item.tingkat_sosial).filter(Boolean))].sort();
 
   const isWargaPrasejahtera = (item) => {
     const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
@@ -269,9 +271,11 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
 
     if (!filterCategory || !filterValue) return true;
 
+    if (filterCategory === 'Kriteria') return item.kriteria === filterValue;
+    if (filterCategory === 'Tingkat Sosial') return item.tingkat_sosial === filterValue;
     if (filterCategory === 'Desa') return item.desa === filterValue;
     if (filterCategory === 'Kecamatan') return item.kecamatan === filterValue;
-    if (filterCategory === 'Status') {
+    if (filterCategory === 'Kategori Sosial') {
       const isPra = isWargaPrasejahtera(item);
       const status = (item.status_kesejahteraan || item.kategori_sosial || '').toLowerCase().replace(/\s+/g, '');
       
@@ -662,7 +666,9 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                   sx={{ borderRadius: 3, bgcolor: 'white' }}
                 >
                   <MenuItem value=""><em>None</em></MenuItem>
-                  <MenuItem value="Status">Tingkat Kesejahteraan</MenuItem>
+                  <MenuItem value="Kriteria">Kriteria</MenuItem>
+                  <MenuItem value="Kategori Sosial">Kategori Sosial</MenuItem>
+                  <MenuItem value="Tingkat Sosial">Tingkat Sosial</MenuItem>
                   <MenuItem value="Desa">Desa</MenuItem>
                   <MenuItem value="Kecamatan">Kecamatan</MenuItem>
                 </Select>
@@ -679,8 +685,14 @@ export default function AdminPrasejahtera({ readOnly = false, canCreate = false,
                     sx={{ borderRadius: 3, bgcolor: 'white' }}
                   >
                     <MenuItem value=""><em>All</em></MenuItem>
-                    {filterCategory === 'Status' && ['Prasejahtera', 'Sejahtera', 'Sejahtera Mandiri'].map(opt => (
+                    {filterCategory === 'Kategori Sosial' && ['Prasejahtera', 'Sejahtera', 'Sejahtera Mandiri'].map(opt => (
                       <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                    ))}
+                    {filterCategory === 'Kriteria' && uniqueKriteria.map(opt => (
+                      <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                    ))}
+                    {filterCategory === 'Tingkat Sosial' && ['Rentan Ekstrem', 'Rentan Prioritas', 'Rentan Transisi'].map(opt => (
+                      <MenuItem key={opt} value={opt}>{opt.toUpperCase()}</MenuItem>
                     ))}
                     {filterCategory === 'Desa' && uniqueDesa.map(opt => (
                       <MenuItem key={opt} value={opt}>{opt}</MenuItem>
