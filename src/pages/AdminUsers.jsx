@@ -263,7 +263,8 @@ export default function AdminUsers({ currentUser }) {
         <TableContainer component={Paper} sx={{ 
           borderRadius: 3, 
           boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', 
-          overflow: 'hidden', 
+          overflow: 'auto', 
+          maxHeight: 'calc(100vh - 220px)',
           border: '1px solid #e2e8f0',
         }}>
           {loading ? (
@@ -272,8 +273,8 @@ export default function AdminUsers({ currentUser }) {
               <Typography sx={{ mt: 2, color: '#64748b' }}>Memuat data user...</Typography>
             </Box>
           ) : (
-            <Table className="modern-table">
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
+            <Table className="modern-table" stickyHeader>
+              <TableHead sx={{ '& th': { bgcolor: '#f8fafc', zIndex: 10 } }}>
                 <TableRow>
                   <TableCell align="center" sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center !important', width: '60px' }}>No</TableCell>
                   <TableCell sx={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>User & Info</TableCell>
