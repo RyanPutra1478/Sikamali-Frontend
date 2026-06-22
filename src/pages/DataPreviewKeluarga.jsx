@@ -201,6 +201,26 @@ const DataPreviewKeluarga = ({ user }) => {
         return;
       }
       
+      // Merge employment data to get tempat_bekerja and updated status_kerja
+      try {
+        const employments = await adminAPI.getEmployment();
+        if (detail && detail.members && Array.isArray(detail.members)) {
+           detail.members = detail.members.map(m => {
+              const emp = employments.find(e => e.nik === m.nik);
+              if (emp) {
+                 return { 
+                   ...m, 
+                   tempat_bekerja: emp.tempat_bekerja || m.tempat_bekerja, 
+                   status_kerja: emp.pekerjaan || emp.status_kerja || m.pekerjaan || m.status_kerja 
+                 };
+              }
+              return m;
+           });
+        }
+      } catch(err) {
+        console.error("Failed to merge employment data", err);
+      }
+
       setSelectedKK(detail);
       setActiveTab("detail");
     } catch (err) {
@@ -750,7 +770,9 @@ const DataPreviewKeluarga = ({ user }) => {
                       <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Nama Lengkap</th>
                       <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Jenis Kelamin</th>
                       <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Hubungan</th>
-                      <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Status</th>
+                      <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Status Kerja</th>
+                      <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Tempat Bekerja</th>
+                      <th style={{ fontSize: "0.8rem", fontWeight: "800" }}>Status Domisili</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -776,6 +798,12 @@ const DataPreviewKeluarga = ({ user }) => {
                             <span className="kk-badge" style={{ fontSize: "0.75rem" }}>
                               {member.hubungan_keluarga}
                             </span>
+                          </td>
+                          <td style={{ fontSize: "0.75rem" }}>
+                            {member.pekerjaan || member.status_kerja || "-"}
+                          </td>
+                          <td style={{ fontSize: "0.75rem" }}>
+                            {member.tempat_bekerja || "-"}
                           </td>
                           <td>
                             <span style={{ 
